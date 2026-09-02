@@ -13,8 +13,8 @@ A collection of Python notebooks covering the language from first principles thr
 | 5 | Conditional Statements and Loops | [`5. Conditional Statements and Loops.ipynb`](./5.%20Conditional%20Statements%20and%20Loops.ipynb) | [Read article 5](https://shikharkumar13.github.io/Python-Programming-Code/5_conditionals_loops.html) |
 | 6 | Functions in Python | [`6. Functions in Python.ipynb`](./6.%20Functions%20in%20Python.ipynb) | [Read Article 6](https://shikharkumar13.github.io/Python-Programming-Code/6_Python_functions.html) |
 | 7 | Types of Functions in Python | [`7. Types of Functions in Python.ipynb`](./7.%20Types%20of%20Functions%20in%20Python.ipynb) | [Read Article 7](https://shikharkumar13.github.io/Python-Programming-Code/7_types_of_functions.html) |
-| 8 | Object Oriented Programming (OOPs) | [`8. Object Oriented Programming(OOPs).ipynb`](./8.%20Object%20Oriented%20Programming%28OOPs%29.ipynb) | [Read →]() |
-| 9 | Exception Handling | [`9. Exception_Handling.ipynb`](./9.%20Exception_Handling.ipynb) | [Read →]() |
+| 8 | Object Oriented Programming (OOPs) | [`8. Object Oriented Programming(OOPs).ipynb`](./8.%20Object%20Oriented%20Programming%28OOPs%29.ipynb) | [Read Article 8](https://shikharkumar13.github.io/Python-Programming-Code/8_OOPs_in_Python.html) |
+| 9 | Exception Handling | [`9. Exception_Handling.ipynb`](./9.%20Exception_Handling.ipynb) | [Read Article 9](https://shikharkumar13.github.io/Python-Programming-Code/9_Exception_Handling.html) |
 | 10 | File Handling | [`10. File_Handling.ipynb`](./10.%20File_Handling.ipynb) | [Read →]() |
  
 > Article links will be added as they're published, one per topic above.
