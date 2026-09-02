@@ -1,0 +1,757 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Introduction to Python: A Complete Beginner's Guide</title>
+<meta name="description" content="A beginner's guide to Python: literals, variables, syntax rules, and what actually happens in memory and the CPU when your code runs.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>:root{
+  --bg:#FDFDFC;
+  --paper:#FFFFFF;
+  --ink:#1A1A1A;
+  --ink-soft:#4A4A48;
+  --ink-faint:#8A877E;
+  --accent:#2F5FA8;
+  --accent-soft:#EEF3FA;
+  --line:#E5E3DE;
+  --code-bg:#22252A;
+  --code-text:#E8E6E1;
+  --code-line:#33373E;
+  --font-serif:'Lora', Georgia, 'Times New Roman', serif;
+  --font-mono:'IBM Plex Mono','SFMono-Regular',Consolas,monospace;
+}
+*,*::before,*::after{box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--font-serif);
+  font-size:19px;
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--accent-soft);color:var(--accent);}
+a{color:var(--accent);text-decoration-color:rgba(47,95,168,.35);text-underline-offset:2px;}
+a:hover{text-decoration-color:currentColor;}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+.wrap{max-width:680px;margin:0 auto;padding:0 24px;}
+
+/* Masthead */
+.masthead{padding:64px 0 8px;}
+.kicker{
+  font-family:var(--font-mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:18px;
+}
+h1.title{
+  font-family:var(--font-serif);font-weight:600;font-size:clamp(1.9rem,5vw,2.6rem);
+  line-height:1.22;letter-spacing:-.01em;margin:0 0 20px;
+}
+.byline{
+  display:flex;align-items:center;gap:10px;color:var(--ink-faint);
+  font-size:.92rem;font-family:var(--font-mono);margin-bottom:8px;
+}
+.byline .dot{width:4px;height:4px;border-radius:50%;background:var(--ink-faint);}
+.dek{font-size:1.15rem;color:var(--ink-soft);margin:18px 0 0;line-height:1.6;}
+
+hr.rule{border:none;border-top:1px solid var(--line);margin:44px 0;}
+
+/* Article body */
+article{padding-bottom:80px;}
+article h2{
+  font-family:var(--font-serif);font-weight:600;font-size:1.5rem;
+  letter-spacing:-.005em;margin:52px 0 18px;line-height:1.3;
+}
+article h1.part-title{
+  font-family:var(--font-mono);font-weight:500;font-size:.95rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--accent);text-align:center;margin:64px 0 40px;padding-top:20px;border-top:1px solid var(--line);
+}
+article h3{font-family:var(--font-serif);font-weight:600;font-size:1.18rem;margin:32px 0 12px;}
+article p{margin:0 0 22px;}
+article ul,article ol{margin:0 0 22px;padding-left:1.4em;}
+article li{margin-bottom:9px;}
+article li::marker{color:var(--accent);}
+article strong{font-weight:700;}
+article code{
+  font-family:var(--font-mono);font-size:.82em;background:var(--accent-soft);
+  padding:.1em .36em;border-radius:4px;color:#1D4785;
+}
+article blockquote{
+  margin:26px 0;padding:4px 0 4px 20px;border-left:2.5px solid var(--accent);
+  color:var(--ink-soft);font-size:.98rem;
+}
+article blockquote p{margin:0;}
+
+/* Tables */
+.table-wrap{overflow-x:auto;margin:26px 0 30px;}
+article table{width:100%;border-collapse:collapse;font-size:.88rem;font-family:var(--font-mono);}
+article thead th{
+  text-align:left;padding:9px 14px;border-bottom:2px solid var(--ink);
+  font-weight:600;font-size:.78rem;letter-spacing:.02em;
+}
+article tbody td{padding:9px 14px;border-bottom:1px solid var(--line);vertical-align:top;}
+article tbody tr:first-child td{padding-top:12px;}
+
+/* Code blocks */
+.code-card{margin:26px 0 30px;border-radius:8px;overflow:hidden;background:var(--code-bg);}
+.code-card .code-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 14px;border-bottom:1px solid var(--code-line);
+}
+.code-card .lang{font-family:var(--font-mono);font-size:.68rem;color:#7A8290;letter-spacing:.08em;text-transform:uppercase;}
+.code-card pre{margin:0;padding:16px 20px;overflow-x:auto;}
+.code-card code{
+  font-family:var(--font-mono);font-size:.86rem;line-height:1.6;
+  color:var(--code-text);background:none;padding:0;
+}
+.code-card .k,.code-card .kn,.code-card .kd{color:#89B4E8;}
+.code-card .nb{color:#89B4E8;}
+.code-card .nf,.code-card .fm{color:#7ED0B4;}
+.code-card .s,.code-card .s1,.code-card .s2,.code-card .sa{color:#D7C283;}
+.code-card .mi,.code-card .mf{color:#E39A6C;}
+.code-card .o,.code-card .p{color:#8A93A3;}
+.code-card .c,.code-card .c1,.code-card .cm{color:#666D78;font-style:italic;}
+.code-card .n{color:var(--code-text);}
+.code-card .nc{color:#E3CC7A;}
+
+/* Diagrams */
+.diagram{margin:34px 0;padding:22px 20px;background:var(--paper);border:1px solid var(--line);border-radius:10px;}
+.diagram svg{width:100%;height:auto;display:block;}
+.diagram-cap{
+  font-family:var(--font-mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-faint);text-align:center;margin-top:12px;
+}
+
+/* Footnote markers */
+sup.fn{font-family:var(--font-mono);color:var(--accent);cursor:pointer;font-size:.72em;}
+.footnotes{margin-top:60px;padding-top:24px;border-top:1px solid var(--line);font-size:.9rem;color:var(--ink-soft);}
+.footnotes ol{padding-left:1.3em;}
+.footnotes li{margin-bottom:10px;}
+
+/* End note */
+.end-note{
+  margin-top:56px;padding:24px 26px;background:var(--accent-soft);border-radius:10px;
+  font-size:.98rem;color:var(--ink-soft);
+}
+.end-note strong{color:var(--ink);}
+
+footer{
+  text-align:center;padding:40px 24px 60px;font-family:var(--font-mono);
+  font-size:.76rem;color:var(--ink-faint);
+}
+
+@media(max-width:520px){
+  body{font-size:17.5px;}
+  .masthead{padding-top:44px;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <div class="kicker">Python Data Science Series &nbsp;·&nbsp; Article 10 &nbsp;·&nbsp; Verified &amp; Updated</div>
+    <h1 class="title">Introduction to Python: A Complete Beginner's Guide</h1>
+    <p class="dek">Welcome to your very first step into programming. This guide covers the fundamentals of Python: what it is, how you store and name data, the rules of the language, and then goes a level deeper into something most beginners never get told, which is what actually happens behind the scenes when you run code. By the end, you'll know how to write Python and understand what the computer is doing when it reads it.</p>
+  </div>
+
+  <hr class="rule">
+
+  <article>
+    <h2>What Is Python?</h2>
+<p>Python is an interpreted, high-level, general-purpose programming language. It's one of the most popular languages in the world today, and it has become the go-to language for data science. Here's what those three words actually mean.</p>
+<p><strong>High-level</strong> means it reads almost like English. You don't have to manage the tiny, fiddly details of how the computer's memory works; Python handles that for you.</p>
+<p><strong>Interpreted</strong> means Python runs your code line by line, rather than converting the whole program into machine code ahead of time. (We'll get into exactly what this means later, since it matters more than it sounds.)</p>
+<p><strong>General-purpose</strong> means it isn't locked to one job. You can build websites, analyze data, automate boring tasks, train AI models, or write games with it.</p>
+<h3>Why Is Python So Popular?</h3>
+<p>It's general-purpose, lightweight, and fast to write. Because it isn't specialized for a single task, you can use it for almost anything, and you'll write fewer lines than you would in most other languages.</p>
+<p>It became the language of data science, almost by accident. Python wasn't designed for data science, but its simplicity plus a huge ecosystem of free, community-built tools (like NumPy, Pandas, Matplotlib, and SciPy) made it the natural home for working with data.</p>
+<p>It has a flat learning curve. The syntax is clean and simple, which makes it approachable even for people who have never programmed before. Python is famous for being readable: you can often guess what a piece of code does just by looking at it.</p>
+<p>It has a large, active community. This matters more than beginners realize. When you hit a problem (and you will), chances are someone has already solved it and posted the answer online. You're never really stuck alone.</p>
+<hr />
+<h2>Literals and Variables</h2>
+<p>These are the two most fundamental building blocks in any program, so it's worth understanding them clearly.</p>
+<h3>Literals: The Raw Data</h3>
+<p>A literal is a fixed value written directly into your code, a piece of raw information. There are many kinds, but the four you'll use most are:</p>
+<ul>
+<li><strong>Integers (<code>int</code>)</strong>: whole numbers, like <code>10</code></li>
+<li><strong>Floats (<code>float</code>)</strong>: decimal numbers, like <code>20.5</code></li>
+<li><strong>Booleans (<code>bool</code>)</strong>: <code>True</code> or <code>False</code> values</li>
+<li><strong>Strings (<code>str</code>)</strong>: text data, like <code>'Python'</code></li>
+</ul>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="mi">10</span>          <span class="c1"># an integer literal</span>
+<span class="mf">20.5</span>        <span class="c1"># a float literal</span>
+<span class="s1">&#39;Python&#39;</span>    <span class="c1"># a string literal</span>
+<span class="kc">True</span>        <span class="c1"># a boolean literal</span>
+</code></pre></div>
+
+<p>A literal on its own is just a value sitting there. To actually use it, you usually store it somewhere, and that's where variables come in.</p>
+<h3>Variables: The Containers</h3>
+<p>A variable is a named container that holds a literal value. You give it a name, and you can use that name to retrieve or change the value later.</p>
+<p>Storing a value into a variable is called assignment, and you do it with the equals sign (<code>=</code>):</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="n">num</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Shikhar&#39;</span>
+</code></pre></div>
+
+<p>Read the <code>=</code> as "gets" or "is assigned": <em>"num gets the value 10."</em> It is not the "equals" of mathematics; it's an instruction to store something.</p>
+<h3>The Rules for Naming Variables</h3>
+<p>Python is strict about variable names. Follow these rules:</p>
+<ul>
+<li>A name can only contain <strong>letters, numbers, and underscores</strong> (<code>_</code>).</li>
+<li>A name must <strong>start with a letter or an underscore</strong>, never a digit.</li>
+<li>A name <strong>cannot be a keyword</strong> (reserved words that already mean something to Python, more on these shortly).</li>
+<li>A name <strong>cannot contain spaces</strong>. To join words, use an underscore or capital letters.</li>
+</ul>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="n">num</span> <span class="o">=</span> <span class="mi">10</span>          <span class="c1"># valid</span>
+<span class="n">num1</span> <span class="o">=</span> <span class="mi">10</span>         <span class="c1"># valid</span>
+<span class="n">num_2</span> <span class="o">=</span> <span class="mi">20</span>        <span class="c1"># valid</span>
+<span class="n">_num3</span> <span class="o">=</span> <span class="mi">30</span>        <span class="c1"># valid (starts with underscore)</span>
+
+<span class="mi">4</span><span class="n">num</span> <span class="o">=</span> <span class="mi">40</span>         <span class="c1"># INVALID: starts with a digit</span>
+<span class="k">for</span> <span class="o">=</span> <span class="mi">50</span>          <span class="c1"># INVALID: &#39;for&#39; is a keyword</span>
+</code></pre></div>
+
+<p>For multi-word names, two common styles are used:</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="n">first_name</span> <span class="o">=</span> <span class="s1">&#39;Shikhar&#39;</span>   <span class="c1"># snake_case (preferred in Python)</span>
+<span class="n">firstName</span>  <span class="o">=</span> <span class="s1">&#39;Virat&#39;</span>     <span class="c1"># camelCase</span>
+<span class="n">FirstName</span>  <span class="o">=</span> <span class="s1">&#39;Rohit&#39;</span>     <span class="c1"># PascalCase</span>
+</code></pre></div>
+
+<p>The most important naming advice: make your names descriptive. The computer doesn't care, but humans (including future-you) do.</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="n">a</span> <span class="o">=</span> <span class="mi">21</span>       <span class="c1"># what is &#39;a&#39;? No idea.</span>
+<span class="n">age</span> <span class="o">=</span> <span class="mi">21</span>     <span class="c1"># instantly clear</span>
+</code></pre></div>
+
+<hr />
+<h2>The Basic Rules of Writing Python</h2>
+<p>Python has a few non-negotiable rules that trip up beginners. Knowing them up front saves a lot of frustration.</p>
+<h3>1. Indentation Matters</h3>
+<p>In most languages, indentation (the spaces at the start of a line) is just for looks. In Python, it's part of the language's grammar. Lines that belong together must be indented consistently. Starting a line with random spacing will cause an error:</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Welcome to Python&quot;</span><span class="p">)</span>
+ <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Python is fun&quot;</span><span class="p">)</span>     <span class="c1"># ERROR: unexpected indentation</span>
+</code></pre></div>
+
+<p>This is actually one of the reasons Python code looks so clean: the structure is forced to be visually organized.</p>
+<h3>2. No Punctuation at the End of Statements</h3>
+<p>Unlike some languages that end every line with a semicolon, Python wants lines clean. Don't add stray periods or commas at the end:</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Welcome to Python&quot;</span><span class="p">)</span><span class="o">.</span>    <span class="c1"># ERROR: trailing period breaks the syntax</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Python is fun&quot;</span><span class="p">),</span>        <span class="c1"># RUNS, but not the way you&#39;d expect (see below)</span>
+</code></pre></div>
+
+<p>That trailing comma is a sneaky one. It doesn't error, but it silently turns the statement into a one-item tuple. <code>print("Python is fun"),</code> still prints the text, but the whole expression evaluates to <code>(None,)</code>, a tuple holding <code>print</code>'s return value, which is always <code>None</code>. If you ever see a stray <code>(None,)</code> show up somewhere you didn't expect, a trailing comma like this is a common cause.</p>
+<h3>3. Python Is Case-Sensitive</h3>
+<p><code>print</code> and <code>Print</code> are completely different things to Python. The built-in function is <code>print</code> (all lowercase). Capitalizing it breaks your code:</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="n">Print</span><span class="p">(</span><span class="s1">&#39;Hello&#39;</span><span class="p">)</span>    <span class="c1"># ERROR: Python doesn&#39;t know &#39;Print&#39;</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello&#39;</span><span class="p">)</span>    <span class="c1"># correct</span>
+</code></pre></div>
+
+<p>This applies to everything. <code>age</code>, <code>Age</code>, and <code>AGE</code> would be three separate variables.</p>
+<hr />
+<h2>Writing Comments</h2>
+<p>A comment is text in your code that Python completely ignores. It's there purely for humans, to explain what the code does and why. Good comments make a program far easier to read and maintain, both for others and for yourself months later.</p>
+<p>Python has two ways to write comments.</p>
+<p><strong>Single-line comments</strong> start with a pound/hash sign (<code>#</code>):</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="c1"># This declares a variable for the user&#39;s first name</span>
+<span class="n">first_name</span> <span class="o">=</span> <span class="s1">&#39;Shikhar&#39;</span>
+</code></pre></div>
+
+<p><strong>Multi-line (block) comments</strong> are wrapped in triple quotes (<code>'''</code> or <code>"""</code>):</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">This is a longer comment that</span>
+<span class="sd">spans multiple lines, useful for</span>
+<span class="sd">explaining a whole section of code.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+</code></pre></div>
+
+<p>A good habit: write a short comment describing the purpose of each meaningful piece of code. You don't need to explain every line, but the intent behind a block should be clear.</p>
+<hr />
+<h2>Python Keywords</h2>
+<p>Keywords are reserved words that already have a special meaning to Python. Because Python needs them to understand your code, you cannot use them as variable names, function names, or any other identifier.</p>
+<p>You can see the full list at any time:</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">keyword</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">keyword</span><span class="o">.</span><span class="n">kwlist</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Total number of keywords:&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">keyword</span><span class="o">.</span><span class="n">kwlist</span><span class="p">))</span>
+</code></pre></div>
+
+<p>Examples include <code>if</code>, <code>else</code>, <code>for</code>, <code>while</code>, <code>def</code>, <code>class</code>, <code>import</code>, <code>return</code>, <code>True</code>, <code>False</code>, and <code>None</code>. Almost all keywords are lowercase; the exceptions are <code>True</code>, <code>False</code>, and <code>None</code>, which are capitalized and must be written exactly that way.</p>
+<p>You don't need to memorize them. You'll naturally learn them as you go, and Python will warn you if you accidentally try to use one as a name.</p>
+<hr />
+<h2>Identifiers</h2>
+<p>An identifier is simply the name you give to something in your program: a variable, a function, a class, and so on. (Variable names are the most common kind of identifier.)</p>
+<p>The rules for identifiers are the same as the variable naming rules:</p>
+<ol>
+<li>They can contain letters (uppercase or lowercase), digits, and underscores.</li>
+<li>They cannot start with a digit (<code>variable1</code> is fine, <code>1variable</code> is not).</li>
+<li>They cannot be keywords.</li>
+<li>No special symbols (<code>@</code>, <code>$</code>, <code>%</code>, etc.) are allowed.</li>
+<li>They can be any length.</li>
+</ol>
+<p>A few best practices worth repeating: Python is case-sensitive, so <code>amount</code>, <code>AMOUNT</code>, and <code>aMouNT</code> are three different identifiers. Choose meaningful names; <code>num</code> beats <code>x</code>, and <code>compound_interest</code> beats <code>ci</code>. Separate multiple words with underscores (<code>snake_case</code>) or capital letters (<code>camelCase</code>).</p>
+<hr />
+<h2>Three Important Things About Variables in Python</h2>
+<p>A few behaviors are especially worth understanding early.</p>
+<h3>1. Python Is Dynamically Typed</h3>
+<p>In Python, a variable can hold one type of value now and a completely different type later. You never have to declare what kind of data a variable will hold; Python figures it out on the fly:</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="n">num</span> <span class="o">=</span> <span class="mi">10</span>        <span class="c1"># num is currently an integer</span>
+<span class="n">num</span> <span class="o">=</span> <span class="mi">20</span>        <span class="c1"># still an integer, new value</span>
+<span class="n">num</span> <span class="o">=</span> <span class="s1">&#39;Python&#39;</span>  <span class="c1"># now it&#39;s a string, totally fine in Python!</span>
+</code></pre></div>
+
+<p>This is not allowed in statically typed languages like C, C++, or Java, where a variable's type is fixed when you create it. (More on what "dynamically typed" really means later in this guide.)</p>
+<h3>2. Multiple Assignment in One Line</h3>
+<p>Python lets you assign several variables at once, which keeps code compact:</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="c1"># Instead of three separate lines:</span>
+<span class="n">num1</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">num2</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">num3</span> <span class="o">=</span> <span class="mi">30</span>
+
+<span class="c1"># You can write:</span>
+<span class="n">num1</span><span class="p">,</span> <span class="n">num2</span><span class="p">,</span> <span class="n">num3</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span>
+</code></pre></div>
+
+<p>You can also give several variables the same value in one go:</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="n">val1</span> <span class="o">=</span> <span class="n">val2</span> <span class="o">=</span> <span class="n">val3</span> <span class="o">=</span> <span class="mi">40</span>
+</code></pre></div>
+
+<p>Here's a subtle detail worth sitting with. If you check the memory location of each of these variables using the <code>id()</code> function, they all point to the same place in memory:</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="nb">id</span><span class="p">(</span><span class="n">val1</span><span class="p">)</span>   <span class="c1"># e.g. 140712834561234</span>
+<span class="nb">id</span><span class="p">(</span><span class="n">val2</span><span class="p">)</span>   <span class="c1"># same number</span>
+<span class="nb">id</span><span class="p">(</span><span class="n">val3</span><span class="p">)</span>   <span class="c1"># same number</span>
+</code></pre></div>
+
+<p>Why? Because of how chained assignment works, not because of anything special about the number 40. When you write <code>a = b = c = value</code>, Python evaluates the right-hand side exactly once and then binds all three names to that single result. It doesn't matter what <code>value</code> is; the same thing happens with a string, a list, or any other object. That's why <code>id()</code> returns the same address for all three: they're not separate copies, they're three labels on the one object that got created.</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="n">val1</span> <span class="o">=</span> <span class="n">val2</span> <span class="o">=</span> <span class="n">val3</span> <span class="o">=</span> <span class="mi">40</span>
+<span class="c1"># One value &#39;40&#39; in memory, three labels pointing to it</span>
+</code></pre></div>
+
+<h3>3. Type Conversion</h3>
+<p>You can convert a value from one type to another using the type's name as a function. This is called type casting:</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="n">num1</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="nb">type</span><span class="p">(</span><span class="n">num1</span><span class="p">)</span>          <span class="c1"># &lt;class &#39;int&#39;&gt;</span>
+
+<span class="n">num1</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">num1</span><span class="p">)</span>  <span class="c1"># convert to float</span>
+<span class="n">num1</span>                <span class="c1"># 10.0</span>
+
+<span class="n">val1</span> <span class="o">=</span> <span class="mf">30.3</span>
+<span class="nb">int</span><span class="p">(</span><span class="n">val1</span><span class="p">)</span>           <span class="c1"># 30  (note: the decimal is chopped off, not rounded)</span>
+
+<span class="nb">str</span><span class="p">(</span><span class="n">num1</span><span class="p">)</span>           <span class="c1"># &#39;10.0&#39;  (now it&#39;s text)</span>
+</code></pre></div>
+
+<p>But conversions only work when they make sense. You can't turn the word "Python" into a number:</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="nb">int</span><span class="p">(</span><span class="s1">&#39;Python&#39;</span><span class="p">)</span>   <span class="c1"># Raises ValueError: invalid literal for int()</span>
+</code></pre></div>
+
+<p>This is logical: there's no number hiding inside the word "Python," so Python refuses.</p>
+<hr />
+<h1 class="part-title">Part Two &nbsp;·&nbsp; What Actually Happens When You Run Code</h1>
+<p>This is the part most beginners never get explained, but understanding it will make you a far more confident programmer. Let's look under the hood.</p>
+<h2>How a Computer Actually Thinks</h2>
+<p>Here's the fundamental truth: a computer's processor (the CPU) only understands one language, machine code. This is pure binary, just <code>1</code>s and <code>0</code>s, representing electrical on/off signals. It looks nothing like Python. Something like <code>num = 10</code> means absolutely nothing to the raw hardware.</p>
+<p>So there's a gap. On one side, you have human-friendly Python. On the other, you have a machine that only speaks binary. Something has to bridge that gap, to translate your Python into instructions the CPU can actually execute.</p>
+<hr />
+<h2>How Python Reads Your Code</h2>
+<p>When you run a Python program, here's what happens, step by step, in plain English:</p>
+<p><strong>Step 1: Reading and checking (parsing).</strong> Python first reads through your code, top to bottom, and checks that the grammar makes sense. If you forgot a colon or misspelled something structurally, it stops right here and reports a syntax error before running anything. Think of this like proofreading a sentence before reading it aloud.</p>
+<p><strong>Step 2: Translating to bytecode.</strong> Python converts your readable code into an intermediate, compact form called bytecode. This isn't machine code yet; it's a halfway language that Python's engine understands. (You may have seen mysterious <code>.pyc</code> files or a <code>__pycache__</code> folder appear. That's the saved bytecode, kept around so Python doesn't have to re-translate unchanged code every time.)</p>
+<p><strong>Step 3: Executing line by line.</strong> A program called the Python Virtual Machine (PVM) takes that bytecode and runs it, one instruction at a time, translating each piece into actual machine actions on the fly. This is the part that makes Python "interpreted": the running and the final translation happen together, live.</p>
+<p>So the journey looks like this:</p>
+<div class="code-card"><div class="code-head"><span class="lang">flow</span></div><pre><code>Your Python code  →  Bytecode  →  Python Virtual Machine  →  CPU does the work
+</code></pre></div><div class="diagram"><svg viewBox="0 0 640 190" xmlns="http://www.w3.org/2000/svg" font-family="'IBM Plex Mono', monospace">
+  <defs>
+    <marker id="arrow1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2F5FA8"/>
+    </marker>
+  </defs>
+
+  <!-- Box 1: Python code -->
+  <rect x="10" y="55" width="130" height="60" rx="8" fill="#FFFFFF" stroke="#2F5FA8" stroke-width="1.5"/>
+  <text x="75" y="80" text-anchor="middle" font-size="12" font-weight="600" fill="#1A1A1A">Your Python</text>
+  <text x="75" y="96" text-anchor="middle" font-size="12" font-weight="600" fill="#1A1A1A">code (.py)</text>
+
+  <line x1="140" y1="85" x2="170" y2="85" stroke="#2F5FA8" stroke-width="1.5" marker-end="url(#arrow1)"/>
+  <text x="155" y="72" text-anchor="middle" font-size="9" fill="#4A4A48">parse</text>
+
+  <!-- Box 2: Bytecode -->
+  <rect x="172" y="55" width="130" height="60" rx="8" fill="#FFFFFF" stroke="#2F5FA8" stroke-width="1.5"/>
+  <text x="237" y="80" text-anchor="middle" font-size="12" font-weight="600" fill="#1A1A1A">Bytecode</text>
+  <text x="237" y="96" text-anchor="middle" font-size="12" font-weight="600" fill="#1A1A1A">(.pyc)</text>
+
+  <line x1="302" y1="85" x2="332" y2="85" stroke="#2F5FA8" stroke-width="1.5" marker-end="url(#arrow1)"/>
+  <text x="317" y="72" text-anchor="middle" font-size="9" fill="#4A4A48">execute</text>
+
+  <!-- Box 3: PVM -->
+  <rect x="334" y="55" width="140" height="60" rx="8" fill="#2F5FA8" stroke="#2F5FA8" stroke-width="1.5"/>
+  <text x="404" y="80" text-anchor="middle" font-size="12" font-weight="600" fill="#FFFFFF">Python Virtual</text>
+  <text x="404" y="96" text-anchor="middle" font-size="12" font-weight="600" fill="#FFFFFF">Machine (PVM)</text>
+
+  <line x1="474" y1="85" x2="504" y2="85" stroke="#2F5FA8" stroke-width="1.5" marker-end="url(#arrow1)"/>
+  <text x="489" y="72" text-anchor="middle" font-size="9" fill="#4A4A48">runs</text>
+
+  <!-- Box 4: CPU -->
+  <rect x="506" y="55" width="124" height="60" rx="8" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.5"/>
+  <text x="568" y="80" text-anchor="middle" font-size="12" font-weight="600" fill="#1A1A1A">CPU</text>
+  <text x="568" y="96" text-anchor="middle" font-size="11" fill="#4A4A48">does the work</text>
+
+  <text x="320" y="150" text-anchor="middle" font-size="11" fill="#4A4A48">You write the first box. Python handles everything after it, automatically.</text>
+</svg>
+<div class="diagram-cap">The journey from source code to CPU</div></div>
+
+<p>You write the first box. Python handles everything after it, automatically, every time you hit "run."</p>
+<hr />
+<h2>What Happens in Memory (The Simple Version)</h2>
+<p>When your code creates data, that data has to physically live somewhere, in the computer's memory (RAM). Here's a beginner-friendly mental model of how Python handles this.</p>
+<p>When you write:</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="n">num</span> <span class="o">=</span> <span class="mi">10</span>
+</code></pre></div>
+
+<p>Two separate things happen:
+1. Python creates an <strong>object</strong> in memory to hold the value <code>10</code>. This object sits at a specific address, like a house on a street.
+2. The name <code>num</code> becomes a <strong>label</strong> that points to that address.</p>
+<p>Here's the insight that makes everything else click: in Python, a variable is not a box that contains a value. It's a label (or "tag") attached to a value living in memory.</p>
+<p>This explains the earlier mystery. When you wrote <code>val1 = val2 = val3 = 40</code>, Python didn't make three copies of <code>40</code>. It made one object holding <code>40</code> and stuck three labels on it. That's why <code>id()</code> returned the same address for all three: they were all pointing at the same house.</p>
+<p>And when you do this:</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="n">num</span> <span class="o">=</span> <span class="mi">10</span>        <span class="c1"># &#39;num&#39; label points to a 10 object</span>
+<span class="n">num</span> <span class="o">=</span> <span class="s1">&#39;Python&#39;</span>  <span class="c1"># the label is MOVED to point at a new &#39;Python&#39; object</span>
+</code></pre></div>
+
+<p>...the <code>10</code> doesn't get overwritten in place. Instead, a brand-new <code>'Python'</code> object is created elsewhere, and the <code>num</code> label is simply moved over to point at it. The old <code>10</code>, if nothing else points to it, eventually gets cleaned up automatically.</p>
+<div class="diagram"><svg viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg" font-family="'IBM Plex Mono', monospace">
+  <defs>
+    <marker id="arrow2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2F5FA8"/>
+    </marker>
+    <marker id="arrow2gray" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#B7B4AC"/>
+    </marker>
+  </defs>
+
+  <text x="10" y="24" font-size="12" font-weight="600" fill="#1A1A1A">val1 = val2 = val3 = 40</text>
+
+  <!-- three labels -->
+  <rect x="10" y="40" width="60" height="30" rx="6" fill="#FFFFFF" stroke="#2F5FA8" stroke-width="1.3"/>
+  <text x="40" y="60" text-anchor="middle" font-size="11" fill="#1A1A1A">val1</text>
+
+  <rect x="80" y="40" width="60" height="30" rx="6" fill="#FFFFFF" stroke="#2F5FA8" stroke-width="1.3"/>
+  <text x="110" y="60" text-anchor="middle" font-size="11" fill="#1A1A1A">val2</text>
+
+  <rect x="150" y="40" width="60" height="30" rx="6" fill="#FFFFFF" stroke="#2F5FA8" stroke-width="1.3"/>
+  <text x="180" y="60" text-anchor="middle" font-size="11" fill="#1A1A1A">val3</text>
+
+  <!-- object -->
+  <rect x="70" y="105" width="80" height="46" rx="8" fill="#2F5FA8"/>
+  <text x="110" y="133" text-anchor="middle" font-size="14" font-weight="700" fill="#FFFFFF">40</text>
+
+  <path d="M 40 70 C 40 90, 90 90, 100 105" fill="none" stroke="#2F5FA8" stroke-width="1.3" marker-end="url(#arrow2)"/>
+  <path d="M 110 70 L 110 105" fill="none" stroke="#2F5FA8" stroke-width="1.3" marker-end="url(#arrow2)"/>
+  <path d="M 180 70 C 180 90, 130 90, 120 105" fill="none" stroke="#2F5FA8" stroke-width="1.3" marker-end="url(#arrow2)"/>
+
+  <text x="220" y="132" font-size="10.5" fill="#4A4A48">One object.</text>
+  <text x="220" y="147" font-size="10.5" fill="#4A4A48">Three labels pointing at it.</text>
+
+  <!-- divider -->
+  <line x1="0" y1="185" x2="640" y2="185" stroke="#E5E3DE" stroke-width="1"/>
+
+  <text x="10" y="210" font-size="12" font-weight="600" fill="#1A1A1A">num = 10   →   num = 'Python'</text>
+
+  <!-- old object, grayed -->
+  <rect x="10" y="225" width="90" height="42" rx="8" fill="#F0EFEB" stroke="#B7B4AC" stroke-width="1.3" stroke-dasharray="4 3"/>
+  <text x="55" y="251" text-anchor="middle" font-size="13" fill="#9A968C">10</text>
+  <text x="55" y="282" text-anchor="middle" font-size="9" fill="#9A968C">no label points here:</text>
+  <text x="55" y="294" text-anchor="middle" font-size="9" fill="#9A968C">garbage collected</text>
+
+  <!-- label, moved -->
+  <rect x="150" y="225" width="70" height="30" rx="6" fill="#FFFFFF" stroke="#2F5FA8" stroke-width="1.3"/>
+  <text x="185" y="245" text-anchor="middle" font-size="11" fill="#1A1A1A">num</text>
+
+  <!-- new object -->
+  <rect x="270" y="220" width="120" height="46" rx="8" fill="#2F5FA8"/>
+  <text x="330" y="248" text-anchor="middle" font-size="13" font-weight="700" fill="#FFFFFF">'Python'</text>
+
+  <path d="M 220 240 L 268 240" fill="none" stroke="#2F5FA8" stroke-width="1.3" marker-end="url(#arrow2)"/>
+  <path d="M 100 246 L 148 246" fill="none" stroke="#B7B4AC" stroke-width="1.3" stroke-dasharray="3 3" marker-end="url(#arrow2gray)"/>
+  <text x="124" y="238" text-anchor="middle" font-size="8.5" fill="#9A968C">label moves</text>
+</svg>
+<div class="diagram-cap">Variables are labels, not boxes</div></div><h3>Garbage Collection: Automatic Cleanup</h3>
+<p>That "cleaned up automatically" part has a name: garbage collection. Python keeps track of how many labels point to each object. When an object has no labels pointing to it anymore, it's unreachable, so Python automatically frees up that memory for reuse.</p>
+<p>In lower-level languages like C, you have to manually claim and release memory, and forgetting to do so causes serious bugs. Python does this housekeeping for you behind the scenes, which is one of the big reasons it's so beginner-friendly. One less thing to worry about.</p>
+<hr />
+<h2>Interpreted vs Compiled Languages</h2>
+<p>This is one of the most useful distinctions to understand, and it's simpler than it sounds. Both approaches solve the same problem (translating human code into machine code), just at different times.</p>
+<p>A compiled language (like C, C++, or Rust) translates your entire program into machine code before it runs, all at once. This translation step is called compilation, and it produces a standalone executable file. Running that file is then very fast, because all the translating is already done.</p>
+<blockquote>
+<p><strong>Analogy:</strong> Compiling is like translating an entire book from French to English, printing the finished English version, and handing it to the reader. The reader (the CPU) gets a complete, ready-to-read translation.</p>
+</blockquote>
+<p>An interpreted language (like Python) translates and runs your code line by line, as it goes, every time you run it. There's no separate "build the whole thing first" step.</p>
+<blockquote>
+<p><strong>Analogy:</strong> Interpreting is like having a live human translator standing next to you, translating each sentence out loud the moment it's spoken. More flexible, but a bit slower, because translation happens during the conversation.</p>
+</blockquote>
+<div class="diagram"><svg viewBox="0 0 640 220" xmlns="http://www.w3.org/2000/svg" font-family="'IBM Plex Mono', monospace">
+
+  <text x="10" y="20" font-size="11" font-weight="600" fill="#1A1A1A">COMPILED (C, C++, Rust)</text>
+
+  <rect x="10" y="32" width="260" height="34" rx="6" fill="#2F5FA8"/>
+  <text x="140" y="53" text-anchor="middle" font-size="11" fill="#FFFFFF">translate entire program at once</text>
+
+  <rect x="280" y="32" width="350" height="34" rx="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="1.3"/>
+  <text x="455" y="53" text-anchor="middle" font-size="11" fill="#1A1A1A">then run: fast, all translation is already done</text>
+
+  <line x1="10" y1="80" x2="630" y2="80" stroke="#E5E3DE" stroke-width="1"/>
+
+  <text x="10" y="105" font-size="11" font-weight="600" fill="#1A1A1A">INTERPRETED (Python)</text>
+
+  <!-- alternating small blocks -->
+  <g font-size="9.5" fill="#FFFFFF">
+    <rect x="10"  y="118" width="72" height="30" rx="5" fill="#2F5FA8"/>
+    <rect x="90"  y="118" width="72" height="30" rx="5" fill="#7893C4"/>
+    <rect x="170" y="118" width="72" height="30" rx="5" fill="#2F5FA8"/>
+    <rect x="250" y="118" width="72" height="30" rx="5" fill="#7893C4"/>
+    <rect x="330" y="118" width="72" height="30" rx="5" fill="#2F5FA8"/>
+    <rect x="410" y="118" width="72" height="30" rx="5" fill="#7893C4"/>
+    <rect x="490" y="118" width="72" height="30" rx="5" fill="#2F5FA8"/>
+    <rect x="570" y="118" width="60" height="30" rx="5" fill="#7893C4"/>
+    <text x="46"  y="137" text-anchor="middle">line 1</text>
+    <text x="126" y="137" text-anchor="middle">line 2</text>
+    <text x="206" y="137" text-anchor="middle">line 3</text>
+    <text x="286" y="137" text-anchor="middle">line 4</text>
+    <text x="366" y="137" text-anchor="middle">line 5</text>
+    <text x="446" y="137" text-anchor="middle">line 6</text>
+    <text x="526" y="137" text-anchor="middle">line 7</text>
+    <text x="600" y="137" text-anchor="middle">...</text>
+  </g>
+  <text x="10" y="168" font-size="10" fill="#4A4A48">Each line is translated and run before moving to the next, continuously, while the program executes.</text>
+
+  <line x1="10" y1="185" x2="630" y2="185" stroke="#E5E3DE" stroke-width="1"/>
+  <text x="10" y="205" font-size="10" fill="#4A4A48">Same total work either way: the difference is WHEN the translation happens.</text>
+</svg>
+<div class="diagram-cap">Same total translation work, different timing</div></div><p>Here's how they compare:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>Compiled (C, C++)</th>
+<th>Interpreted (Python)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>When translation happens</td>
+<td>Once, before running</td>
+<td>Continuously, while running</td>
+</tr>
+<tr>
+<td>Speed of execution</td>
+<td>Very fast</td>
+<td>Slower</td>
+</tr>
+<tr>
+<td>Ease of use / testing</td>
+<td>Slower to test (rebuild each time)</td>
+<td>Instant, just run it</td>
+</tr>
+<tr>
+<td>Catches errors</td>
+<td>Many caught before running</td>
+<td>Often only when that line runs</td>
+</tr>
+<tr>
+<td>Portability</td>
+<td>Tied to the system it was built for</td>
+<td>Runs anywhere Python is installed</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>The honest middle ground:</strong> Python is technically a blend. As you learned above, it first compiles your code to bytecode, then interprets that bytecode. But from a beginner's point of view, the experience is interpreted: you write code and run it instantly, with no separate build step.</p>
+<p>The practical takeaway: Python trades some raw speed for a lot of convenience. For most tasks, that trade is well worth it.</p>
+<hr />
+<h2>Static vs Dynamically Typed Languages</h2>
+<p>We touched on this earlier; here's the full, simple picture.</p>
+<p>The "type" of a variable means what kind of data it holds: a number, some text, a true/false value, and so on. The difference between static and dynamic typing is about when and whether you have to declare that type.</p>
+<p>A statically typed language (like C, C++, or Java) requires you to declare a variable's type up front, and that type is locked in. A variable declared to hold a number can only ever hold a number.</p>
+<div class="code-card"><div class="code-head"><span class="lang">java</span></div><pre><code><span class="c1">// Java example</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">25</span><span class="p">;</span><span class="w">       </span><span class="c1">// &#39;age&#39; is declared as an integer, forever</span>
+<span class="n">age</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;hello&quot;</span><span class="p">;</span><span class="w">      </span><span class="c1">// ERROR: you can&#39;t put text in an integer variable</span>
+</code></pre></div>
+
+<p>A dynamically typed language (like Python) figures out the type automatically based on whatever value you assign, and lets you change it freely:</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="n">age</span> <span class="o">=</span> <span class="mi">25</span>         <span class="c1"># Python sees a number, treats age as an int</span>
+<span class="n">age</span> <span class="o">=</span> <span class="s2">&quot;hello&quot;</span>    <span class="c1"># now it&#39;s a string, perfectly fine</span>
+</code></pre></div>
+
+<p>Here's the comparison:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>Statically Typed (Java, C++)</th>
+<th>Dynamically Typed (Python)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Declare types?</td>
+<td>Yes, required</td>
+<td>No, automatic</td>
+</tr>
+<tr>
+<td>Can a variable change type?</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Catches type mistakes</td>
+<td>Before running</td>
+<td>Only when that line runs</td>
+</tr>
+<tr>
+<td>Code length</td>
+<td>More verbose</td>
+<td>Shorter, faster to write</td>
+</tr>
+<tr>
+<td>Best for</td>
+<td>Large, safety-critical systems</td>
+<td>Quick development, flexibility</td>
+</tr>
+</tbody>
+</table></div>
+<p>The trade-off in one sentence: static typing catches more mistakes early but makes you write more, while dynamic typing is faster and more flexible but can let type-related bugs slip through until runtime. Python chooses flexibility, which is part of why it's so quick to learn.</p>
+<hr />
+<h2>Where Python Shines, and Where It Struggles</h2>
+<p>No language is perfect for everything. Understanding Python's strengths and weaknesses helps you know when to reach for it, and when something else might fit better.</p>
+<h3>Where Python Shines</h3>
+<p><strong>Readability and beginner-friendliness.</strong> Python's clean syntax means you spend more time solving your actual problem and less time fighting the language. It's widely considered the best first language to learn.</p>
+<p><strong>Data science, machine learning, and AI.</strong> This is Python's biggest strength. The ecosystem of tools, NumPy, Pandas, scikit-learn, TensorFlow, PyTorch, is unmatched, and the large majority of AI research and development happens in Python<sup class="fn">1</sup> (though performance-critical pieces are often written in C++, and languages like R and Julia hold their own in specific corners of data science).</p>
+<p><strong>Automation and scripting.</strong> Need to rename a thousand files, scrape a website, or automate a repetitive task? Python is well-suited for quick, practical scripts.</p>
+<p><strong>Web development (back-end).</strong> Frameworks like Django and Flask power many real websites and APIs.</p>
+<p><strong>Glue code and rapid prototyping.</strong> Python is well-suited for quickly stitching different systems together and for testing an idea fast before committing to a more complex build.</p>
+<p><strong>The community and libraries.</strong> For almost any task you can imagine, someone has probably already built a free Python library for it. This saves enormous amounts of time.</p>
+<h3>Where Python Struggles</h3>
+<p><strong>Raw speed.</strong> Because it's interpreted and dynamically typed, Python is significantly slower than compiled languages like C++ or Rust for heavy number-crunching. (Clever workaround: speed-critical libraries like NumPy are actually written in C under the hood, so you get C-like speed with Python-like ease.)</p>
+<p><strong>Mobile app development.</strong> Python is rarely used to build phone apps. For that, languages like Swift (iOS) and Kotlin (Android) dominate.</p>
+<p><strong>Memory usage.</strong> Python's convenience comes at a cost: it generally uses more memory than lower-level languages, which can matter on devices with very limited resources.</p>
+<p><strong>True parallel processing.</strong> For most of Python's history, a design feature called the Global Interpreter Lock (GIL) has prevented standard Python from running multiple threads at full speed simultaneously across multiple CPU cores. This is genuinely changing: Python 3.13 introduced an experimental mode that lets you disable the GIL, and Python 3.14 made that "free-threaded" mode officially supported.<sup class="fn">2</sup> It's still opt-in rather than the default, and a lot of the ecosystem (including some C extensions) is still catching up, so for now it's worth knowing the limitation exists rather than relying on it being solved. You don't need to understand the details yet, just that this is an active area of change in Python.</p>
+<p><strong>Very high-performance or real-time systems.</strong> For things like operating systems, game engines, or systems where every microsecond counts, compiled languages are usually the better choice.</p>
+<p>Put together, Python is a flexible, beginner-friendly language that's fast to write even when it isn't the fastest to run. For most of what people actually want to do, especially data, automation, and AI, its strengths far outweigh its weaknesses.</p>
+<hr />
+<h2>Putting It All Together</h2>
+<p>Let's tie the whole journey together with a single, simple line of code and trace what happens:</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="n">age</span> <span class="o">=</span> <span class="mi">25</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">age</span><span class="p">)</span>
+</code></pre></div>
+
+<ol>
+<li><strong>You write</strong> these two human-readable lines.</li>
+<li><strong>Python parses</strong> them, checking the grammar is valid.</li>
+<li><strong>It translates</strong> them into bytecode.</li>
+<li><strong>In memory</strong>, an object holding <code>25</code> is created, and the label <code>age</code> is attached to it.</li>
+<li><strong>The Python Virtual Machine executes</strong> the bytecode line by line, first the assignment, then the <code>print</code>.</li>
+<li><strong>The CPU</strong> carries out the actual work, and <code>25</code> appears on your screen.</li>
+<li><strong>When the program ends</strong>, Python's garbage collector cleans up the memory automatically.</li>
+</ol>
+<p>All of that, from two tiny lines, happens in a fraction of a second, and now you understand every step.</p>
+<hr />
+<h2>Quick Reference Summary</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>Key Idea</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Python</strong></td>
+<td>Interpreted, high-level, general-purpose, beginner-friendly</td>
+</tr>
+<tr>
+<td><strong>Literal</strong></td>
+<td>A raw fixed value: <code>10</code>, <code>20.5</code>, <code>'Python'</code>, <code>True</code></td>
+</tr>
+<tr>
+<td><strong>Variable</strong></td>
+<td>A named label pointing to a value in memory</td>
+</tr>
+<tr>
+<td><strong>Assignment (<code>=</code>)</strong></td>
+<td>Stores a value into a variable ("gets," not math equals)</td>
+</tr>
+<tr>
+<td><strong>Keywords</strong></td>
+<td>Reserved words you can't use as names (<code>if</code>, <code>for</code>, <code>True</code>...)</td>
+</tr>
+<tr>
+<td><strong>Identifier</strong></td>
+<td>Any name you create for a variable, function, or class</td>
+</tr>
+<tr>
+<td><strong>Indentation</strong></td>
+<td>Part of Python's grammar, not optional</td>
+</tr>
+<tr>
+<td><strong>Case sensitivity</strong></td>
+<td><code>print</code> ≠ <code>Print</code>; <code>age</code> ≠ <code>Age</code></td>
+</tr>
+<tr>
+<td><strong>Comments</strong></td>
+<td><code>#</code> for one line, <code>'''...'''</code> for blocks; ignored by Python</td>
+</tr>
+<tr>
+<td><strong>Dynamic typing</strong></td>
+<td>Variables can change type freely</td>
+</tr>
+<tr>
+<td><strong>Type conversion</strong></td>
+<td><code>int()</code>, <code>float()</code>, <code>str()</code>, only when it makes sense</td>
+</tr>
+<tr>
+<td><strong><code>id()</code></strong></td>
+<td>Shows an object's memory address</td>
+</tr>
+<tr>
+<td><strong>Bytecode</strong></td>
+<td>The intermediate form Python translates your code into</td>
+</tr>
+<tr>
+<td><strong>PVM</strong></td>
+<td>The Python Virtual Machine that runs the bytecode</td>
+</tr>
+<tr>
+<td><strong>Garbage collection</strong></td>
+<td>Automatic cleanup of unused memory</td>
+</tr>
+<tr>
+<td><strong>Compiled vs Interpreted</strong></td>
+<td>Translate-all-first vs translate-as-you-go</td>
+</tr>
+<tr>
+<td><strong>Static vs Dynamic typing</strong></td>
+<td>Fixed types declared up front vs flexible automatic types</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p>You now have the <em>what</em> of Python's basics, plus the <em>why</em> and the <em>how</em> underneath them. When you teach a new learner, start with literals and variables, let them write a few lines, and then reveal the behind-the-scenes story: variables as labels, code becoming bytecode, the virtual machine doing the work. That moment when someone understands what's really happening inside the machine is when programming stops feeling like magic and starts feeling like a tool they can command.</p>
+
+    <div class="end-note">
+      <strong>Where this leaves you:</strong> you now have the <em>what</em> of Python's basics, plus the <em>why</em> and the <em>how</em> underneath them. That's usually the point where programming stops feeling like magic and starts feeling like a tool you can actually direct.
+    </div>
+
+    <div class="footnotes">
+      <strong>Notes</strong>
+      <ol>
+        <li id="fn1">Estimates vary by survey and year (roughly 58–70% of AI/ML practitioners report Python as their primary language as of 2026, per Stack Overflow and industry surveys), so "large majority" is used here rather than a single precise figure that would go stale quickly.</li>
+        <li id="fn2">Python 3.13 (October 2024) introduced free-threading as an experimental, opt-in build (PEP 703). Python 3.14 (October 2025) promoted it to officially supported status (PEP 779), though it remains opt-in rather than the default build, and third-party C extensions are still being updated for compatibility.</li>
+      </ol>
+    </div>
+  </article>
+
+</div>
+
+<footer>Python Data Science Series · Article 10, verified and polished</footer>
+</body>
+</html>
