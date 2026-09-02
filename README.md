@@ -15,6 +15,6 @@ A collection of Python notebooks covering the language from first principles thr
 | 7 | Types of Functions in Python | [`7. Types of Functions in Python.ipynb`](./7.%20Types%20of%20Functions%20in%20Python.ipynb) | [Read Article 7](https://shikharkumar13.github.io/Python-Programming-Code/7_types_of_functions.html) |
 | 8 | Object Oriented Programming (OOPs) | [`8. Object Oriented Programming(OOPs).ipynb`](./8.%20Object%20Oriented%20Programming%28OOPs%29.ipynb) | [Read Article 8](https://shikharkumar13.github.io/Python-Programming-Code/8_OOPs_in_Python.html) |
 | 9 | Exception Handling | [`9. Exception_Handling.ipynb`](./9.%20Exception_Handling.ipynb) | [Read Article 9](https://shikharkumar13.github.io/Python-Programming-Code/9_Exception_Handling.html) |
-| 10 | File Handling | [`10. File_Handling.ipynb`](./10.%20File_Handling.ipynb) | [Read →]() |
+| 10 | File Handling | [`10. File_Handling.ipynb`](./10.%20File_Handling.ipynb) | [Read Article 10](https://shikharkumar13.github.io/Python-Programming-Code/10_File_Handling.html) |
  
-> Article links will be added as they're published, one per topic above.
+> Detailed article links have been added, one per topic above.
