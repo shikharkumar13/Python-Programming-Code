@@ -6,7 +6,7 @@ A collection of Python notebooks covering the language from first principles thr
  
 | # | Topic | Notebook | Article |
 |---|---|---|---|
-| 1 | Introduction to Python | [`1. Introduction to Python.ipynb`](./1.%20Introduction%20to%20Python.ipynb) | [Read →]() |
+| 1 | Introduction to Python | [`1. Introduction to Python.ipynb`](./1.%20Introduction%20to%20Python.ipynb) | [Read article 1](https://shikharkumar13.github.io/Python-Programming-Code/1_introduction_to_python.html) |
 | 2 | Lists, Tuples and Strings | [`2. Lists, Tuples and Strings.ipynb`](./2.%20Lists%2C%20Tuples%20and%20Strings.ipynb) | [Read →]() |
 | 3 | Sets and Dictionaries | [`3. Sets and Dictionaries.ipynb`](./3.%20Sets%20and%20Dictionaries.ipynb) | [Read →]() |
 | 4 | Operators | [`4. Operators.ipynb`](./4.%20Operators.ipynb) | [Read →]() |
