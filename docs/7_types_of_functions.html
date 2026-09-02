@@ -1,0 +1,716 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Types of Functions in Python: A Complete Guide</title>
+<meta name="description" content="A complete guide to enumerate, zip, filter, map, reduce, lambda, recursion, and higher-order functions in Python, with real examples from Airbnb, Spotify, Amazon, Reddit, and AWS.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>:root{
+  --bg:#FDFDFC;
+  --paper:#FFFFFF;
+  --ink:#1A1A1A;
+  --ink-soft:#4A4A48;
+  --ink-faint:#8A877E;
+  --accent:#2F5FA8;
+  --accent-soft:#EEF3FA;
+  --line:#E5E3DE;
+  --code-bg:#22252A;
+  --code-text:#E8E6E1;
+  --code-line:#33373E;
+  --font-serif:'Lora', Georgia, 'Times New Roman', serif;
+  --font-mono:'IBM Plex Mono','SFMono-Regular',Consolas,monospace;
+}
+*,*::before,*::after{box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--font-serif);
+  font-size:19px;
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--accent-soft);color:var(--accent);}
+a{color:var(--accent);text-decoration-color:rgba(47,95,168,.35);text-underline-offset:2px;}
+a:hover{text-decoration-color:currentColor;}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+.wrap{max-width:680px;margin:0 auto;padding:0 24px;}
+
+/* Masthead */
+.masthead{padding:64px 0 8px;}
+.kicker{
+  font-family:var(--font-mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:18px;
+}
+h1.title{
+  font-family:var(--font-serif);font-weight:600;font-size:clamp(1.9rem,5vw,2.6rem);
+  line-height:1.22;letter-spacing:-.01em;margin:0 0 20px;
+}
+.byline{
+  display:flex;align-items:center;gap:10px;color:var(--ink-faint);
+  font-size:.92rem;font-family:var(--font-mono);margin-bottom:8px;
+}
+.byline .dot{width:4px;height:4px;border-radius:50%;background:var(--ink-faint);}
+.dek{font-size:1.15rem;color:var(--ink-soft);margin:18px 0 0;line-height:1.6;}
+
+hr.rule{border:none;border-top:1px solid var(--line);margin:44px 0;}
+
+/* Article body */
+article{padding-bottom:80px;}
+article h2{
+  font-family:var(--font-serif);font-weight:600;font-size:1.5rem;
+  letter-spacing:-.005em;margin:52px 0 18px;line-height:1.3;
+}
+article h1.part-title{
+  font-family:var(--font-mono);font-weight:500;font-size:.95rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--accent);text-align:center;margin:64px 0 40px;padding-top:20px;border-top:1px solid var(--line);
+}
+article h3{font-family:var(--font-serif);font-weight:600;font-size:1.18rem;margin:32px 0 12px;}
+article p{margin:0 0 22px;}
+article ul,article ol{margin:0 0 22px;padding-left:1.4em;}
+article li{margin-bottom:9px;}
+article li::marker{color:var(--accent);}
+article strong{font-weight:700;}
+article code{
+  font-family:var(--font-mono);font-size:.82em;background:var(--accent-soft);
+  padding:.1em .36em;border-radius:4px;color:#1D4785;
+}
+article blockquote{
+  margin:26px 0;padding:4px 0 4px 20px;border-left:2.5px solid var(--accent);
+  color:var(--ink-soft);font-size:.98rem;
+}
+article blockquote p{margin:0;}
+
+/* Tables */
+.table-wrap{overflow-x:auto;margin:26px 0 30px;}
+article table{width:100%;border-collapse:collapse;font-size:.88rem;font-family:var(--font-mono);}
+article thead th{
+  text-align:left;padding:9px 14px;border-bottom:2px solid var(--ink);
+  font-weight:600;font-size:.78rem;letter-spacing:.02em;
+}
+article tbody td{padding:9px 14px;border-bottom:1px solid var(--line);vertical-align:top;}
+article tbody tr:first-child td{padding-top:12px;}
+
+/* Code blocks */
+.code-card{margin:26px 0 30px;border-radius:8px;overflow:hidden;background:var(--code-bg);}
+.code-card .code-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 14px;border-bottom:1px solid var(--code-line);
+}
+.code-card .lang{font-family:var(--font-mono);font-size:.68rem;color:#7A8290;letter-spacing:.08em;text-transform:uppercase;}
+.code-card pre{margin:0;padding:16px 20px;overflow-x:auto;}
+.code-card code{
+  font-family:var(--font-mono);font-size:.86rem;line-height:1.6;
+  color:var(--code-text);background:none;padding:0;
+}
+.code-card .k,.code-card .kn,.code-card .kd{color:#89B4E8;}
+.code-card .nb{color:#89B4E8;}
+.code-card .nf,.code-card .fm{color:#7ED0B4;}
+.code-card .s,.code-card .s1,.code-card .s2,.code-card .sa{color:#D7C283;}
+.code-card .mi,.code-card .mf{color:#E39A6C;}
+.code-card .o,.code-card .p{color:#8A93A3;}
+.code-card .c,.code-card .c1,.code-card .cm{color:#666D78;font-style:italic;}
+.code-card .n{color:var(--code-text);}
+.code-card .nc{color:#E3CC7A;}
+
+/* Diagrams */
+.diagram{margin:34px 0;padding:22px 20px;background:var(--paper);border:1px solid var(--line);border-radius:10px;}
+.diagram svg{width:100%;height:auto;display:block;}
+.diagram-cap{
+  font-family:var(--font-mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-faint);text-align:center;margin-top:12px;
+}
+
+/* Footnote markers */
+sup.fn{font-family:var(--font-mono);color:var(--accent);cursor:pointer;font-size:.72em;}
+.footnotes{margin-top:60px;padding-top:24px;border-top:1px solid var(--line);font-size:.9rem;color:var(--ink-soft);}
+.footnotes ol{padding-left:1.3em;}
+.footnotes li{margin-bottom:10px;}
+
+/* End note */
+.end-note{
+  margin-top:56px;padding:24px 26px;background:var(--accent-soft);border-radius:10px;
+  font-size:.98rem;color:var(--ink-soft);
+}
+.end-note strong{color:var(--ink);}
+
+footer{
+  text-align:center;padding:40px 24px 60px;font-family:var(--font-mono);
+  font-size:.76rem;color:var(--ink-faint);
+}
+
+@media(max-width:520px){
+  body{font-size:17.5px;}
+  .masthead{padding-top:44px;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <div class="kicker">Python Programming Series &nbsp;·&nbsp; Article 8</div>
+    <h1 class="title">Types of Functions in Python: A Complete Guide</h1>
+    <p class="dek">Writing your own functions is one skill. Knowing the handful of built-in tools that work <em>with</em> functions, and the different shapes a function itself can take, is a different one. <code>enumerate</code>, <code>zip</code>, <code>filter</code>, <code>map</code>, and <code>reduce</code> all follow a similar pattern: take an iterable, apply some logic to it, and hand back a new result. Lambda functions, recursive functions, and higher-order functions describe different <em>shapes</em> a function can be written in, not new tools exactly, but new ways of thinking about what a function is allowed to do.</p>
+  </div>
+
+  <hr class="rule">
+
+  <article>
+    <p>This guide covers each one in detail, verified by running the actual code, with real examples from Airbnb, Spotify, Amazon, X (formerly Twitter), Reddit, and AWS.</p>
+<hr />
+<h2 id="enumerate-numbering-an-iterable"><code>enumerate()</code>: Numbering an Iterable</h2>
+<p>Looping over a list normally only gives you the values, not their positions:</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="n">numbers</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">45</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">11</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">numbers</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</code></pre></div>
+
+<p>If you also need to know <em>where</em> each value sits in the list, <code>enumerate()</code> wraps the iterable and hands back a running counter alongside each item:</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="k">for</span> <span class="n">counter</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">numbers</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">counter</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>0 10
+1 20
+2 45
+3 8
+4 23
+5 32
+6 90
+7 11
+</code></pre></div>
+
+<p>The counter defaults to starting at <code>0</code>, but you can tell it to start anywhere:</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="k">for</span> <span class="n">counter</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">numbers</span><span class="p">,</span> <span class="mi">5</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">counter</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>5 10
+6 20
+7 45
+8 8
+9 23
+10 32
+11 90
+12 11
+</code></pre></div>
+
+<p>That second argument to <code>enumerate()</code> is genuinely useful anytime you need "position 1" to mean the first item instead of the zeroth, like displaying a numbered list to a user.</p>
+<hr />
+<h2 id="zip-pairing-up-multiple-sequences"><code>zip()</code>: Pairing Up Multiple Sequences</h2>
+<p><code>zip()</code> takes two or more iterables and pairs up their items position by position, stopping as soon as the shortest one runs out:</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Vinay&quot;</span><span class="p">,</span> <span class="s2">&quot;Ronit&quot;</span><span class="p">,</span> <span class="s2">&quot;Sachin&quot;</span><span class="p">,</span> <span class="s2">&quot;Surya&quot;</span><span class="p">,</span> <span class="s2">&quot;Virat&quot;</span><span class="p">]</span>
+<span class="n">passwords</span> <span class="o">=</span> <span class="p">(</span><span class="mi">123</span><span class="p">,</span> <span class="mi">234</span><span class="p">,</span> <span class="mi">345</span><span class="p">,</span> <span class="mi">456</span><span class="p">,</span> <span class="mi">567</span><span class="p">)</span>
+<span class="n">age</span> <span class="o">=</span> <span class="p">{</span><span class="mi">21</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">25</span><span class="p">}</span>
+
+<span class="n">zipped_data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">passwords</span><span class="p">,</span> <span class="n">age</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>[(&#39;Vinay&#39;, 123, 21), (&#39;Ronit&#39;, 234, 22), (&#39;Sachin&#39;, 345, 23), (&#39;Surya&#39;, 456, 24), (&#39;Virat&#39;, 567, 25)]
+</code></pre></div>
+
+<p>This particular example mixes three different container types, a list, a tuple, and a set, and it happens to line up cleanly here. Worth knowing why "happens to" is doing real work in that sentence: a <strong>set never guarantees any particular order</strong>. The reason <code>{21, 22, 23, 24, 25}</code> comes out sorted above is a detail of how CPython currently hashes small integers, not a promise the language makes. Swap in a set of strings and the illusion breaks immediately:</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="n">sample</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;twenty-one&#39;</span><span class="p">,</span> <span class="s1">&#39;twenty-two&#39;</span><span class="p">,</span> <span class="s1">&#39;twenty-three&#39;</span><span class="p">,</span> <span class="s1">&#39;twenty-four&#39;</span><span class="p">,</span> <span class="s1">&#39;twenty-five&#39;</span><span class="p">}</span>
+<span class="nb">list</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>[&#39;twenty-one&#39;, &#39;twenty-two&#39;, &#39;twenty-five&#39;, &#39;twenty-three&#39;, &#39;twenty-four&#39;]
+</code></pre></div>
+
+<p>Whenever the <em>position</em> of an item matters, which is the entire point of <code>zip()</code>, stick to ordered containers (lists or tuples) for every sequence involved. A set is the right tool when you only care about membership and uniqueness, not the tool for anything where "3rd item" needs to mean something reliable.</p>
+<hr />
+<h2 id="filter-map-and-reduce-the-big-three"><code>filter()</code>, <code>map()</code>, and <code>reduce()</code>: The Big Three</h2>
+<p>These three show up constantly once you start writing more compact code, and they're easiest to understand side by side, since they all take a function and an iterable but do three genuinely different things with them.</p>
+<ul>
+<li><strong><code>filter(function, iterable)</code></strong> keeps only the items where <code>function</code> returns something truthy. The output is shorter than or equal to the input.</li>
+<li><strong><code>map(function, iterable)</code></strong> transforms every item through <code>function</code>. The output is always the same length as the input.</li>
+<li><strong><code>reduce(function, iterable)</code></strong> collapses the whole iterable down to a single value, by repeatedly combining items two at a time.</li>
+</ul>
+<div class="diagram"><svg viewBox="0 0 640 260" xmlns="http://www.w3.org/2000/svg" font-family="'IBM Plex Mono', monospace">
+  <defs>
+    <marker id="fa1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2F5FA8"/>
+    </marker>
+  </defs>
+
+  <!-- Column headers -->
+  <text x="106" y="20" text-anchor="middle" font-size="12" font-weight="700" fill="#1A1A1A">filter()</text>
+  <text x="320" y="20" text-anchor="middle" font-size="12" font-weight="700" fill="#1A1A1A">map()</text>
+  <text x="534" y="20" text-anchor="middle" font-size="12" font-weight="700" fill="#1A1A1A">reduce()</text>
+
+  <!-- FILTER column -->
+  <g>
+    <rect x="66" y="34" width="80" height="26" rx="5" fill="#FFFFFF" stroke="#8A877E" stroke-width="1"/>
+    <text x="106" y="51" text-anchor="middle" font-size="10" fill="#4A4A48">[1,2,3,4,5,6]</text>
+    <line x1="106" y1="60" x2="106" y2="80" stroke="#2F5FA8" stroke-width="1.3" marker-end="url(#fa1)"/>
+    <text x="106" y="94" text-anchor="middle" font-size="9" fill="#8A877E">keep evens?</text>
+    <rect x="76" y="100" width="60" height="24" rx="5" fill="#2F5FA8"/>
+    <text x="106" y="116" text-anchor="middle" font-size="10" fill="#FFFFFF">[2, 4, 6]</text>
+    <text x="106" y="140" text-anchor="middle" font-size="8.5" fill="#8A877E">shorter list</text>
+    <text x="106" y="152" text-anchor="middle" font-size="8.5" fill="#8A877E">survivors only</text>
+  </g>
+
+  <!-- MAP column -->
+  <g>
+    <rect x="280" y="34" width="80" height="26" rx="5" fill="#FFFFFF" stroke="#8A877E" stroke-width="1"/>
+    <text x="320" y="51" text-anchor="middle" font-size="10" fill="#4A4A48">[1,2,3,4]</text>
+    <line x1="320" y1="60" x2="320" y2="80" stroke="#2F5FA8" stroke-width="1.3" marker-end="url(#fa1)"/>
+    <text x="320" y="94" text-anchor="middle" font-size="9" fill="#8A877E">square each</text>
+    <rect x="270" y="100" width="100" height="24" rx="5" fill="#2F5FA8"/>
+    <text x="320" y="116" text-anchor="middle" font-size="10" fill="#FFFFFF">[1, 4, 9, 16]</text>
+    <text x="320" y="140" text-anchor="middle" font-size="8.5" fill="#8A877E">same length</text>
+    <text x="320" y="152" text-anchor="middle" font-size="8.5" fill="#8A877E">every item transformed</text>
+  </g>
+
+  <!-- REDUCE column -->
+  <g>
+    <rect x="494" y="34" width="80" height="26" rx="5" fill="#FFFFFF" stroke="#8A877E" stroke-width="1"/>
+    <text x="534" y="51" text-anchor="middle" font-size="10" fill="#4A4A48">[1,2,3,4]</text>
+    <line x1="534" y1="60" x2="534" y2="80" stroke="#2F5FA8" stroke-width="1.3" marker-end="url(#fa1)"/>
+    <text x="534" y="94" text-anchor="middle" font-size="9" fill="#8A877E">1+2=3, 3+3=6, 6+4=10</text>
+    <rect x="509" y="100" width="50" height="24" rx="5" fill="#2F5FA8"/>
+    <text x="534" y="116" text-anchor="middle" font-size="10" fill="#FFFFFF">10</text>
+    <text x="534" y="140" text-anchor="middle" font-size="8.5" fill="#8A877E">one final value</text>
+    <text x="534" y="152" text-anchor="middle" font-size="8.5" fill="#8A877E">rolled up pairwise</text>
+  </g>
+
+  <line x1="30" y1="180" x2="610" y2="180" stroke="#E5E3DE" stroke-width="1"/>
+  <text x="320" y="205" text-anchor="middle" font-size="10.5" fill="#4A4A48">All three take a function and an iterable. The difference is entirely in the shape of what comes back:</text>
+  <text x="320" y="224" text-anchor="middle" font-size="10.5" fill="#4A4A48">a shorter list, an equal-length list, or a single collapsed value.</text>
+</svg>
+<div class="diagram-cap">filter, map, and reduce at a glance</div></div><h3 id="filter"><code>filter()</code></h3>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">find_positive</span><span class="p">(</span><span class="n">num</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">num</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">num</span>
+
+<span class="n">list1</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">))</span>
+<span class="n">positive_values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="n">find_positive</span><span class="p">,</span> <span class="n">list1</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>positive_values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+</code></pre></div>
+
+<p>This gets the right answer, but it's worth noticing exactly <em>why</em>: <code>find_positive</code> never actually returns <code>True</code> or <code>False</code>. For a positive number it returns the number itself; for anything else, since there's no <code>else</code>, it falls through and implicitly returns <code>None</code>. <code>filter()</code> doesn't require an actual boolean, just something Python considers truthy or falsy, and both a positive number and <code>None</code> fit that bill correctly here. It works, but a function written to explicitly <code>return num &gt; 0</code> says the same thing more clearly and doesn't rely on a reader knowing Python's truthiness rules. The Airbnb example below does exactly that.</p>
+<p><strong>Airbnb: Filtering Search Results.</strong> A search returns thousands of listings; the site only needs the ones under a price cutoff.</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="n">listings</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Cozy Studio&quot;</span><span class="p">,</span> <span class="s2">&quot;price&quot;</span><span class="p">:</span> <span class="mi">95</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Luxury Villa&quot;</span><span class="p">,</span> <span class="s2">&quot;price&quot;</span><span class="p">:</span> <span class="mi">450</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Downtown Loft&quot;</span><span class="p">,</span> <span class="s2">&quot;price&quot;</span><span class="p">:</span> <span class="mi">130</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Beachfront Condo&quot;</span><span class="p">,</span> <span class="s2">&quot;price&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">}</span>
+<span class="p">]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">is_affordable</span><span class="p">(</span><span class="n">listing</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">listing</span><span class="p">[</span><span class="s2">&quot;price&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">150</span>
+
+<span class="n">affordable_places</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="n">is_affordable</span><span class="p">,</span> <span class="n">listings</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">place</span> <span class="ow">in</span> <span class="n">affordable_places</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found: </span><span class="si">{</span><span class="n">place</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> - $</span><span class="si">{</span><span class="n">place</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">/night&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Found: Cozy Studio - $95/night
+Found: Downtown Loft - $130/night
+</code></pre></div>
+
+<h3 id="map"><code>map()</code></h3>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">square</span><span class="p">(</span><span class="n">num</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">num</span> <span class="o">**</span> <span class="mi">2</span>
+
+<span class="n">list2</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">65</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span>
+<span class="n">mapped_values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">square</span><span class="p">,</span> <span class="n">list2</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>mapped_values = [4, 4225, 1024, 121, 49, 64]
+</code></pre></div>
+
+<p><strong>Spotify: Currency Conversion for Royalties.</strong> Every value in an earnings list needs the same conversion applied to it, which is exactly what <code>map()</code> is for.</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="n">usd_earnings</span> <span class="o">=</span> <span class="p">[</span><span class="mf">100.50</span><span class="p">,</span> <span class="mf">250.00</span><span class="p">,</span> <span class="mf">45.75</span><span class="p">,</span> <span class="mf">800.20</span><span class="p">]</span>
+<span class="n">exchange_rate</span> <span class="o">=</span> <span class="mf">0.92</span>  <span class="c1"># 1 USD = 0.92 EUR</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">convert_to_euros</span><span class="p">(</span><span class="n">amount</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="n">amount</span> <span class="o">*</span> <span class="n">exchange_rate</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="n">eur_earnings</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">convert_to_euros</span><span class="p">,</span> <span class="n">usd_earnings</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Original USD: </span><span class="si">{</span><span class="n">usd_earnings</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Converted EUR: </span><span class="si">{</span><span class="n">eur_earnings</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Original USD: [100.5, 250.0, 45.75, 800.2]
+Converted EUR: [92.46, 230.0, 42.09, 736.18]
+</code></pre></div>
+
+<h3 id="reduce"><code>reduce()</code></h3>
+<p>Unlike <code>filter</code> and <code>map</code>, <code>reduce</code> isn't a built-in you can call directly; it lives in the <code>functools</code> module. Here's the plain loop it replaces, side by side with the function itself:</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="c1"># The manual version</span>
+<span class="n">product</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">lst</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">num</span> <span class="ow">in</span> <span class="n">lst</span><span class="p">:</span>
+    <span class="n">product</span> <span class="o">*=</span> <span class="n">num</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">product</span><span class="p">)</span>   <span class="c1"># 24</span>
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">reduce</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">multiply</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y</span>
+
+<span class="n">list3</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>
+<span class="n">product</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="n">multiply</span><span class="p">,</span> <span class="n">list3</span><span class="p">)</span>   <span class="c1"># 120</span>
+</code></pre></div>
+
+<p><code>reduce</code> calls <code>multiply</code> on the first two items, then calls it again on that result and the third item, and so on, carrying a running total forward until only one value is left.</p>
+<p><strong>Amazon Logistics: Total Freight Weight.</strong> A cargo plane's total load weight is exactly this kind of rolling sum.</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">reduce</span>
+
+<span class="n">package_weights</span> <span class="o">=</span> <span class="p">[</span><span class="mf">12.5</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">8.2</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">add_weights</span><span class="p">(</span><span class="n">weight1</span><span class="p">,</span> <span class="n">weight2</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">weight1</span> <span class="o">+</span> <span class="n">weight2</span>
+
+<span class="n">total_cargo_weight</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="n">add_weights</span><span class="p">,</span> <span class="n">package_weights</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Individual packages: </span><span class="si">{</span><span class="n">package_weights</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total takeoff weight: </span><span class="si">{</span><span class="n">total_cargo_weight</span><span class="si">}</span><span class="s2"> kg&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Individual packages: [12.5, 4.0, 8.2, 1.5, 20.0]
+Total takeoff weight: 46.2 kg
+</code></pre></div>
+
+<hr />
+<h2 id="anonymous-functions-lambda">Anonymous Functions: <code>lambda</code></h2>
+<p>A <code>lambda</code> is a function without a name, written on a single line. The rules are a little different from a normal <code>def</code>:</p>
+<ul>
+<li>It can take any number of parameters, or none.</li>
+<li><code>lambda</code> replaces <code>def functionname(...)</code>; no parentheses go around the parameter list.</li>
+<li>A colon separates the parameters from the expression.</li>
+<li>There's no <code>return</code> keyword; the expression's value is automatically what gets sent back.</li>
+</ul>
+<p><strong>Syntax:</strong> <code>lambda parameters: expression</code></p>
+<p>A normal function and its lambda equivalent, side by side:</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">addition</span><span class="p">(</span><span class="n">num1</span><span class="p">,</span> <span class="n">num2</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">num1</span> <span class="o">+</span> <span class="n">num2</span>
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="k">lambda</span> <span class="n">num1</span><span class="p">,</span> <span class="n">num2</span><span class="p">:</span> <span class="n">num1</span> <span class="o">+</span> <span class="n">num2</span>
+</code></pre></div>
+
+<p>A slightly more involved one, including a conditional expression inside the lambda:</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">maximum</span><span class="p">(</span><span class="n">num1</span><span class="p">,</span> <span class="n">num2</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">num1</span> <span class="o">&gt;</span> <span class="n">num2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">num1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">num2</span>
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="n">maximum</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">num1</span><span class="p">,</span> <span class="n">num2</span><span class="p">:</span> <span class="n">num1</span> <span class="k">if</span> <span class="n">num1</span> <span class="o">&gt;</span> <span class="n">num2</span> <span class="k">else</span> <span class="n">num2</span>
+
+<span class="n">maximum</span><span class="p">(</span><span class="mi">23</span><span class="p">,</span> <span class="mi">45</span><span class="p">)</span>   <span class="c1"># 45</span>
+</code></pre></div>
+
+<p>Lambdas are used constantly alongside <code>filter</code>, <code>map</code>, and <code>reduce</code>, specifically because writing a full <code>def</code> for a one-line throwaway function is more ceremony than the logic deserves:</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="n">lst</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>
+
+<span class="n">even_lst</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">num</span><span class="p">:</span> <span class="n">num</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">lst</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">even_lst</span><span class="p">)</span>                                          <span class="c1"># [2, 4]</span>
+
+<span class="n">new_lst</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">lst</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">new_lst</span><span class="p">)</span>                                            <span class="c1"># [1, 4, 9, 16, 25]</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">reduce</span>
+<span class="n">product_lst</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y</span><span class="p">,</span> <span class="n">lst</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">product_lst</span><span class="p">)</span>                                         <span class="c1"># 120</span>
+</code></pre></div>
+
+<p><strong>X (Twitter): Sorting Trending Topics.</strong> <code>sorted()</code> accepts a <code>key</code> function that tells it what to compare, and a lambda is the natural fit for "just look at this one field."</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="n">trending_topics</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;hashtag&quot;</span><span class="p">:</span> <span class="s2">&quot;#Python&quot;</span><span class="p">,</span> <span class="s2">&quot;volume&quot;</span><span class="p">:</span> <span class="mi">15000</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;hashtag&quot;</span><span class="p">:</span> <span class="s2">&quot;#TechNews&quot;</span><span class="p">,</span> <span class="s2">&quot;volume&quot;</span><span class="p">:</span> <span class="mi">8500</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;hashtag&quot;</span><span class="p">:</span> <span class="s2">&quot;#Coding&quot;</span><span class="p">,</span> <span class="s2">&quot;volume&quot;</span><span class="p">:</span> <span class="mi">22000</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;hashtag&quot;</span><span class="p">:</span> <span class="s2">&quot;#AI&quot;</span><span class="p">,</span> <span class="s2">&quot;volume&quot;</span><span class="p">:</span> <span class="mi">45000</span><span class="p">}</span>
+<span class="p">]</span>
+
+<span class="n">sorted_trends</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">trending_topics</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">topic</span><span class="p">:</span> <span class="n">topic</span><span class="p">[</span><span class="s2">&quot;volume&quot;</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">rank</span><span class="p">,</span> <span class="n">trend</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sorted_trends</span><span class="p">[:</span><span class="mi">3</span><span class="p">],</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rank</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">trend</span><span class="p">[</span><span class="s1">&#39;hashtag&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">trend</span><span class="p">[</span><span class="s1">&#39;volume&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> tweets)&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>1. #AI (45000 tweets)
+2. #Coding (22000 tweets)
+3. #Python (15000 tweets)
+</code></pre></div>
+
+<p>Without the lambda, sorting by volume would need a separate named function defined purely to extract one dictionary key, used exactly once and never again.</p>
+<hr />
+<h2 id="recursive-functions">Recursive Functions</h2>
+<p>A recursive function is a function that calls itself, working on a smaller version of the same problem each time, until it reaches a case simple enough to answer directly.</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">factorial</span><span class="p">(</span><span class="n">num</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">num</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">num</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">num</span> <span class="o">*</span> <span class="n">factorial</span><span class="p">(</span><span class="n">num</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="n">num</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Factorial of </span><span class="si">{</span><span class="n">num</span><span class="si">}</span><span class="s2"> is </span><span class="si">{</span><span class="n">factorial</span><span class="p">(</span><span class="n">num</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Factorial of 7 is 5040
+</code></pre></div>
+
+<p>Two parts make a recursive function work: a <strong>base case</strong> (<code>num == 0 or num == 1</code>, where the function stops calling itself and just returns an answer) and a <strong>recursive case</strong> (where it calls itself with a smaller input, moving toward that base case). Skip the base case entirely and the function calls itself forever, until Python gives up with a <code>RecursionError</code>.</p>
+<p>Tracing <code>factorial(4)</code> shows the two-phase shape every recursive function has: it keeps calling itself <em>downward</em> until it hits the base case, then those calls resolve <em>upward</em>, each one multiplying by the number it was waiting on.</p>
+<div class="diagram"><svg viewBox="0 0 640 320" xmlns="http://www.w3.org/2000/svg" font-family="'IBM Plex Mono', monospace">
+  <defs>
+    <marker id="fa2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2F5FA8"/>
+    </marker>
+    <marker id="fa2b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8A877E"/>
+    </marker>
+  </defs>
+
+  <text x="150" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="#1A1A1A">CALLING DOWN</text>
+  <text x="490" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="#1A1A1A">RETURNING UP</text>
+  <line x1="320" y1="4" x2="320" y2="300" stroke="#E5E3DE" stroke-width="1" stroke-dasharray="3 3"/>
+
+  <!-- Descending calls -->
+  <rect x="40" y="30" width="150" height="28" rx="5" fill="#FFFFFF" stroke="#2F5FA8" stroke-width="1.3"/>
+  <text x="115" y="49" text-anchor="middle" font-size="10.5" fill="#1A1A1A">factorial(4)</text>
+
+  <rect x="60" y="70" width="150" height="28" rx="5" fill="#FFFFFF" stroke="#2F5FA8" stroke-width="1.3"/>
+  <text x="135" y="89" text-anchor="middle" font-size="10.5" fill="#1A1A1A">factorial(3)</text>
+
+  <rect x="80" y="110" width="150" height="28" rx="5" fill="#FFFFFF" stroke="#2F5FA8" stroke-width="1.3"/>
+  <text x="155" y="129" text-anchor="middle" font-size="10.5" fill="#1A1A1A">factorial(2)</text>
+
+  <rect x="100" y="150" width="150" height="28" rx="5" fill="#2F5FA8"/>
+  <text x="175" y="169" text-anchor="middle" font-size="10.5" fill="#FFFFFF">factorial(1) → 1</text>
+  <text x="175" y="192" text-anchor="middle" font-size="8.5" fill="#8A877E">base case, stops here</text>
+
+  <path d="M115 58 L135 70" stroke="#2F5FA8" stroke-width="1.2" marker-end="url(#fa2)"/>
+  <path d="M135 98 L155 110" stroke="#2F5FA8" stroke-width="1.2" marker-end="url(#fa2)"/>
+  <path d="M155 138 L175 150" stroke="#2F5FA8" stroke-width="1.2" marker-end="url(#fa2)"/>
+
+  <!-- Ascending returns -->
+  <rect x="430" y="150" width="170" height="28" rx="5" fill="#FFFFFF" stroke="#8A877E" stroke-width="1.3"/>
+  <text x="515" y="169" text-anchor="middle" font-size="10" fill="#4A4A48">2 × 1 = 2</text>
+
+  <rect x="440" y="110" width="170" height="28" rx="5" fill="#FFFFFF" stroke="#8A877E" stroke-width="1.3"/>
+  <text x="525" y="129" text-anchor="middle" font-size="10" fill="#4A4A48">3 × 2 = 6</text>
+
+  <rect x="450" y="70" width="170" height="28" rx="5" fill="#FFFFFF" stroke="#8A877E" stroke-width="1.3"/>
+  <text x="535" y="89" text-anchor="middle" font-size="10" fill="#4A4A48">4 × 6 = 24</text>
+
+  <rect x="450" y="30" width="170" height="28" rx="5" fill="#2F5FA8"/>
+  <text x="535" y="49" text-anchor="middle" font-size="10.5" fill="#FFFFFF">factorial(4) = 24</text>
+
+  <path d="M515 150 L525 138" stroke="#8A877E" stroke-width="1.2" marker-end="url(#fa2b)"/>
+  <path d="M525 110 L535 98" stroke="#8A877E" stroke-width="1.2" marker-end="url(#fa2b)"/>
+  <path d="M535 70 L535 58" stroke="#8A877E" stroke-width="1.2" marker-end="url(#fa2b)"/>
+
+  <line x1="30" y1="215" x2="610" y2="215" stroke="#E5E3DE" stroke-width="1"/>
+  <text x="320" y="240" text-anchor="middle" font-size="10.5" fill="#4A4A48">Each call waits for the one below it to finish before it can multiply and return.</text>
+  <text x="320" y="258" text-anchor="middle" font-size="10.5" fill="#4A4A48">Nothing actually multiplies until factorial(1) hits the base case and the unwinding begins.</text>
+</svg>
+<div class="diagram-cap">Tracing factorial(4): down to the base case, then back up</div></div><p><strong>Reddit: Counting Nested Comment Threads.</strong> A comment can have replies, and those replies can have their own replies, arbitrarily deep. There's no way to know the depth in advance, which is exactly the situation recursion is built for.</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="n">reddit_thread</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;Great tutorial!&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;replies&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;I agree, very helpful.&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;replies&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;Helped me pass my test.&quot;</span><span class="p">,</span> <span class="s2">&quot;replies&quot;</span><span class="p">:</span> <span class="p">[]}</span>
+            <span class="p">]</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;Could you do one on OOP next?&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;replies&quot;</span><span class="p">:</span> <span class="p">[]</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">count_total_comments</span><span class="p">(</span><span class="n">comment_node</span><span class="p">):</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># count the current comment itself</span>
+    <span class="k">for</span> <span class="n">reply</span> <span class="ow">in</span> <span class="n">comment_node</span><span class="p">[</span><span class="s2">&quot;replies&quot;</span><span class="p">]:</span>
+        <span class="n">total</span> <span class="o">+=</span> <span class="n">count_total_comments</span><span class="p">(</span><span class="n">reply</span><span class="p">)</span>  <span class="c1"># recurse into each reply</span>
+    <span class="k">return</span> <span class="n">total</span>
+
+<span class="n">total_count</span> <span class="o">=</span> <span class="n">count_total_comments</span><span class="p">(</span><span class="n">reddit_thread</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total comments in this thread: </span><span class="si">{</span><span class="n">total_count</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Total comments in this thread: 4
+</code></pre></div>
+
+<p>Here the base case is implicit: a comment with an empty <code>"replies"</code> list simply doesn't loop at all, and returns <code>1</code> on its own.</p>
+<hr />
+<h2 id="higher-order-functions">Higher-Order Functions</h2>
+<p>A higher-order function is any function that takes another function as an argument, returns a function, or both. <code>filter</code>, <code>map</code>, and <code>reduce</code> are all higher-order functions themselves, since every one of them accepts a function as its first argument.</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">apply_to_each</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">iterable</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">func</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">iterable</span><span class="p">]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">square</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span>
+
+<span class="n">numbers</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>
+<span class="n">squared_numbers</span> <span class="o">=</span> <span class="n">apply_to_each</span><span class="p">(</span><span class="n">square</span><span class="p">,</span> <span class="n">numbers</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">squared_numbers</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>[1, 4, 9, 16, 25]
+</code></pre></div>
+
+<p>The other direction, a function that <em>returns</em> a function, is called a <strong>closure</strong>, and it's worth slowing down on:</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">create_adder</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">adder</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
+    <span class="k">return</span> <span class="n">adder</span>
+
+<span class="n">add_15</span> <span class="o">=</span> <span class="n">create_adder</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">add_15</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>25
+</code></pre></div>
+
+<p><code>create_adder(15)</code> doesn't add anything by itself; it builds and returns a brand-new <code>adder</code> function that has permanently remembered <code>x = 15</code>. <code>add_15</code> is that returned function, and every time it's called it still has access to the <code>15</code> from the call that created it, even though <code>create_adder</code> itself finished running long ago. This is the mechanism behind a lot of customizable, reusable code: instead of one rigid <code>add15()</code> function, <code>create_adder</code> can stamp out an <code>add_5</code>, an <code>add_100</code>, or any other adder, on demand.</p>
+<div class="diagram"><svg viewBox="0 0 640 240" xmlns="http://www.w3.org/2000/svg" font-family="'IBM Plex Mono', monospace">
+  <defs>
+    <marker id="fa3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2F5FA8"/>
+    </marker>
+  </defs>
+
+  <text x="120" y="22" text-anchor="middle" font-size="11" font-weight="700" fill="#1A1A1A">create_adder(15)</text>
+  <rect x="30" y="34" width="180" height="60" rx="7" fill="#FFFFFF" stroke="#8A877E" stroke-width="1.2"/>
+  <text x="120" y="58" text-anchor="middle" font-size="10" fill="#4A4A48">runs once, builds a</text>
+  <text x="120" y="73" text-anchor="middle" font-size="10" fill="#4A4A48">new adder() function</text>
+  <text x="120" y="88" text-anchor="middle" font-size="9" fill="#8A877E">then finishes and exits</text>
+
+  <line x1="210" y1="64" x2="260" y2="64" stroke="#2F5FA8" stroke-width="1.3" marker-end="url(#fa3)"/>
+  <text x="235" y="52" text-anchor="middle" font-size="8.5" fill="#8A877E">returns</text>
+
+  <text x="400" y="22" text-anchor="middle" font-size="11" font-weight="700" fill="#1A1A1A">add_15</text>
+  <rect x="264" y="34" width="280" height="90" rx="8" fill="#2F5FA8"/>
+  <text x="404" y="56" text-anchor="middle" font-size="10.5" fill="#FFFFFF">def adder(y):</text>
+  <text x="404" y="72" text-anchor="middle" font-size="10.5" fill="#FFFFFF">    return x + y</text>
+
+  <rect x="284" y="86" width="240" height="30" rx="14" fill="#1A1A1A" opacity=".22"/>
+  <text x="404" y="106" text-anchor="middle" font-size="9.5" fill="#FFFFFF">🎒 remembers: x = 15</text>
+
+  <text x="404" y="150" text-anchor="middle" font-size="10" fill="#4A4A48">add_15(10)</text>
+  <line x1="404" y1="124" x2="404" y2="145" stroke="#8A877E" stroke-width="1.1" marker-end="url(#fa3)"/>
+
+  <rect x="330" y="160" width="150" height="30" rx="6" fill="#FFFFFF" stroke="#2F5FA8" stroke-width="1.3"/>
+  <text x="405" y="180" text-anchor="middle" font-size="11" fill="#1A1A1A">15 + 10 = 25</text>
+
+  <line x1="30" y1="205" x2="610" y2="205" stroke="#E5E3DE" stroke-width="1"/>
+  <text x="320" y="226" text-anchor="middle" font-size="10.5" fill="#4A4A48">add_15 keeps its own private copy of x = 15, permanently, even though create_adder already finished running.</text>
+</svg>
+<div class="diagram-cap">A closure: add_15 permanently remembers x = 15</div></div><p><strong>AWS: Execution Timers for Billing.</strong> Cloud billing platforms need to measure how long arbitrary customer code takes to run, without knowing in advance what that code does. A higher-order "wrapper" function solves this: it accepts the customer's function as an argument, times it, and reports the result.</p>
+<div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">execution_timer</span><span class="p">(</span><span class="n">customer_function</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;AWS Cloud: Starting execution timer...&quot;</span><span class="p">)</span>
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="n">customer_function</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>  <span class="c1"># the customer&#39;s own function, passed in as an argument</span>
+
+    <span class="n">end_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">duration</span> <span class="o">=</span> <span class="n">end_time</span> <span class="o">-</span> <span class="n">start_time</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;AWS Cloud: Execution finished. Billed for </span><span class="si">{</span><span class="n">duration</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2"> seconds.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">process_data</span><span class="p">(</span><span class="n">data_list</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;   Customer Code: Processing data...&quot;</span><span class="p">)</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Customer Code: Processed </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">data_list</span><span class="p">)</span><span class="si">}</span><span class="s2"> items.&quot;</span><span class="p">)</span>
+
+<span class="n">user_data</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>
+<span class="n">execution_timer</span><span class="p">(</span><span class="n">process_data</span><span class="p">,</span> <span class="n">user_data</span><span class="p">)</span>
+</code></pre></div>
+
+<p><code>execution_timer</code> never needs to know what <code>process_data</code> actually does; it just needs to know it's a function it can call. Any other customer function could be passed into the exact same <code>execution_timer</code> without changing a single line of it.</p>
+<hr />
+<h2 id="quick-reference-summary">Quick Reference Summary</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Takes</th>
+<th>Returns</th>
+<th>Use it when</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>enumerate(iterable)</code></td>
+<td>one iterable</td>
+<td>pairs of <code>(index, value)</code></td>
+<td>you need each item's position while looping</td>
+</tr>
+<tr>
+<td><code>zip(a, b, ...)</code></td>
+<td>two or more iterables</td>
+<td>tuples pairing up matching positions</td>
+<td>combining parallel sequences (use lists/tuples, not sets)</td>
+</tr>
+<tr>
+<td><code>filter(func, iterable)</code></td>
+<td>a function + an iterable</td>
+<td>only the items where <code>func</code> is truthy</td>
+<td>narrowing a list down by a condition</td>
+</tr>
+<tr>
+<td><code>map(func, iterable)</code></td>
+<td>a function + an iterable</td>
+<td>every item transformed by <code>func</code></td>
+<td>applying the same operation to every item</td>
+</tr>
+<tr>
+<td><code>reduce(func, iterable)</code></td>
+<td>a function + an iterable (from <code>functools</code>)</td>
+<td>a single collapsed value</td>
+<td>rolling totals, products, or combining everything into one result</td>
+</tr>
+<tr>
+<td><code>lambda params: expr</code></td>
+<td>any number of parameters</td>
+<td>the expression's value</td>
+<td>a small, throwaway function, often passed straight into <code>filter</code>/<code>map</code>/<code>sorted</code></td>
+</tr>
+<tr>
+<td>Recursive function</td>
+<td>itself, on a smaller input</td>
+<td>eventually, a base-case value</td>
+<td>problems with unknown or arbitrary depth (nested data, tree structures)</td>
+</tr>
+<tr>
+<td>Higher-order function</td>
+<td>and/or returns another function</td>
+<td>varies</td>
+<td>building flexible, reusable wrappers around other functions</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<p><code>filter</code>, <code>map</code>, and <code>reduce</code> all answer the same underlying question, "what do I do with every item in this collection?", just with three different endings: keep some, transform all, or combine everything into one. Lambda, recursion, and higher-order functions aren't separate tools so much as three different answers to "what is a function allowed to look like?" Once those two ideas are separate in your head, reading unfamiliar functional-style code gets a lot less intimidating.</p>
+
+    <div class="end-note">
+      <strong>Where this leaves you:</strong> filter, map, and reduce all answer the same question, what do I do with every item in this collection, just with three different endings. Lambda, recursion, and higher-order functions are three different answers to what a function is allowed to look like. Once those two ideas are separate in your head, functional-style code reads a lot less like magic.
+    </div>
+  </article>
+
+</div>
+
+<footer>Python Programming Series — Article 8, verified end to end</footer>
+</body>
+</html>
