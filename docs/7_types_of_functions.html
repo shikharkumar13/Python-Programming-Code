@@ -148,13 +148,24 @@ footer{
   body{font-size:17.5px;}
   .masthead{padding-top:44px;}
 }
+
+.series-nav{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:0 0 8px;}
+.series-nav a{display:block;padding:15px 18px;border:1px solid var(--line);border-radius:6px;background:var(--paper);text-decoration:none;transition:border-color .14s;}
+.series-nav a:hover{border-color:var(--accent);}
+.series-nav .dir{display:block;font-family:var(--font-mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:5px;}
+.series-nav .name{display:block;font-family:var(--font-serif);font-weight:600;font-size:1rem;color:var(--ink);line-height:1.3;}
+.series-nav .next{grid-column:2;text-align:right;}
+.series-nav .all{grid-column:1/-1;text-align:center;border:none;background:none;padding:4px;font-family:var(--font-mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);}
+.series-nav .all:hover{border:none;color:var(--accent);}
+.kicker a{color:inherit;}
+@media(max-width:560px){.series-nav{grid-template-columns:1fr;}.series-nav .next{grid-column:1;text-align:left;}}
 </style>
 </head>
 <body>
 <div class="wrap">
 
   <div class="masthead">
-    <div class="kicker">Python Programming Series &nbsp;·&nbsp; Article 7</div>
+    <div class="kicker"><a href="index.html">Python Programming Series</a> &nbsp;·&nbsp; Article 7</div>
     <h1 class="title">Types of Functions in Python: A Complete Guide</h1>
     <p class="dek">Writing your own functions is one skill. Knowing the handful of built-in tools that work <em>with</em> functions, and the different shapes a function itself can take, is a different one. <code>enumerate</code>, <code>zip</code>, <code>filter</code>, <code>map</code>, and <code>reduce</code> all follow a similar pattern: take an iterable, apply some logic to it, and hand back a new result. Lambda functions, recursive functions, and higher-order functions describe different <em>shapes</em> a function can be written in, not new tools exactly, but new ways of thinking about what a function is allowed to do.</p>
   </div>
@@ -708,6 +719,13 @@ Total takeoff weight: 46.2 kg
       <strong>Where this leaves you:</strong> filter, map, and reduce all answer the same question, what do I do with every item in this collection, just with three different endings. Lambda, recursion, and higher-order functions are three different answers to what a function is allowed to look like. Once those two ideas are separate in your head, functional-style code reads a lot less like magic.
     </div>
   </article>
+
+  <nav class="series-nav">
+    <a class="prev" href="6_Python_functions.html"><span class="dir">← Previous</span><span class="name">Functions in Python</span></a>
+    <a class="next" href="8_OOPs_in_Python.html"><span class="dir">Next →</span><span class="name">Object-Oriented Programming</span></a>
+    <a class="all" href="index.html">All ten articles</a>
+  </nav>
+
 
 </div>
 

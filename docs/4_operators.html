@@ -151,6 +151,17 @@ footer.site-footer a{font-size:.8rem;color:var(--ink-soft);}
   .sidebar.open{transform:translateX(0);}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}.sidebar{transition:none;}}
+
+.series-nav{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:28px;}
+.series-nav a{display:block;padding:15px 18px;border:1px solid var(--line);border-radius:var(--r-m);background:var(--surface);box-shadow:var(--shadow);text-decoration:none;transition:border-color .14s;}
+.series-nav a:hover{border-color:var(--indigo);}
+.series-nav .dir{display:block;font-family:var(--font-m);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:5px;}
+.series-nav .name{display:block;font-family:var(--font-d);font-weight:600;font-size:.97rem;color:var(--ink);line-height:1.3;}
+.series-nav .next{grid-column:2;text-align:right;}
+.series-nav .all{grid-column:1/-1;text-align:center;border:none;background:none;box-shadow:none;padding:4px;font-family:var(--font-m);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);}
+.series-nav .all:hover{border:none;color:var(--indigo-text);}
+.topbar a.brand{text-decoration:none;color:var(--ink);}
+@media(max-width:560px){.series-nav{grid-template-columns:1fr;}.series-nav .next{grid-column:1;text-align:left;}}
 </style>
 </head>
 <body>
@@ -246,7 +257,7 @@ footer.site-footer a{font-size:.8rem;color:var(--ink-soft);}
 
 
 <div class="topbar">
-  <span class="brand">§4 &nbsp;<span>Operators</span></span>
+  <a class="brand" href="index.html">§4 &nbsp;<span>Operators</span></a>
   <button id="navToggle" aria-label="Toggle navigation">
     <svg class="icon"><use href="#icon-menu"></use></svg>
   </button>
@@ -632,6 +643,11 @@ footer.site-footer a{font-size:.8rem;color:var(--ink-soft);}
       <div class="article-end">
         <p><strong>Operators are the verbs of Python.</strong> Once the six families stop feeling like an arbitrary list of symbols and start feeling like six different questions you can ask your data (how much? is it equal? are both true? which object is this? is it a member? what do the bits look like?), reading unfamiliar code gets a lot less intimidating.</p>
       </div>
+      <nav class="series-nav">
+        <a class="prev" href="3_sets_dictionaries.html"><span class="dir">← Previous</span><span class="name">Sets and Dictionaries</span></a>
+        <a class="next" href="5_conditionals_loops.html"><span class="dir">Next →</span><span class="name">Conditional Statements and Loops</span></a>
+        <a class="all" href="index.html">All ten articles</a>
+      </nav>
     </main>
   </div>
 </div>

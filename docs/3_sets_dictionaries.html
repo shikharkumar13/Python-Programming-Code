@@ -157,6 +157,17 @@ footer.site-footer a{font-size:.8rem;color:var(--ink-soft);}
   .sidebar.open{transform:translateX(0);}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}.sidebar{transition:none;}}
+
+.series-nav{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:28px;}
+.series-nav a{display:block;padding:15px 18px;border:1px solid var(--line);border-radius:var(--r-m);background:var(--surface);box-shadow:var(--shadow);text-decoration:none;transition:border-color .14s;}
+.series-nav a:hover{border-color:var(--indigo);}
+.series-nav .dir{display:block;font-family:var(--font-m);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:5px;}
+.series-nav .name{display:block;font-family:var(--font-d);font-weight:600;font-size:.97rem;color:var(--ink);line-height:1.3;}
+.series-nav .next{grid-column:2;text-align:right;}
+.series-nav .all{grid-column:1/-1;text-align:center;border:none;background:none;box-shadow:none;padding:4px;font-family:var(--font-m);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);}
+.series-nav .all:hover{border:none;color:var(--indigo-text);}
+.topbar a.brand{text-decoration:none;color:var(--ink);}
+@media(max-width:560px){.series-nav{grid-template-columns:1fr;}.series-nav .next{grid-column:1;text-align:left;}}
 </style>
 </head>
 <body>
@@ -258,7 +269,7 @@ footer.site-footer a{font-size:.8rem;color:var(--ink-soft);}
 
 
 <div class="topbar">
-  <span class="brand">§3 &nbsp;<span>Sets &amp; Dictionaries</span></span>
+  <a class="brand" href="index.html">§3 &nbsp;<span>Sets &amp; Dictionaries</span></a>
   <button id="navToggle" aria-label="Toggle navigation">
     <svg class="icon"><use href="#icon-menu"></use></svg>
   </button>
@@ -660,6 +671,11 @@ footer.site-footer a{font-size:.8rem;color:var(--ink-soft);}
       <div class="article-end">
         <p><strong>The shape of the problem tells you which one to reach for.</strong> Need to guarantee no duplicates and don't care about order? That's a set. Need to look something up by name instead of scanning for it? That's a dictionary. Both trade the simplicity of a list for a specific, powerful guarantee.</p>
       </div>
+      <nav class="series-nav">
+        <a class="prev" href="2_lists_tuples_strings.html"><span class="dir">← Previous</span><span class="name">Lists, Tuples and Strings</span></a>
+        <a class="next" href="4_operators.html"><span class="dir">Next →</span><span class="name">Operators</span></a>
+        <a class="all" href="index.html">All ten articles</a>
+      </nav>
     </main>
   </div>
 </div>
