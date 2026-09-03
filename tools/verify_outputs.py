@@ -9,7 +9,11 @@ compares, without touching the file on disk.
     python3 tools/verify_outputs.py --all
 
 Cells tagged `skip-verify` in their metadata are reported as skipped rather
-than compared — for the handful that make live network calls.
+than compared, for the handful that make live network calls. They are still
+executed; only the comparison is skipped. `allow_errors=True` means a cell
+that raises records the error as its output instead of aborting the run, which
+is what chapter 1's deliberate ZeroDivisionError needs, and what lets an
+offline machine get through the network chapters.
 """
 import copy
 import pathlib
@@ -37,7 +41,7 @@ def _text(outputs):
 def verify(name):
     nb = nbformat.read(ROOT / name, as_version=4)
     fresh = copy.deepcopy(nb)
-    NotebookClient(fresh, timeout=120, kernel_name='python3',
+    NotebookClient(fresh, timeout=120, kernel_name='python3', allow_errors=True,
                    resources={'metadata': {'path': str(ROOT)}}).execute()
 
     problems, skipped, checked = [], 0, 0
