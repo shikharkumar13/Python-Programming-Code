@@ -7,6 +7,7 @@ toolkit_demo/
 api_demo/
 scraper_demo/
 reliable_demo/
+capstone_demo/
 
 # Jupyter
 .ipynb_checkpoints/

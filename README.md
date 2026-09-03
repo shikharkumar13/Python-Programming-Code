@@ -27,4 +27,5 @@ A collection of Python notebooks covering the language from first principles thr
 | 17 | Working with APIs | [`17. Working with APIs.ipynb`](./17.%20Working%20with%20APIs.ipynb) | _article coming soon_ |
 | 18 | Web Scraping | [`18. Web Scraping.ipynb`](./18.%20Web%20Scraping.ipynb) | _article coming soon_ |
 | 19 | Writing Reliable Code | [`19. Writing Reliable Code.ipynb`](./19.%20Writing%20Reliable%20Code.ipynb) | _article coming soon_ |
+| 20 | Capstone Project | [`20. Capstone Project.ipynb`](./20.%20Capstone%20Project.ipynb) | _article coming soon_ |
 
