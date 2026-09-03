@@ -4,6 +4,7 @@ module_demo/
 generators_demo/
 context_demo/
 toolkit_demo/
+api_demo/
 
 # Jupyter
 .ipynb_checkpoints/

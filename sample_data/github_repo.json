@@ -1,0 +1,25 @@
+{
+  "id": 81598961,
+  "name": "cpython",
+  "full_name": "python/cpython",
+  "description": "The Python programming language",
+  "html_url": "https://github.com/python/cpython",
+  "language": "Python",
+  "stargazers_count": 75971,
+  "forks_count": 35319,
+  "open_issues_count": 9622,
+  "created_at": "2017-02-10T19:23:51Z",
+  "updated_at": "2026-09-03T15:51:15Z",
+  "topics": [],
+  "license": {
+    "key": "other",
+    "name": "Other",
+    "spdx_id": "NOASSERTION"
+  },
+  "owner": {
+    "login": "python",
+    "id": 1525981,
+    "type": "Organization",
+    "html_url": "https://github.com/python"
+  }
+}

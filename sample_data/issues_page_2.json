@@ -1,0 +1,26 @@
+[
+  {
+    "number": 156895,
+    "title": "Configure script output doesn't mention CXX",
+    "state": "open",
+    "user": "smontanaro",
+    "created_at": "2026-09-03T13:26:02Z",
+    "comments": 0
+  },
+  {
+    "number": 156894,
+    "title": "Wrong error position for tokenizer errors reporting a range if the line contains non-ASCII characters",
+    "state": "open",
+    "user": "serhiy-storchaka",
+    "created_at": "2026-09-03T13:21:47Z",
+    "comments": 0
+  },
+  {
+    "number": 156892,
+    "title": "gh-156891: Fix shlex source inclusion at EOF",
+    "state": "open",
+    "user": "lpyu001",
+    "created_at": "2026-09-03T12:57:06Z",
+    "comments": 0
+  }
+]

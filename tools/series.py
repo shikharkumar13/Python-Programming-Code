@@ -39,7 +39,7 @@ SERIES = [
     (14, 'Context Managers',                 '14. Context Managers.ipynb', None, 'B'),
     (15, 'The Standard Library Toolkit',     '15. The Standard Library Toolkit.ipynb', None, 'B'),
     (16, 'Regular Expressions',              '16. Regular Expressions.ipynb', None, 'B'),
-    (17, 'Working with APIs',                None, None, 'B'),
+    (17, 'Working with APIs',                '17. Working with APIs.ipynb', None, 'B'),
     (18, 'Web Scraping',                     None, None, 'B'),
     (19, 'Writing Reliable Code',            None, None, 'B'),
     (20, 'Capstone Project',                 None, None, 'B'),

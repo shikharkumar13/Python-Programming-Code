@@ -1,0 +1,26 @@
+[
+  {
+    "number": 156891,
+    "title": "`shlex` silently discards a sourced stream when the source filename ends at EOF",
+    "state": "open",
+    "user": "lpyu001",
+    "created_at": "2026-09-03T12:48:03Z",
+    "comments": 0
+  },
+  {
+    "number": 156890,
+    "title": "gh-155742: Add tests on the PyMarshal C API",
+    "state": "open",
+    "user": "vstinner",
+    "created_at": "2026-09-03T10:44:29Z",
+    "comments": 3
+  },
+  {
+    "number": 156889,
+    "title": "[3.13] Reword `atexit` docs (GH-156086)",
+    "state": "open",
+    "user": "encukou",
+    "created_at": "2026-09-03T10:41:15Z",
+    "comments": 1
+  }
+]

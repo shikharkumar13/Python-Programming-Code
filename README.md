@@ -24,4 +24,5 @@ A collection of Python notebooks covering the language from first principles thr
 | 14 | Context Managers | [`14. Context Managers.ipynb`](./14.%20Context%20Managers.ipynb) | _article coming soon_ |
 | 15 | The Standard Library Toolkit | [`15. The Standard Library Toolkit.ipynb`](./15.%20The%20Standard%20Library%20Toolkit.ipynb) | _article coming soon_ |
 | 16 | Regular Expressions | [`16. Regular Expressions.ipynb`](./16.%20Regular%20Expressions.ipynb) | _article coming soon_ |
+| 17 | Working with APIs | [`17. Working with APIs.ipynb`](./17.%20Working%20with%20APIs.ipynb) | _article coming soon_ |
 

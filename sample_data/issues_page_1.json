@@ -1,0 +1,26 @@
+[
+  {
+    "number": 156898,
+    "title": "[3.15] gh-89735: Document requirements for the *headers* argument (GH-155640)",
+    "state": "open",
+    "user": "miss-islington",
+    "created_at": "2026-09-03T15:48:50Z",
+    "comments": 1
+  },
+  {
+    "number": 156897,
+    "title": "gh-155742: Optimize json float parsing",
+    "state": "open",
+    "user": "vstinner",
+    "created_at": "2026-09-03T14:28:20Z",
+    "comments": 1
+  },
+  {
+    "number": 156896,
+    "title": "Importing idlelib.run deletes tkinter dialog submodules from sys.modules",
+    "state": "open",
+    "user": "serhiy-storchaka",
+    "created_at": "2026-09-03T13:28:13Z",
+    "comments": 1
+  }
+]
