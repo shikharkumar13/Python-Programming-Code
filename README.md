@@ -2,7 +2,7 @@
 
 A collection of Python notebooks covering the language from first principles through object-oriented programming, exception handling, and file I/O. Each topic below is paired with a written companion article.
 
-📖 **Read the articles online:** <https://shikharkumar13.github.io/Python-Programming-Code/>
+📖 **Read the articles online:** <https://shikharkumar13.github.io/Python-Programming-Code/index.html>
 
 ## 📚 Topics Covered
 
