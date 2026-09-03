@@ -1033,7 +1033,7 @@ FD after 13 months: FD MATURED, can withdraw now
   <text x="480" y="158" text-anchor="middle" font-size="9" fill="#8890B0">ONE parent.</text>
   <text x="480" y="172" text-anchor="middle" font-size="9" fill="#8890B0">MULTIPLE children.</text>
 </svg>
-<div class="cap">Single inheritance (one parent, one child) vs. hierarchical inheritance (one parent, many children) — easy to conflate, worth keeping distinct</div></div><h3 id="method-resolution-order-mro-and-the-diamond-problem">Method Resolution Order (MRO) and the Diamond Problem</h3>
+<div class="cap">Single inheritance (one parent, one child) vs. hierarchical inheritance (one parent, many children) — easy to conflate, worth keeping distinct</div></div><h3 id="method-resolution-order-mro-and-the-diamond-problem">5.5 Hybrid Inheritance and the MRO</h3>
 <p>When a class inherits from multiple parents that share a common ancestor, Python needs a rule for which parent's version of a method to use. This is the classic <strong>Diamond Problem</strong>:</p>
 <div class="diagram-card"><pre><code>        A
        / \
