@@ -35,7 +35,7 @@ SERIES = [
     # Phase A in progress: notebooks land first, articles are backfilled.
     (11, 'Modules and Virtual Environments', '11. Modules and Virtual Environments.ipynb', None, 'B'),
     (12, 'Iterators and Generators',         '12. Iterators and Generators.ipynb', None, 'B'),
-    (13, 'Closures and Decorators',          None, None, 'B'),
+    (13, 'Closures and Decorators',          '13. Closures and Decorators.ipynb', None, 'B'),
     (14, 'Context Managers',                 None, None, 'B'),
     (15, 'The Standard Library Toolkit',     None, None, 'B'),
     (16, 'Regular Expressions',              None, None, 'B'),

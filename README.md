@@ -20,4 +20,5 @@ A collection of Python notebooks covering the language from first principles thr
 | 10 | File Handling | [`10. File_Handling.ipynb`](./10.%20File_Handling.ipynb) | [Read article 10](https://shikharkumar13.github.io/Python-Programming-Code/10_File_Handling.html) |
 | 11 | Modules and Virtual Environments | [`11. Modules and Virtual Environments.ipynb`](./11.%20Modules%20and%20Virtual%20Environments.ipynb) | _article coming soon_ |
 | 12 | Iterators and Generators | [`12. Iterators and Generators.ipynb`](./12.%20Iterators%20and%20Generators.ipynb) | _article coming soon_ |
+| 13 | Closures and Decorators | [`13. Closures and Decorators.ipynb`](./13.%20Closures%20and%20Decorators.ipynb) | _article coming soon_ |
 
