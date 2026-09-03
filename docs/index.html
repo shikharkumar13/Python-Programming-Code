@@ -1,1 +1,204 @@
-<h1>Welcome to my website!</h1>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Python Programming Series</title>
+<meta name="description" content="A ten-part guide to Python, from literals and variables through object-oriented programming, exception handling, and file I/O. Each article is paired with a Jupyter notebook.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>:root{
+  --bg:#FDFDFC;
+  --paper:#FFFFFF;
+  --ink:#1A1A1A;
+  --ink-soft:#4A4A48;
+  --ink-faint:#8A877E;
+  --accent:#2F5FA8;
+  --accent-soft:#EEF3FA;
+  --line:#E5E3DE;
+  --font-serif:'Lora', Georgia, 'Times New Roman', serif;
+  --font-mono:'IBM Plex Mono','SFMono-Regular',Consolas,monospace;
+}
+*,*::before,*::after{box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--font-serif);
+  font-size:19px;
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--accent-soft);color:var(--accent);}
+a{color:var(--accent);text-decoration-color:rgba(47,95,168,.35);text-underline-offset:2px;}
+a:hover{text-decoration-color:currentColor;}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+.wrap{max-width:680px;margin:0 auto;padding:0 24px;}
+
+.masthead{padding:64px 0 8px;}
+.kicker{
+  font-family:var(--font-mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:18px;
+}
+h1.title{
+  font-family:var(--font-serif);font-weight:600;font-size:clamp(1.9rem,5vw,2.6rem);
+  line-height:1.22;letter-spacing:-.01em;margin:0 0 20px;
+}
+.dek{font-size:1.15rem;color:var(--ink-soft);margin:18px 0 0;line-height:1.6;}
+
+hr.rule{border:none;border-top:1px solid var(--line);margin:44px 0;}
+
+/* Contents */
+.toc-heading{
+  font-family:var(--font-mono);font-weight:500;font-size:.72rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-faint);margin:0 0 28px;
+}
+ol.contents{list-style:none;margin:0;padding:0;}
+ol.contents li{
+  display:flex;gap:18px;align-items:baseline;
+  padding:18px 0;border-bottom:1px solid var(--line);
+}
+ol.contents li:first-child{border-top:1px solid var(--line);}
+.num{
+  font-family:var(--font-mono);font-size:.8rem;color:var(--ink-faint);
+  min-width:2.1em;flex-shrink:0;padding-top:.2em;
+}
+.entry{min-width:0;}
+.entry a.article-link{font-size:1.08rem;font-weight:600;}
+.entry .blurb{display:block;font-size:.92rem;color:var(--ink-soft);line-height:1.5;margin-top:4px;}
+.entry .nb{
+  display:inline-block;font-family:var(--font-mono);font-size:.72rem;
+  color:var(--ink-faint);margin-top:8px;text-decoration-color:rgba(138,135,126,.4);
+}
+.entry .nb:hover{color:var(--accent);}
+.blurb code{
+  font-family:var(--font-mono);font-size:.82em;background:var(--accent-soft);
+  padding:.1em .36em;border-radius:4px;color:#1D4785;
+}
+
+.end-note{
+  background:var(--accent-soft);border-left:2px solid var(--accent);
+  padding:18px 22px;margin:44px 0 0;font-size:.96rem;color:var(--ink-soft);
+}
+.end-note a{font-weight:600;}
+
+footer{
+  text-align:center;padding:40px 24px 60px;font-family:var(--font-mono);
+  font-size:.76rem;color:var(--ink-faint);
+}
+@media (max-width:520px){
+  body{font-size:17px;}
+  .masthead{padding-top:44px;}
+  ol.contents li{gap:12px;}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="masthead">
+    <div class="kicker">Python Programming Series</div>
+    <h1 class="title">Learning Python, from first principles</h1>
+    <p class="dek">A ten-part guide covering the language from literals and variables through object-oriented programming, exception handling, and file I/O. Every article is paired with a Jupyter notebook containing the runnable code.</p>
+  </div>
+
+  <hr class="rule">
+
+  <p class="toc-heading">The ten articles</p>
+
+  <ol class="contents">
+    <li>
+      <span class="num">01</span>
+      <span class="entry">
+        <a class="article-link" href="1_introduction_to_python.html">Introduction to Python</a>
+        <span class="blurb">Literals, variables, syntax rules, keywords and identifiers, then a level deeper into what actually happens in memory when your code runs.</span>
+        <a class="nb" href="https://github.com/shikharkumar13/Python-Programming-Code/blob/main/1.%20Introduction%20to%20Python.ipynb">Notebook ↗</a>
+      </span>
+    </li>
+    <li>
+      <span class="num">02</span>
+      <span class="entry">
+        <a class="article-link" href="2_lists_tuples_strings.html">Lists, Tuples and Strings</a>
+        <span class="blurb">Creating, indexing and slicing; what mutability really means; copying pitfalls; and the methods you will reach for most often.</span>
+        <a class="nb" href="https://github.com/shikharkumar13/Python-Programming-Code/blob/main/2.%20Lists%2C%20Tuples%20and%20Strings.ipynb">Notebook ↗</a>
+      </span>
+    </li>
+    <li>
+      <span class="num">03</span>
+      <span class="entry">
+        <a class="article-link" href="3_sets_dictionaries.html">Sets and Dictionaries</a>
+        <span class="blurb">Uniqueness and set mathematics, key-value lookups, and how to choose between the two when both would technically work.</span>
+        <a class="nb" href="https://github.com/shikharkumar13/Python-Programming-Code/blob/main/3.%20Sets%20and%20Dictionaries.ipynb">Notebook ↗</a>
+      </span>
+    </li>
+    <li>
+      <span class="num">04</span>
+      <span class="entry">
+        <a class="article-link" href="4_operators.html">Operators</a>
+        <span class="blurb">All six families, the <code>is</code> versus <code>==</code> distinction explained properly, bitwise operators bit by bit, and operator precedence.</span>
+        <a class="nb" href="https://github.com/shikharkumar13/Python-Programming-Code/blob/main/4.%20Operators.ipynb">Notebook ↗</a>
+      </span>
+    </li>
+    <li>
+      <span class="num">05</span>
+      <span class="entry">
+        <a class="article-link" href="5_conditionals_loops.html">Conditional Statements and Loops</a>
+        <span class="blurb">if / elif / else, while and for, break, continue and pass, and list comprehension as a shorter way to say the same thing.</span>
+        <a class="nb" href="https://github.com/shikharkumar13/Python-Programming-Code/blob/main/5.%20Conditional%20Statements%20and%20Loops.ipynb">Notebook ↗</a>
+      </span>
+    </li>
+    <li>
+      <span class="num">06</span>
+      <span class="entry">
+        <a class="article-link" href="6_Python_functions.html">Functions in Python</a>
+        <span class="blurb">Definition versus call, parameters versus arguments, the four argument types, return versus print, and variable scope.</span>
+        <a class="nb" href="https://github.com/shikharkumar13/Python-Programming-Code/blob/main/6.%20Functions%20in%20Python.ipynb">Notebook ↗</a>
+      </span>
+    </li>
+    <li>
+      <span class="num">07</span>
+      <span class="entry">
+        <a class="article-link" href="7_types_of_functions.html">Types of Functions in Python</a>
+        <span class="blurb">enumerate, zip, filter, map and reduce; lambda expressions; recursion; and the higher-order functions that tie them together.</span>
+        <a class="nb" href="https://github.com/shikharkumar13/Python-Programming-Code/blob/main/7.%20Types%20of%20Functions%20in%20Python.ipynb">Notebook ↗</a>
+      </span>
+    </li>
+    <li>
+      <span class="num">08</span>
+      <span class="entry">
+        <a class="article-link" href="8_OOPs_in_Python.html">Object-Oriented Programming</a>
+        <span class="blurb">Classes and objects, and the four pillars: encapsulation, inheritance, polymorphism and abstraction, each with a worked example.</span>
+        <a class="nb" href="https://github.com/shikharkumar13/Python-Programming-Code/blob/main/8.%20Object%20Oriented%20Programming%28OOPs%29.ipynb">Notebook ↗</a>
+      </span>
+    </li>
+    <li>
+      <span class="num">09</span>
+      <span class="entry">
+        <a class="article-link" href="9_Exception_Handling.html">Exception Handling</a>
+        <span class="blurb">try / except / else / finally, the exception hierarchy, raising and re-raising, assert, and building your own exception types.</span>
+        <a class="nb" href="https://github.com/shikharkumar13/Python-Programming-Code/blob/main/9.%20Exception_Handling.ipynb">Notebook ↗</a>
+      </span>
+    </li>
+    <li>
+      <span class="num">10</span>
+      <span class="entry">
+        <a class="article-link" href="10_File_Handling.html">File Handling</a>
+        <span class="blurb">Opening, reading and writing; file modes; seek and tell; the os module and pathlib; CSV and JSON; and handling file errors gracefully.</span>
+        <a class="nb" href="https://github.com/shikharkumar13/Python-Programming-Code/blob/main/10.%20File_Handling.ipynb">Notebook ↗</a>
+      </span>
+    </li>
+  </ol>
+
+  <div class="end-note">
+    <strong>New here?</strong> Start with <a href="1_introduction_to_python.html">Introduction to Python</a> and work through in order &mdash; each article assumes the ones before it. All the code lives in the <a href="https://github.com/shikharkumar13/Python-Programming-Code">GitHub repository</a>.
+  </div>
+
+</div>
+
+<footer>Python Programming Series &nbsp;·&nbsp; Ten articles</footer>
+</body>
+</html>
