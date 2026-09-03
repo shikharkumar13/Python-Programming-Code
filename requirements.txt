@@ -7,3 +7,7 @@
 
 requests>=2.31
 beautifulsoup4>=4.12
+
+# Chapter 19's tools. Not needed to run the notebooks, only to follow along.
+pytest>=8.0
+mypy>=1.8

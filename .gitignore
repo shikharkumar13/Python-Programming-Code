@@ -6,6 +6,7 @@ context_demo/
 toolkit_demo/
 api_demo/
 scraper_demo/
+reliable_demo/
 
 # Jupyter
 .ipynb_checkpoints/
@@ -13,6 +14,10 @@ scraper_demo/
 # Python
 __pycache__/
 *.py[cod]
+
+# Tool caches
+.pytest_cache/
+.mypy_cache/
 
 # Secrets: never commit these
 .env

@@ -26,4 +26,5 @@ A collection of Python notebooks covering the language from first principles thr
 | 16 | Regular Expressions | [`16. Regular Expressions.ipynb`](./16.%20Regular%20Expressions.ipynb) | _article coming soon_ |
 | 17 | Working with APIs | [`17. Working with APIs.ipynb`](./17.%20Working%20with%20APIs.ipynb) | _article coming soon_ |
 | 18 | Web Scraping | [`18. Web Scraping.ipynb`](./18.%20Web%20Scraping.ipynb) | _article coming soon_ |
+| 19 | Writing Reliable Code | [`19. Writing Reliable Code.ipynb`](./19.%20Writing%20Reliable%20Code.ipynb) | _article coming soon_ |
 

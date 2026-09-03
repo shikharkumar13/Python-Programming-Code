@@ -41,7 +41,7 @@ SERIES = [
     (16, 'Regular Expressions',              '16. Regular Expressions.ipynb', None, 'B'),
     (17, 'Working with APIs',                '17. Working with APIs.ipynb', None, 'B'),
     (18, 'Web Scraping',                    '18. Web Scraping.ipynb', None, 'B'),
-    (19, 'Writing Reliable Code',            None, None, 'B'),
+    (19, 'Writing Reliable Code',          '19. Writing Reliable Code.ipynb', None, 'B'),
     (20, 'Capstone Project',                 None, None, 'B'),
 ]
 
