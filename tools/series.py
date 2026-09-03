@@ -36,7 +36,7 @@ SERIES = [
     (11, 'Modules and Virtual Environments', '11. Modules and Virtual Environments.ipynb', None, 'B'),
     (12, 'Iterators and Generators',         '12. Iterators and Generators.ipynb', None, 'B'),
     (13, 'Closures and Decorators',          '13. Closures and Decorators.ipynb', None, 'B'),
-    (14, 'Context Managers',                 None, None, 'B'),
+    (14, 'Context Managers',                 '14. Context Managers.ipynb', None, 'B'),
     (15, 'The Standard Library Toolkit',     None, None, 'B'),
     (16, 'Regular Expressions',              None, None, 'B'),
     (17, 'Working with APIs',                None, None, 'B'),
