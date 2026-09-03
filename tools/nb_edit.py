@@ -108,3 +108,39 @@ def new_notebook(cells):
                              "version": "3.12.8"}},
             "nbformat": 4,
             "nbformat_minor": 5}
+
+
+def save_executed(name, nb, strip_execution=True, keep_ids=True):
+    """Write a freshly executed notebook in the repo's on-disk style.
+
+    Two things make a regenerated notebook diff badly against the committed
+    one, even when nothing meaningful changed:
+
+    * nbclient records `execution` timestamps in every code cell's metadata.
+      The existing notebooks have empty cell metadata, and the timestamps
+      change on every run.
+    * cell ids are generated randomly, so re-running a build rewrites the id
+      of every cell in the file.
+
+    This strips the timestamps and reuses the ids of any cell whose content is
+    unchanged, so the diff shows only what actually differs.
+    """
+    import json as _json
+    path = ROOT / name
+
+    old_ids = {}
+    if keep_ids and path.exists():
+        for cell in _json.loads(path.read_text(encoding='utf-8'))['cells']:
+            key = (cell['cell_type'], ''.join(cell['source']))
+            old_ids.setdefault(key, []).append(cell.get('id'))
+
+    for cell in nb['cells']:
+        if strip_execution:
+            cell.get('metadata', {}).pop('execution', None)
+        key = (cell['cell_type'], ''.join(cell['source']))
+        if old_ids.get(key):
+            cell['id'] = old_ids[key].pop(0)
+
+    nb['metadata']['kernelspec'] = dict(KERNELSPEC)
+    path.write_text(_json.dumps(nb, indent=1, ensure_ascii=False) + '\n', encoding='utf-8')
+    return path
