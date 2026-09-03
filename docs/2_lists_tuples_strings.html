@@ -569,6 +569,26 @@ Total items in cart: 3
 <div class="output-card"><pre><code>Custom Sorted Playlist: [&#39;vid_104&#39;, &#39;vid_101&#39;, &#39;vid_102&#39;, &#39;vid_103&#39;, &#39;vid_999&#39;]
 </code></pre></div>
 
+<p><strong>Twitter/X: Post Drafts.</strong> Drafts are kept in a list because you might save several with the exact same text, and the order you wrote them in matters. A list preserves every entry, duplicates included, and lets you edit or delete any one of them in place.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="c1"># A list of saved drafts</span>
+<span class="n">drafts</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;Python is amazing!&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Working on a new YouTube video...&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Coming soon!&quot;</span>
+<span class="p">]</span>
+
+<span class="c1"># User deletes the oldest draft</span>
+<span class="k">del</span> <span class="n">drafts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># User edits the current latest draft</span>
+<span class="n">drafts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Coming soon! Stay tuned for the Python series.&quot;</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Your Saved Drafts: </span><span class="si">{</span><span class="n">drafts</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Your Saved Drafts: [&#39;Working on a new YouTube video...&#39;, &#39;Coming soon! Stay tuned for the Python series.&#39;]
+</code></pre></div>
+
 <hr />
 <h2 id="part-2-tuples-the-locked-container"><span class="h-icon t"><svg class="icon"><use href="#icon-tuple"></use></svg></span>Part 2: Tuples: The Locked Container</h2>
 <p>A tuple looks almost identical to a list, mixed data types, indexing, slicing, but with one rule change that affects everything: <strong>once created, it cannot be modified.</strong> Think of it as a sealed certificate: the moment it's issued, the values on it are final.</p>
