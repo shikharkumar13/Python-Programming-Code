@@ -173,20 +173,20 @@ footer{
   <hr class="rule">
 
   <article>
-    <h2>What Is Python?</h2>
+    <h2 id="what-is-python">What Is Python?</h2>
 <p>Python is an interpreted, high-level, general-purpose programming language. It's one of the most popular languages in the world today, and it has become the go-to language for data science. Here's what those three words actually mean.</p>
 <p><strong>High-level</strong> means it reads almost like English. You don't have to manage the tiny, fiddly details of how the computer's memory works; Python handles that for you.</p>
 <p><strong>Interpreted</strong> means Python runs your code line by line, rather than converting the whole program into machine code ahead of time. (We'll get into exactly what this means later, since it matters more than it sounds.)</p>
 <p><strong>General-purpose</strong> means it isn't locked to one job. You can build websites, analyze data, automate boring tasks, train AI models, or write games with it.</p>
-<h3>Why Is Python So Popular?</h3>
+<h3 id="why-is-python-so-popular">Why Is Python So Popular?</h3>
 <p>It's general-purpose, lightweight, and fast to write. Because it isn't specialized for a single task, you can use it for almost anything, and you'll write fewer lines than you would in most other languages.</p>
 <p>It became the language of data science, almost by accident. Python wasn't designed for data science, but its simplicity plus a huge ecosystem of free, community-built tools (like NumPy, Pandas, Matplotlib, and SciPy) made it the natural home for working with data.</p>
 <p>It has a flat learning curve. The syntax is clean and simple, which makes it approachable even for people who have never programmed before. Python is famous for being readable: you can often guess what a piece of code does just by looking at it.</p>
 <p>It has a large, active community. This matters more than beginners realize. When you hit a problem (and you will), chances are someone has already solved it and posted the answer online. You're never really stuck alone.</p>
 <hr />
-<h2>Literals and Variables</h2>
+<h2 id="literals-and-variables">Literals and Variables</h2>
 <p>These are the two most fundamental building blocks in any program, so it's worth understanding them clearly.</p>
-<h3>Literals: The Raw Data</h3>
+<h3 id="literals-the-raw-data">Literals: The Raw Data</h3>
 <p>A literal is a fixed value written directly into your code, a piece of raw information. There are many kinds, but the four you'll use most are:</p>
 <ul>
 <li><strong>Integers (<code>int</code>)</strong>: whole numbers, like <code>10</code></li>
@@ -201,7 +201,7 @@ footer{
 </code></pre></div>
 
 <p>A literal on its own is just a value sitting there. To actually use it, you usually store it somewhere, and that's where variables come in.</p>
-<h3>Variables: The Containers</h3>
+<h3 id="variables-the-containers">Variables: The Containers</h3>
 <p>A variable is a named container that holds a literal value. You give it a name, and you can use that name to retrieve or change the value later.</p>
 <p>Storing a value into a variable is called assignment, and you do it with the equals sign (<code>=</code>):</p>
 <div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="n">num</span> <span class="o">=</span> <span class="mi">10</span>
@@ -209,7 +209,7 @@ footer{
 </code></pre></div>
 
 <p>Read the <code>=</code> as "gets" or "is assigned": <em>"num gets the value 10."</em> It is not the "equals" of mathematics; it's an instruction to store something.</p>
-<h3>The Rules for Naming Variables</h3>
+<h3 id="the-rules-for-naming-variables">The Rules for Naming Variables</h3>
 <p>Python is strict about variable names. Follow these rules:</p>
 <ul>
 <li>A name can only contain <strong>letters, numbers, and underscores</strong> (<code>_</code>).</li>
@@ -238,23 +238,23 @@ footer{
 </code></pre></div>
 
 <hr />
-<h2>The Basic Rules of Writing Python</h2>
+<h2 id="the-basic-rules-of-writing-python">The Basic Rules of Writing Python</h2>
 <p>Python has a few non-negotiable rules that trip up beginners. Knowing them up front saves a lot of frustration.</p>
-<h3>1. Indentation Matters</h3>
+<h3 id="1-indentation-matters">1. Indentation Matters</h3>
 <p>In most languages, indentation (the spaces at the start of a line) is just for looks. In Python, it's part of the language's grammar. Lines that belong together must be indented consistently. Starting a line with random spacing will cause an error:</p>
 <div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Welcome to Python&quot;</span><span class="p">)</span>
  <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Python is fun&quot;</span><span class="p">)</span>     <span class="c1"># ERROR: unexpected indentation</span>
 </code></pre></div>
 
 <p>This is actually one of the reasons Python code looks so clean: the structure is forced to be visually organized.</p>
-<h3>2. No Punctuation at the End of Statements</h3>
+<h3 id="2-no-punctuation-at-the-end-of-statements">2. No Punctuation at the End of Statements</h3>
 <p>Unlike some languages that end every line with a semicolon, Python wants lines clean. Don't add stray periods or commas at the end:</p>
 <div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Welcome to Python&quot;</span><span class="p">)</span><span class="o">.</span>    <span class="c1"># ERROR: trailing period breaks the syntax</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Python is fun&quot;</span><span class="p">),</span>        <span class="c1"># RUNS, but not the way you&#39;d expect (see below)</span>
 </code></pre></div>
 
 <p>That trailing comma is a sneaky one. It doesn't error, but it silently turns the statement into a one-item tuple. <code>print("Python is fun"),</code> still prints the text, but the whole expression evaluates to <code>(None,)</code>, a tuple holding <code>print</code>'s return value, which is always <code>None</code>. If you ever see a stray <code>(None,)</code> show up somewhere you didn't expect, a trailing comma like this is a common cause.</p>
-<h3>3. Python Is Case-Sensitive</h3>
+<h3 id="3-python-is-case-sensitive">3. Python Is Case-Sensitive</h3>
 <p><code>print</code> and <code>Print</code> are completely different things to Python. The built-in function is <code>print</code> (all lowercase). Capitalizing it breaks your code:</p>
 <div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="n">Print</span><span class="p">(</span><span class="s1">&#39;Hello&#39;</span><span class="p">)</span>    <span class="c1"># ERROR: Python doesn&#39;t know &#39;Print&#39;</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello&#39;</span><span class="p">)</span>    <span class="c1"># correct</span>
@@ -262,7 +262,7 @@ footer{
 
 <p>This applies to everything. <code>age</code>, <code>Age</code>, and <code>AGE</code> would be three separate variables.</p>
 <hr />
-<h2>Writing Comments</h2>
+<h2 id="writing-comments">Writing Comments</h2>
 <p>A comment is text in your code that Python completely ignores. It's there purely for humans, to explain what the code does and why. Good comments make a program far easier to read and maintain, both for others and for yourself months later.</p>
 <p>Python has two ways to write comments.</p>
 <p><strong>Single-line comments</strong> start with a pound/hash sign (<code>#</code>):</p>
@@ -280,7 +280,7 @@ footer{
 
 <p>A good habit: write a short comment describing the purpose of each meaningful piece of code. You don't need to explain every line, but the intent behind a block should be clear.</p>
 <hr />
-<h2>Python Keywords</h2>
+<h2 id="python-keywords">Python Keywords</h2>
 <p>Keywords are reserved words that already have a special meaning to Python. Because Python needs them to understand your code, you cannot use them as variable names, function names, or any other identifier.</p>
 <p>You can see the full list at any time:</p>
 <div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">keyword</span>
@@ -291,7 +291,7 @@ footer{
 <p>Examples include <code>if</code>, <code>else</code>, <code>for</code>, <code>while</code>, <code>def</code>, <code>class</code>, <code>import</code>, <code>return</code>, <code>True</code>, <code>False</code>, and <code>None</code>. Almost all keywords are lowercase; the exceptions are <code>True</code>, <code>False</code>, and <code>None</code>, which are capitalized and must be written exactly that way.</p>
 <p>You don't need to memorize them. You'll naturally learn them as you go, and Python will warn you if you accidentally try to use one as a name.</p>
 <hr />
-<h2>Identifiers</h2>
+<h2 id="identifiers">Identifiers</h2>
 <p>An identifier is simply the name you give to something in your program: a variable, a function, a class, and so on. (Variable names are the most common kind of identifier.)</p>
 <p>The rules for identifiers are the same as the variable naming rules:</p>
 <ol>
@@ -303,9 +303,9 @@ footer{
 </ol>
 <p>A few best practices worth repeating: Python is case-sensitive, so <code>amount</code>, <code>AMOUNT</code>, and <code>aMouNT</code> are three different identifiers. Choose meaningful names; <code>num</code> beats <code>x</code>, and <code>compound_interest</code> beats <code>ci</code>. Separate multiple words with underscores (<code>snake_case</code>) or capital letters (<code>camelCase</code>).</p>
 <hr />
-<h2>Three Important Things About Variables in Python</h2>
+<h2 id="three-important-things-about-variables-in-python">Three Important Things About Variables in Python</h2>
 <p>A few behaviors are especially worth understanding early.</p>
-<h3>1. Python Is Dynamically Typed</h3>
+<h3 id="1-python-is-dynamically-typed">1. Python Is Dynamically Typed</h3>
 <p>In Python, a variable can hold one type of value now and a completely different type later. You never have to declare what kind of data a variable will hold; Python figures it out on the fly:</p>
 <div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="n">num</span> <span class="o">=</span> <span class="mi">10</span>        <span class="c1"># num is currently an integer</span>
 <span class="n">num</span> <span class="o">=</span> <span class="mi">20</span>        <span class="c1"># still an integer, new value</span>
@@ -313,7 +313,7 @@ footer{
 </code></pre></div>
 
 <p>This is not allowed in statically typed languages like C, C++, or Java, where a variable's type is fixed when you create it. (More on what "dynamically typed" really means later in this guide.)</p>
-<h3>2. Multiple Assignment in One Line</h3>
+<h3 id="2-multiple-assignment-in-one-line">2. Multiple Assignment in One Line</h3>
 <p>Python lets you assign several variables at once, which keeps code compact:</p>
 <div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="c1"># Instead of three separate lines:</span>
 <span class="n">num1</span> <span class="o">=</span> <span class="mi">10</span>
@@ -339,7 +339,7 @@ footer{
 <span class="c1"># One value &#39;40&#39; in memory, three labels pointing to it</span>
 </code></pre></div>
 
-<h3>3. Type Conversion</h3>
+<h3 id="3-type-conversion">3. Type Conversion</h3>
 <p>You can convert a value from one type to another using the type's name as a function. This is called type casting:</p>
 <div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="n">num1</span> <span class="o">=</span> <span class="mi">10</span>
 <span class="nb">type</span><span class="p">(</span><span class="n">num1</span><span class="p">)</span>          <span class="c1"># &lt;class &#39;int&#39;&gt;</span>
@@ -361,11 +361,11 @@ footer{
 <hr />
 <h1 class="part-title">Part Two &nbsp;·&nbsp; What Actually Happens When You Run Code</h1>
 <p>This is the part most beginners never get explained, but understanding it will make you a far more confident programmer. Let's look under the hood.</p>
-<h2>How a Computer Actually Thinks</h2>
+<h2 id="how-a-computer-actually-thinks">How a Computer Actually Thinks</h2>
 <p>Here's the fundamental truth: a computer's processor (the CPU) only understands one language, machine code. This is pure binary, just <code>1</code>s and <code>0</code>s, representing electrical on/off signals. It looks nothing like Python. Something like <code>num = 10</code> means absolutely nothing to the raw hardware.</p>
 <p>So there's a gap. On one side, you have human-friendly Python. On the other, you have a machine that only speaks binary. Something has to bridge that gap, to translate your Python into instructions the CPU can actually execute.</p>
 <hr />
-<h2>How Python Reads Your Code</h2>
+<h2 id="how-python-reads-your-code">How Python Reads Your Code</h2>
 <p>When you run a Python program, here's what happens, step by step, in plain English:</p>
 <p><strong>Step 1: Reading and checking (parsing).</strong> Python first reads through your code, top to bottom, and checks that the grammar makes sense. If you forgot a colon or misspelled something structurally, it stops right here and reports a syntax error before running anything. Think of this like proofreading a sentence before reading it aloud.</p>
 <p><strong>Step 2: Translating to bytecode.</strong> Python converts your readable code into an intermediate, compact form called bytecode. This isn't machine code yet; it's a halfway language that Python's engine understands. (You may have seen mysterious <code>.pyc</code> files or a <code>__pycache__</code> folder appear. That's the saved bytecode, kept around so Python doesn't have to re-translate unchanged code every time.)</p>
@@ -414,7 +414,7 @@ footer{
 
 <p>You write the first box. Python handles everything after it, automatically, every time you hit "run."</p>
 <hr />
-<h2>What Happens in Memory (The Simple Version)</h2>
+<h2 id="what-happens-in-memory-the-simple-version">What Happens in Memory (The Simple Version)</h2>
 <p>When your code creates data, that data has to physically live somewhere, in the computer's memory (RAM). Here's a beginner-friendly mental model of how Python handles this.</p>
 <p>When you write:</p>
 <div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="n">num</span> <span class="o">=</span> <span class="mi">10</span>
@@ -487,11 +487,11 @@ footer{
   <path d="M 100 246 L 148 246" fill="none" stroke="#B7B4AC" stroke-width="1.3" stroke-dasharray="3 3" marker-end="url(#arrow2gray)"/>
   <text x="124" y="238" text-anchor="middle" font-size="8.5" fill="#9A968C">label moves</text>
 </svg>
-<div class="diagram-cap">Variables are labels, not boxes</div></div><h3>Garbage Collection: Automatic Cleanup</h3>
+<div class="diagram-cap">Variables are labels, not boxes</div></div><h3 id="garbage-collection-automatic-cleanup">Garbage Collection: Automatic Cleanup</h3>
 <p>That "cleaned up automatically" part has a name: garbage collection. Python keeps track of how many labels point to each object. When an object has no labels pointing to it anymore, it's unreachable, so Python automatically frees up that memory for reuse.</p>
 <p>In lower-level languages like C, you have to manually claim and release memory, and forgetting to do so causes serious bugs. Python does this housekeeping for you behind the scenes, which is one of the big reasons it's so beginner-friendly. One less thing to worry about.</p>
 <hr />
-<h2>Interpreted vs Compiled Languages</h2>
+<h2 id="interpreted-vs-compiled-languages">Interpreted vs Compiled Languages</h2>
 <p>This is one of the most useful distinctions to understand, and it's simpler than it sounds. Both approaches solve the same problem (translating human code into machine code), just at different times.</p>
 <p>A compiled language (like C, C++, or Rust) translates your entire program into machine code before it runs, all at once. This translation step is called compilation, and it produces a standalone executable file. Running that file is then very fast, because all the translating is already done.</p>
 <blockquote>
@@ -579,7 +579,7 @@ footer{
 <p><strong>The honest middle ground:</strong> Python is technically a blend. As you learned above, it first compiles your code to bytecode, then interprets that bytecode. But from a beginner's point of view, the experience is interpreted: you write code and run it instantly, with no separate build step.</p>
 <p>The practical takeaway: Python trades some raw speed for a lot of convenience. For most tasks, that trade is well worth it.</p>
 <hr />
-<h2>Static vs Dynamically Typed Languages</h2>
+<h2 id="static-vs-dynamically-typed-languages">Static vs Dynamically Typed Languages</h2>
 <p>We touched on this earlier; here's the full, simple picture.</p>
 <p>The "type" of a variable means what kind of data it holds: a number, some text, a true/false value, and so on. The difference between static and dynamic typing is about when and whether you have to declare that type.</p>
 <p>A statically typed language (like C, C++, or Java) requires you to declare a variable's type up front, and that type is locked in. A variable declared to hold a number can only ever hold a number.</p>
@@ -632,16 +632,16 @@ footer{
 </table></div>
 <p>The trade-off in one sentence: static typing catches more mistakes early but makes you write more, while dynamic typing is faster and more flexible but can let type-related bugs slip through until runtime. Python chooses flexibility, which is part of why it's so quick to learn.</p>
 <hr />
-<h2>Where Python Shines, and Where It Struggles</h2>
+<h2 id="where-python-shines-and-where-it-struggles">Where Python Shines, and Where It Struggles</h2>
 <p>No language is perfect for everything. Understanding Python's strengths and weaknesses helps you know when to reach for it, and when something else might fit better.</p>
-<h3>Where Python Shines</h3>
+<h3 id="where-python-shines">Where Python Shines</h3>
 <p><strong>Readability and beginner-friendliness.</strong> Python's clean syntax means you spend more time solving your actual problem and less time fighting the language. It's widely considered the best first language to learn.</p>
 <p><strong>Data science, machine learning, and AI.</strong> This is Python's biggest strength. The ecosystem of tools, NumPy, Pandas, scikit-learn, TensorFlow, PyTorch, is unmatched, and the large majority of AI research and development happens in Python<sup class="fn">1</sup> (though performance-critical pieces are often written in C++, and languages like R and Julia hold their own in specific corners of data science).</p>
 <p><strong>Automation and scripting.</strong> Need to rename a thousand files, scrape a website, or automate a repetitive task? Python is well-suited for quick, practical scripts.</p>
 <p><strong>Web development (back-end).</strong> Frameworks like Django and Flask power many real websites and APIs.</p>
 <p><strong>Glue code and rapid prototyping.</strong> Python is well-suited for quickly stitching different systems together and for testing an idea fast before committing to a more complex build.</p>
 <p><strong>The community and libraries.</strong> For almost any task you can imagine, someone has probably already built a free Python library for it. This saves enormous amounts of time.</p>
-<h3>Where Python Struggles</h3>
+<h3 id="where-python-struggles">Where Python Struggles</h3>
 <p><strong>Raw speed.</strong> Because it's interpreted and dynamically typed, Python is significantly slower than compiled languages like C++ or Rust for heavy number-crunching. (Clever workaround: speed-critical libraries like NumPy are actually written in C under the hood, so you get C-like speed with Python-like ease.)</p>
 <p><strong>Mobile app development.</strong> Python is rarely used to build phone apps. For that, languages like Swift (iOS) and Kotlin (Android) dominate.</p>
 <p><strong>Memory usage.</strong> Python's convenience comes at a cost: it generally uses more memory than lower-level languages, which can matter on devices with very limited resources.</p>
@@ -649,7 +649,7 @@ footer{
 <p><strong>Very high-performance or real-time systems.</strong> For things like operating systems, game engines, or systems where every microsecond counts, compiled languages are usually the better choice.</p>
 <p>Put together, Python is a flexible, beginner-friendly language that's fast to write even when it isn't the fastest to run. For most of what people actually want to do, especially data, automation, and AI, its strengths far outweigh its weaknesses.</p>
 <hr />
-<h2>Putting It All Together</h2>
+<h2 id="putting-it-all-together">Putting It All Together</h2>
 <p>Let's tie the whole journey together with a single, simple line of code and trace what happens:</p>
 <div class="code-card"><div class="code-head"><span class="lang">python</span></div><pre><code><span class="n">age</span> <span class="o">=</span> <span class="mi">25</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">age</span><span class="p">)</span>
@@ -666,7 +666,7 @@ footer{
 </ol>
 <p>All of that, from two tiny lines, happens in a fraction of a second, and now you understand every step.</p>
 <hr />
-<h2>Quick Reference Summary</h2>
+<h2 id="quick-reference-summary">Quick Reference Summary</h2>
 <div class="table-wrap"><table>
 <thead>
 <tr>
