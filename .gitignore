@@ -13,6 +13,10 @@ api_demo/
 __pycache__/
 *.py[cod]
 
+# Secrets: never commit these
+.env
+.env.*
+
 # Environments
 .venv/
 venv/
