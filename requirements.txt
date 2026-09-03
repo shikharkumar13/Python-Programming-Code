@@ -1,7 +1,9 @@
 # Chapters 1-16 use only the standard library. These are needed from chapter 17.
+# requests: chapters 17 and 18.  beautifulsoup4: chapter 18.
 #
 #   python3 -m venv .venv
 #   source .venv/bin/activate        # Windows: .venv\Scripts\activate
 #   pip install -r requirements.txt
 
 requests>=2.31
+beautifulsoup4>=4.12
