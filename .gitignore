@@ -3,6 +3,7 @@ file_handling_demo/
 module_demo/
 generators_demo/
 context_demo/
+toolkit_demo/
 
 # Jupyter
 .ipynb_checkpoints/

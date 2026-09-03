@@ -22,4 +22,5 @@ A collection of Python notebooks covering the language from first principles thr
 | 12 | Iterators and Generators | [`12. Iterators and Generators.ipynb`](./12.%20Iterators%20and%20Generators.ipynb) | _article coming soon_ |
 | 13 | Closures and Decorators | [`13. Closures and Decorators.ipynb`](./13.%20Closures%20and%20Decorators.ipynb) | _article coming soon_ |
 | 14 | Context Managers | [`14. Context Managers.ipynb`](./14.%20Context%20Managers.ipynb) | _article coming soon_ |
+| 15 | The Standard Library Toolkit | [`15. The Standard Library Toolkit.ipynb`](./15.%20The%20Standard%20Library%20Toolkit.ipynb) | _article coming soon_ |
 
