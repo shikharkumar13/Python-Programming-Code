@@ -9,6 +9,9 @@ scraper_demo/
 reliable_demo/
 capstone_demo/
 
+# Local assistant instructions, not part of the published course
+CLAUDE.md
+
 # Jupyter
 .ipynb_checkpoints/
 
