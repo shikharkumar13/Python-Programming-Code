@@ -7,7 +7,7 @@ data science, machine learning and AI engineering work.
 <p>
   <img alt="Python 3.10+" src="https://img.shields.io/badge/python-3.10%2B-3776AB?logo=python&logoColor=white">
   <img alt="20 notebooks" src="https://img.shields.io/badge/notebooks-20-F37626?logo=jupyter&logoColor=white">
-  <img alt="882 runnable code cells" src="https://img.shields.io/badge/code%20cells-882-success">
+  <img alt="893 runnable code cells" src="https://img.shields.io/badge/code%20cells-893-success">
   <img alt="outputs verified" src="https://img.shields.io/badge/outputs-reproducible-brightgreen">
 </p>
 
@@ -29,7 +29,7 @@ data science, machine learning and AI engineering work.
 
 ## What this is
 
-20 Jupyter notebooks, 1,626 cells, 882 of them executable, with every
+20 Jupyter notebooks, 1,650 cells, 893 of them executable, with every
 output committed and verified. Chapters 1 to 10 also have a long-form written article
 published as a static site.
 
@@ -117,7 +117,7 @@ The constructs you meet the moment you read real code, and the tooling around th
 
 | # | Chapter | Cells | Notebook | Article |
 |--:|---------|------:|----------|---------|
-| 11 | **Modules and Virtual Environments**<br><sub>`import` machinery, writing modules, packages, pip, venv, layout</sub> | 81 | [open](./11.%20Modules%20and%20Virtual%20Environments.ipynb) | _in progress_ |
+| 11 | **Modules and Virtual Environments**<br><sub>`import` machinery, writing modules, packages, terminal, venv, pip, import errors, layout</sub> | 105 | [open](./11.%20Modules%20and%20Virtual%20Environments.ipynb) | _in progress_ |
 | 12 | **Iterators and Generators**<br><sub>Iterator protocol, `yield`, laziness, generator expressions</sub> | 105 | [open](./12.%20Iterators%20and%20Generators.ipynb) | _in progress_ |
 | 13 | **Closures and Decorators**<br><sub>First-class functions, closures, `@`, `functools`, decorator factories</sub> | 93 | [open](./13.%20Closures%20and%20Decorators.ipynb) | _in progress_ |
 | 14 | **Context Managers**<br><sub>`__enter__`/`__exit__`, `@contextmanager`, `suppress`, `ExitStack`</sub> | 92 | [open](./14.%20Context%20Managers.ipynb) | _in progress_ |
@@ -192,9 +192,9 @@ set's iteration order passes one run and fails the next. The same applies to `id
 memory addresses in a default `repr`, and timings. None of them belong in a committed
 output, and two runs is what finds them.
 
-49 cells carry a `skip-verify` tag because their output legitimately differs every
-run: live network calls, timestamps, memory addresses, interactive `input()`, and set
-iteration order. They still execute; only the comparison is skipped, and the reason is
+51 cells carry a `skip-verify` tag because their output legitimately differs from run
+to run or machine to machine: live network calls, timestamps, memory addresses,
+interactive `input()`, set iteration order, and file paths on the computer running it. They still execute; only the comparison is skipped, and the reason is
 recorded per cell.
 
 ### Offline by default
