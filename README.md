@@ -158,7 +158,8 @@ Getting data from the network, and shipping code that survives contact with it.
 │   ├── nb_edit.py                      byte-identical notebook round-trip
 │   ├── series.py                       the canonical chapter list and nav
 │   ├── verify_outputs.py               re-execute and diff committed outputs
-│   └── highlight.py                    Pygments spans for article code blocks
+│   ├── highlight.py                    Pygments spans for article code blocks
+│   └── requirements.txt                what the tools need (readers never do)
 │
 └── requirements.txt
 ```
@@ -208,6 +209,11 @@ marked cells make a real request, and the notebooks say so up front.
 
 `tools/` holds four helpers used to write and maintain the material. They are not a build
 step: `docs/` is hand-authored and nothing in it is generated from the notebooks.
+Their dependencies are kept out of the reader's `requirements.txt`:
+
+```bash
+pip install -r tools/requirements.txt   # nbformat, nbclient, ipykernel, pygments + the course packages
+```
 
 | Tool | Purpose |
 |------|---------|
@@ -221,6 +227,9 @@ python3 tools/series.py list         # chapter list, and what exists so far
 python3 tools/series.py nav --check  # report prev/next drift across articles
 python3 tools/series.py nav          # rewrite the nav blocks
 ```
+
+`nav` exits non-zero if a published article has no nav block for it to rewrite;
+`nav --check` also exits non-zero on drift, so either can gate a commit.
 
 ---
 

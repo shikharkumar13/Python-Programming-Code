@@ -10,6 +10,9 @@ module keeps the ordering in one place and regenerates the nav from it.
     python3 tools/series.py nav           # rewrite nav in every article
     python3 tools/series.py nav --check   # report drift, change nothing
 
+`nav` exits 1 if any published article has no nav block to rewrite; with
+`--check` it also exits 1 if any block has drifted.
+
 `article=None` means the article has not been written yet: it is skipped when
 linking, so no article ever links to a page that would 404 on the live site.
 """
@@ -40,9 +43,9 @@ SERIES = [
     (15, 'The Standard Library Toolkit',     '15. The Standard Library Toolkit.ipynb', None, 'B'),
     (16, 'Regular Expressions',              '16. Regular Expressions.ipynb', None, 'B'),
     (17, 'Working with APIs',                '17. Working with APIs.ipynb', None, 'B'),
-    (18, 'Web Scraping',                    '18. Web Scraping.ipynb', None, 'B'),
-    (19, 'Writing Reliable Code',          '19. Writing Reliable Code.ipynb', None, 'B'),
-    (20, 'Capstone Project',               '20. Capstone Project.ipynb', None, 'B'),
+    (18, 'Web Scraping',                     '18. Web Scraping.ipynb', None, 'B'),
+    (19, 'Writing Reliable Code',            '19. Writing Reliable Code.ipynb', None, 'B'),
+    (20, 'Capstone Project',                 '20. Capstone Project.ipynb', None, 'B'),
 ]
 
 REPO_URL = 'https://github.com/shikharkumar13/Python-Programming-Code'
@@ -94,7 +97,8 @@ NAV_RE = re.compile(r'^[ \t]*<nav class="series-nav">.*?</nav>', re.S | re.M)
 
 
 def update_nav(check_only=False):
-    rows, changed = published(), []
+    """Rewrite (or just report) every nav block. Returns (changed, missing)."""
+    rows, changed, missing = published(), [], []
     for i, (num, title, _, article, tpl) in enumerate(rows):
         path = DOCS / article
         text = path.read_text()
@@ -102,6 +106,7 @@ def update_nav(check_only=False):
         nav = build_nav(i, indent)
         if not NAV_RE.search(text):
             print(f'  !! no nav block in {article} — insert one first')
+            missing.append(article)
             continue
         new = NAV_RE.sub(lambda m: nav, text, count=1)
         if new != text:
@@ -110,7 +115,7 @@ def update_nav(check_only=False):
                 path.write_text(new)
     verb = 'would change' if check_only else 'updated'
     print(f'{verb}: {len(changed)} article(s)' + (': ' + ', '.join(changed) if changed else ''))
-    return changed
+    return changed, missing
 
 
 if __name__ == '__main__':
@@ -121,6 +126,10 @@ if __name__ == '__main__':
             ar_ok = '✓' if article and (DOCS / article).exists() else '·'
             print(f'{num:>3}. [nb {nb_ok}] [article {ar_ok}]  {title}')
     elif cmd == 'nav':
-        update_nav(check_only='--check' in sys.argv)
+        # Non-zero on anything still wrong afterwards: a missing block always,
+        # drift only under --check (without it, drift has just been fixed).
+        check_only = '--check' in sys.argv
+        changed, missing = update_nav(check_only)
+        sys.exit(1 if missing or (check_only and changed) else 0)
     else:
         sys.exit(__doc__)

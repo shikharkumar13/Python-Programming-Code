@@ -10,8 +10,9 @@ to be run through here first.
     echo 'x = 1' | python3 tools/highlight.py      # -> reads stdin
 
 Or from Python:
-    from highlight import code_card
-    print(code_card(source, output='42'))
+    from highlight import code_card, output_card
+    print(code_card(source))
+    print(output_card('42'))
 """
 import html
 import sys

@@ -10,21 +10,35 @@ compares, without touching the file on disk.
 
 Cells tagged `skip-verify` in their metadata are reported as skipped rather
 than compared. Use it for the few whose output legitimately differs run to
-run: live network calls (ch. 17, 18) and tracebacks that name the notebook's
-own temporary file (ch. 19). They are still executed; only the comparison is
-skipped. `allow_errors=True` means a cell
+run: live network calls (ch. 17, 18), timestamps, memory addresses,
+interactive `input()`, set iteration order, and tracebacks that name the
+notebook's own temporary file (ch. 19). They are still executed; only the
+comparison is skipped. `allow_errors=True` means a cell
 that raises records the error as its output instead of aborting the run, which
 is what chapter 1's deliberate ZeroDivisionError needs, and what lets an
 offline machine get through the network chapters.
 """
 import copy
 import pathlib
+import re
 import sys
 
 import nbformat
 from nbclient import NotebookClient
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
+
+# Noise that differs between machines but says nothing about the code:
+# * IPython names each cell's pseudo-file after a hash of its source, e.g.
+#   "(2791510414.py, line 1)", so editing a comment renames it.
+# * Lines made only of ^ or ~ are traceback position markers; whether they
+#   appear depends on the Python and pytest versions, not on the notebook.
+CELL_FILE = re.compile(r'\b\d{6,}\.py\b')
+MARKER_LINE = re.compile(r'^[ \t]*[\^~]+[ \t]*\n', re.M)
+
+
+def _normalise(text):
+    return MARKER_LINE.sub('', CELL_FILE.sub('<cell>.py', text))
 
 
 def _text(outputs):
@@ -37,7 +51,7 @@ def _text(outputs):
             parts.append(''.join(o.get('data', {}).get('text/plain', [])))
         elif o.get('output_type') == 'error':
             parts.append(o.get('ename', '') + ': ' + o.get('evalue', ''))
-    return ''.join(parts).strip()
+    return _normalise(''.join(parts)).strip()
 
 
 def verify(name):
@@ -72,4 +86,6 @@ if __name__ == '__main__':
                        key=lambda n: int(n.split('.')[0]))
     else:
         names = sys.argv[1:]
+    if not names:
+        sys.exit(__doc__)
     sys.exit(0 if all([verify(n) for n in names]) else 1)
