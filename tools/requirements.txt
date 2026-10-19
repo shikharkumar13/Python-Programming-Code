@@ -1,6 +1,6 @@
 # Authoring tools only. Readers never need these; see ../requirements.txt.
 #
-#   pip install -r tools/requirements.txt
+#   python3 -m pip install -r tools/requirements.txt
 
 # verify_outputs.py re-executes every chapter, so it needs the readers' packages too.
 -r ../requirements.txt

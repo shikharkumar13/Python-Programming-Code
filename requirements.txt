@@ -3,7 +3,7 @@
 #
 #   python3 -m venv .venv
 #   source .venv/bin/activate        # Windows: .venv\Scripts\activate
-#   pip install -r requirements.txt
+#   python3 -m pip install -r requirements.txt
 
 requests>=2.31
 beautifulsoup4>=4.12

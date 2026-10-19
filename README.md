@@ -69,8 +69,8 @@ cd Python-Programming-Code
 python3 -m venv .venv
 source .venv/bin/activate          # Windows: .venv\Scripts\activate
 
-pip install -r requirements.txt    # only needed from chapter 17
-pip install jupyterlab
+python3 -m pip install -r requirements.txt    # only needed from chapter 17
+python3 -m pip install jupyterlab
 
 jupyter lab "1. Introduction to Python.ipynb"
 ```
@@ -212,7 +212,7 @@ step: `docs/` is hand-authored and nothing in it is generated from the notebooks
 Their dependencies are kept out of the reader's `requirements.txt`:
 
 ```bash
-pip install -r tools/requirements.txt   # nbformat, nbclient, ipykernel, pygments + the course packages
+python3 -m pip install -r tools/requirements.txt   # nbformat, nbclient, ipykernel, pygments + the course packages
 ```
 
 | Tool | Purpose |
