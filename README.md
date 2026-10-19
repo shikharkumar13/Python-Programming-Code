@@ -7,7 +7,7 @@ data science, machine learning and AI engineering work.
 <p>
   <img alt="Python 3.10+" src="https://img.shields.io/badge/python-3.10%2B-3776AB?logo=python&logoColor=white">
   <img alt="20 notebooks" src="https://img.shields.io/badge/notebooks-20-F37626?logo=jupyter&logoColor=white">
-  <img alt="901 runnable code cells" src="https://img.shields.io/badge/code%20cells-901-success">
+  <img alt="903 runnable code cells" src="https://img.shields.io/badge/code%20cells-903-success">
   <img alt="outputs verified" src="https://img.shields.io/badge/outputs-reproducible-brightgreen">
 </p>
 
@@ -29,7 +29,7 @@ data science, machine learning and AI engineering work.
 
 ## What this is
 
-20 Jupyter notebooks, 1,670 cells, 901 of them executable, with every
+20 Jupyter notebooks, 1,676 cells, 903 of them executable, with every
 output committed and verified. Chapters 1 to 10 also have a long-form written article
 published as a static site.
 
@@ -122,7 +122,7 @@ The constructs you meet the moment you read real code, and the tooling around th
 | 13 | **Closures and Decorators**<br><sub>First-class functions, closures, `@`, `functools`, decorator factories</sub> | 102 | [open](./13.%20Closures%20and%20Decorators.ipynb) | _in progress_ |
 | 14 | **Context Managers**<br><sub>`__enter__`/`__exit__`, `@contextmanager`, `suppress`, `ExitStack`</sub> | 98 | [open](./14.%20Context%20Managers.ipynb) | _in progress_ |
 | 15 | **The Standard Library Toolkit**<br><sub>`collections`, `itertools`, `functools`, `datetime`</sub> | 127 | [open](./15.%20The%20Standard%20Library%20Toolkit.ipynb) | _in progress_ |
-| 16 | **Regular Expressions**<br><sub>Raw strings, character classes, groups, greedy vs lazy, `re.escape`</sub> | 91 | [open](./16.%20Regular%20Expressions.ipynb) | _in progress_ |
+| 16 | **Regular Expressions**<br><sub>Raw strings, character classes, groups, greedy vs lazy, `re.escape`</sub> | 97 | [open](./16.%20Regular%20Expressions.ipynb) | _in progress_ |
 
 ### Part III: Working with real data (chapters 17 to 20)
 
