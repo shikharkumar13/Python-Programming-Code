@@ -11,6 +11,7 @@ capstone_demo/
 
 # Local assistant instructions, not part of the published course
 CLAUDE.md
+projects.md
 
 # Jupyter
 .ipynb_checkpoints/
