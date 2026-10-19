@@ -7,7 +7,7 @@ data science, machine learning and AI engineering work.
 <p>
   <img alt="Python 3.10+" src="https://img.shields.io/badge/python-3.10%2B-3776AB?logo=python&logoColor=white">
   <img alt="20 notebooks" src="https://img.shields.io/badge/notebooks-20-F37626?logo=jupyter&logoColor=white">
-  <img alt="894 runnable code cells" src="https://img.shields.io/badge/code%20cells-894-success">
+  <img alt="897 runnable code cells" src="https://img.shields.io/badge/code%20cells-897-success">
   <img alt="outputs verified" src="https://img.shields.io/badge/outputs-reproducible-brightgreen">
 </p>
 
@@ -29,7 +29,7 @@ data science, machine learning and AI engineering work.
 
 ## What this is
 
-20 Jupyter notebooks, 1,653 cells, 894 of them executable, with every
+20 Jupyter notebooks, 1,662 cells, 897 of them executable, with every
 output committed and verified. Chapters 1 to 10 also have a long-form written article
 published as a static site.
 
@@ -119,7 +119,7 @@ The constructs you meet the moment you read real code, and the tooling around th
 |--:|---------|------:|----------|---------|
 | 11 | **Modules and Virtual Environments**<br><sub>`import` machinery, writing modules, packages, terminal, venv, pip, import errors, layout</sub> | 105 | [open](./11.%20Modules%20and%20Virtual%20Environments.ipynb) | _in progress_ |
 | 12 | **Iterators and Generators**<br><sub>Iterator protocol, `yield`, laziness, generator expressions</sub> | 108 | [open](./12.%20Iterators%20and%20Generators.ipynb) | _in progress_ |
-| 13 | **Closures and Decorators**<br><sub>First-class functions, closures, `@`, `functools`, decorator factories</sub> | 93 | [open](./13.%20Closures%20and%20Decorators.ipynb) | _in progress_ |
+| 13 | **Closures and Decorators**<br><sub>First-class functions, closures, `@`, `functools`, decorator factories</sub> | 102 | [open](./13.%20Closures%20and%20Decorators.ipynb) | _in progress_ |
 | 14 | **Context Managers**<br><sub>`__enter__`/`__exit__`, `@contextmanager`, `suppress`, `ExitStack`</sub> | 92 | [open](./14.%20Context%20Managers.ipynb) | _in progress_ |
 | 15 | **The Standard Library Toolkit**<br><sub>`collections`, `itertools`, `functools`, `datetime`</sub> | 125 | [open](./15.%20The%20Standard%20Library%20Toolkit.ipynb) | _in progress_ |
 | 16 | **Regular Expressions**<br><sub>Raw strings, character classes, groups, greedy vs lazy, `re.escape`</sub> | 91 | [open](./16.%20Regular%20Expressions.ipynb) | _in progress_ |
