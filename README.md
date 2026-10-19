@@ -7,7 +7,7 @@ data science, machine learning and AI engineering work.
 <p>
   <img alt="Python 3.10+" src="https://img.shields.io/badge/python-3.10%2B-3776AB?logo=python&logoColor=white">
   <img alt="20 notebooks" src="https://img.shields.io/badge/notebooks-20-F37626?logo=jupyter&logoColor=white">
-  <img alt="903 runnable code cells" src="https://img.shields.io/badge/code%20cells-903-success">
+  <img alt="905 runnable code cells" src="https://img.shields.io/badge/code%20cells-905-success">
   <img alt="outputs verified" src="https://img.shields.io/badge/outputs-reproducible-brightgreen">
 </p>
 
@@ -29,7 +29,7 @@ data science, machine learning and AI engineering work.
 
 ## What this is
 
-20 Jupyter notebooks, 1,676 cells, 903 of them executable, with every
+20 Jupyter notebooks, 1,681 cells, 905 of them executable, with every
 output committed and verified. Chapters 1 to 10 also have a long-form written article
 published as a static site.
 
@@ -130,7 +130,7 @@ Getting data from the network, and shipping code that survives contact with it.
 
 | # | Chapter | Cells | Notebook | Article |
 |--:|---------|------:|----------|---------|
-| 17 | **Working with APIs**<br><sub>HTTP verbs, status codes, timeouts, retries, keys, pagination</sub> | 64 | [open](./17.%20Working%20with%20APIs.ipynb) | _in progress_ |
+| 17 | **Working with APIs**<br><sub>HTTP verbs, status codes, timeouts, retries, keys, pagination</sub> | 69 | [open](./17.%20Working%20with%20APIs.ipynb) | _in progress_ |
 | 18 | **Web Scraping**<br><sub>`robots.txt`, BeautifulSoup, selectors, tables, encoding, ethics</sub> | 61 | [open](./18.%20Web%20Scraping.ipynb) | _in progress_ |
 | 19 | **Writing Reliable Code**<br><sub>Type hints, `mypy`, docstrings, `logging`, `pytest`, tracebacks</sub> | 58 | [open](./19.%20Writing%20Reliable%20Code.ipynb) | _in progress_ |
 | 20 | **Capstone Project**<br><sub>End-to-end pipeline: package, tests, validation, CSV and JSON output</sub> | 44 | [open](./20.%20Capstone%20Project.ipynb) | _in progress_ |
@@ -192,9 +192,9 @@ set's iteration order passes one run and fails the next. The same applies to `id
 memory addresses in a default `repr`, and timings. None of them belong in a committed
 output, and two runs is what finds them.
 
-51 cells carry a `skip-verify` tag because their output legitimately differs from run
+52 cells carry a `skip-verify` tag because their output legitimately differs from run
 to run or machine to machine: live network calls, timestamps, memory addresses,
-interactive `input()`, set iteration order, and file paths on the computer running it. They still execute; only the comparison is skipped, and the reason is
+interactive `input()`, set iteration order, installed package versions, and file paths on the computer running it. They still execute; only the comparison is skipped, and the reason is
 recorded per cell.
 
 ### Offline by default

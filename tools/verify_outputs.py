@@ -12,7 +12,8 @@ Cells tagged `skip-verify` in their metadata are reported as skipped rather
 than compared. Use it for the few whose output legitimately differs run to
 run: live network calls (ch. 17, 18), timestamps, memory addresses,
 interactive `input()`, set iteration order, paths that depend on the machine
-(ch. 11: `sys.executable`, an ImportError naming where `math` lives), and
+(ch. 11: `sys.executable`, an ImportError naming where `math` lives), the
+installed version of a package (ch. 17: `requests.__version__`), and
 tracebacks that name the notebook's own temporary file (ch. 19). They are still executed; only the
 comparison is skipped. `allow_errors=True` means a cell
 that raises records the error as its output instead of aborting the run, which
