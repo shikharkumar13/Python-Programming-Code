@@ -29,7 +29,7 @@ data science, machine learning and AI engineering work.
 
 ## What this is
 
-20 Jupyter notebooks, 1,685 cells, 907 of them executable, with every
+20 Jupyter notebooks, 1,686 cells, 907 of them executable, with every
 output committed and verified. Chapters 1 to 10 also have a long-form written article
 published as a static site.
 
@@ -132,7 +132,7 @@ Getting data from the network, and shipping code that survives contact with it.
 |--:|---------|------:|----------|---------|
 | 17 | **Working with APIs**<br><sub>HTTP verbs, status codes, timeouts, retries, keys, pagination</sub> | 69 | [open](./17.%20Working%20with%20APIs.ipynb) | _in progress_ |
 | 18 | **Web Scraping**<br><sub>`robots.txt`, BeautifulSoup, selectors, tables, encoding, ethics</sub> | 65 | [open](./18.%20Web%20Scraping.ipynb) | _in progress_ |
-| 19 | **Writing Reliable Code**<br><sub>Type hints, `mypy`, docstrings, `logging`, `pytest`, tracebacks</sub> | 58 | [open](./19.%20Writing%20Reliable%20Code.ipynb) | _in progress_ |
+| 19 | **Writing Reliable Code**<br><sub>Type hints, `mypy`, docstrings, `logging`, `pytest`, tracebacks</sub> | 59 | [open](./19.%20Writing%20Reliable%20Code.ipynb) | _in progress_ |
 | 20 | **Capstone Project**<br><sub>End-to-end pipeline: package, tests, validation, CSV and JSON output</sub> | 44 | [open](./20.%20Capstone%20Project.ipynb) | _in progress_ |
 
 ---
