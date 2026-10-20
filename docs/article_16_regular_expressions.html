@@ -1,0 +1,1657 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Regular Expressions · Python Programming Series</title>
+<meta name="description" content="A beginner-friendly guide to Python regular expressions: raw strings, the re functions, character classes, quantifiers, anchors, groups, greedy vs lazy matching, flags, re.escape, real examples and when not to use a regex.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+
+:root{
+  --paper:#F3F8FC;--surface:#FFFFFF;--tint:#E8F2FB;
+  --ink:#0E2238;--ink-soft:#3D5570;--ink-faint:#7F95AB;
+  --violet:#0B6FCC;--violet-deep:#0A4F9E;--violet-soft:#E2EFFB;
+  --pink:#3FA34D;--pink-text:#0A7466;--pink-soft:#E0F5F2;
+  --mint:#0FA3A3;--mint-text:#08787A;--mint-soft:#DDF4F4;
+  --sun:#FFB627;--sun-soft:#FFF4D9;
+  --orange:#E89B00;--orange-text:#9A6400;--orange-soft:#FFF0D1;
+  --sky:#013243;--sky-text:#013243;--sky-soft:#E1ECF0;
+  --line:#D6E4F0;--line-strong:#B9CFE3;
+  --code-bg:#0B1E33;--code-head:#08172A;--code-line:#17304D;--out-bg:#071425;
+  --r-s:8px;--r-m:14px;--r-l:22px;
+  --font-d:'Bricolage Grotesque','Arial Rounded MT Bold',sans-serif;
+  --font-b:'Figtree',-apple-system,'Segoe UI',sans-serif;
+  --font-m:'JetBrains Mono','SFMono-Regular',Consolas,monospace;
+}
+*,*::before,*::after{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-b);font-size:17px;line-height:1.68;-webkit-font-smoothing:antialiased;}
+a{color:var(--violet-deep);text-decoration-color:rgba(11,111,204,.35);text-underline-offset:3px;text-decoration-thickness:2px;}
+a:hover{text-decoration-color:currentColor;}
+::selection{background:var(--pink);color:#fff;}
+:focus-visible{outline:3px solid var(--pink);outline-offset:2px;border-radius:4px;}
+.icon{width:1em;height:1em;display:inline-block;vertical-align:-.15em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+
+.shell{max-width:1300px;margin:0 auto;padding:0 clamp(16px,4vw,44px);}
+.topbar{display:none;position:sticky;top:0;z-index:40;align-items:center;justify-content:space-between;padding:12px clamp(16px,4vw,44px);background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-bottom:2px solid var(--violet-soft);}
+.topbar .brand{font-family:var(--font-d);font-weight:800;font-size:.98rem;color:var(--ink);}
+.topbar .brand span{color:var(--violet);}
+.topbar button{border:2px solid var(--violet-soft);background:var(--surface);border-radius:var(--r-s);width:40px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--violet);}
+
+/* ---------- Hero: the one loud moment ---------- */
+.hero{position:relative;margin:clamp(16px,2.5vw,28px) 0 clamp(36px,5vw,56px);padding:clamp(36px,5.5vw,68px) clamp(22px,4.5vw,60px);background:var(--violet);color:#fff;border-radius:var(--r-l);overflow:hidden;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:clamp(28px,4vw,56px);align-items:center;}
+.hero::before{content:"";position:absolute;width:420px;height:420px;border-radius:50%;background:var(--violet-deep);right:-120px;top:-160px;}
+.hero::after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;background:var(--pink);left:-70px;bottom:-90px;opacity:.9;}
+.hero-copy,.hero-art{position:relative;z-index:1;}
+.hero-eyebrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-weight:600;font-size:.95rem;color:rgba(255,255,255,.86);margin-bottom:20px;}
+.hero-eyebrow .badge{background:var(--sun);color:var(--ink);font-family:var(--font-d);font-weight:800;padding:4px 13px;border-radius:999px;font-size:.92rem;}
+h1.title{font-family:var(--font-d);font-weight:800;font-size:clamp(2.15rem,4.6vw,3.7rem);line-height:1.02;letter-spacing:-.025em;margin:0 0 20px;max-width:16ch;color:#fff;}
+.hero-sub{font-size:clamp(1rem,1.5vw,1.12rem);color:rgba(255,255,255,.9);max-width:58ch;margin:0 0 28px;}
+.hero-sub strong{color:#fff;font-weight:700;}
+.hero-chips{display:flex;flex-wrap:wrap;gap:10px;}
+.chip{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.13);border:1.5px solid rgba(255,255,255,.28);padding:7px 14px 7px 10px;border-radius:999px;font-size:.88rem;font-weight:600;color:#fff;}
+.chip .icon{width:1.15em;height:1.15em;}
+.chip:nth-child(1) .icon{color:var(--sun);}
+.chip:nth-child(2) .icon{color:#7FF0D2;}
+.chip:nth-child(3) .icon{color:#C5F27A;}
+.chip:nth-child(4) .icon{color:#9FD6FF;}
+
+.hero-art{display:flex;flex-direction:column;align-items:center;}
+.blueprint{width:min(250px,100%);border:2.5px dashed rgba(255,255,255,.75);border-radius:var(--r-m);padding:14px 16px 12px;font-family:var(--font-m);font-size:.8rem;color:#fff;background:rgba(255,255,255,.06);}
+.bp-title{font-weight:700;margin-bottom:8px;}
+.bp-title .kw{color:#C5F27A;}
+.bp-title .cn{color:var(--sun);}
+.bp-line{padding:2px 0 2px 14px;color:rgba(255,255,255,.82);}
+.bp-line.m{color:#7FF0D2;}
+.fan{width:min(330px,100%);height:44px;display:block;}
+.fan path{stroke:rgba(255,255,255,.7);stroke-width:2;fill:none;stroke-dasharray:4 4;vector-effect:non-scaling-stroke;}
+.objs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:min(360px,100%);}
+.obj{border-radius:12px;padding:10px 10px 9px;font-family:var(--font-m);font-size:.72rem;line-height:1.5;color:var(--ink);box-shadow:0 6px 0 rgba(14,34,56,.28);animation:stamp .5s cubic-bezier(.3,1.5,.6,1) both;}
+.obj b{display:block;font-family:var(--font-d);font-size:1rem;font-weight:800;margin-bottom:3px;}
+.obj span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.o1{background:var(--sun);transform:rotate(-4deg);animation-delay:.25s;}
+.o2{background:#7FF0D2;transform:rotate(2deg);animation-delay:.45s;}
+.o3{background:#C5F27A;transform:rotate(-1.5deg);animation-delay:.65s;}
+@keyframes stamp{from{opacity:0;translate:0 -26px;scale:.85;}to{opacity:1;translate:0 0;scale:1;}}
+.art-cap{margin:18px 0 0;font-family:var(--font-d);font-weight:700;font-size:.95rem;color:rgba(255,255,255,.9);}
+
+/* ---------- Layout + sidebar ---------- */
+.layout{display:grid;grid-template-columns:265px minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:start;padding-bottom:90px;}
+.sidebar{position:sticky;top:24px;max-height:calc(100vh - 48px);overflow-y:auto;padding:16px 10px 16px 0;}
+.sidebar::-webkit-scrollbar{width:5px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:3px;}
+.toc-label{font-family:var(--font-d);font-weight:800;font-size:1rem;color:var(--ink);margin:0 0 10px;padding-left:12px;}
+.toc{list-style:none;margin:0;padding:0;}
+.toc li{margin:0 0 2px;}
+.toc a{display:flex;align-items:center;gap:10px;padding:7px 12px;font-size:.88rem;font-weight:500;color:var(--ink-soft);text-decoration:none;border-radius:10px;transition:background .15s,color .15s;}
+.toc a .icon{width:1.05em;height:1.05em;flex:none;color:var(--violet);}
+.toc a:hover{background:var(--violet-soft);color:var(--ink);}
+.toc a.active{background:var(--violet);color:#fff;font-weight:600;}
+.toc a.active .icon{color:var(--sun);}
+
+/* ---------- Article ---------- */
+.article{min-width:0;padding-top:8px;max-width:820px;}
+.article h2{--acc:var(--violet);font-family:var(--font-d);font-weight:800;font-size:clamp(1.55rem,2.6vw,2rem);line-height:1.15;letter-spacing:-.015em;margin:64px 0 18px;scroll-margin-top:24px;display:flex;align-items:center;gap:14px;}
+.article h2:nth-of-type(5n+2){--acc:var(--pink);}
+.article h2:nth-of-type(5n+3){--acc:var(--mint);}
+.article h2:nth-of-type(5n+4){--acc:var(--orange);}
+.article h2:nth-of-type(5n+5){--acc:var(--sky);}
+.article>h2:first-of-type{margin-top:4px;}
+.article>hr:first-child{display:none;}
+.article h2 .h-icon{width:2.6rem;height:2.6rem;flex:none;display:grid;place-items:center;background:var(--acc);color:#fff;border-radius:12px;transform:rotate(-4deg);box-shadow:0 4px 0 rgba(14,34,56,.18);}
+.article h2 .h-icon .icon{width:1.35rem;height:1.35rem;stroke-width:2;}
+.article h3{font-family:var(--font-d);font-weight:700;font-size:1.2rem;margin:34px 0 10px;scroll-margin-top:24px;color:var(--ink);}
+.article p{margin:0 0 17px;}
+.article ul,.article ol{margin:0 0 20px;padding-left:1.35em;}
+.article li{margin-bottom:8px;padding-left:.2em;}
+.article ul li::marker{color:var(--pink);font-size:1.15em;}
+.article ol li::marker{color:var(--violet);font-family:var(--font-d);font-weight:800;}
+.article strong{font-weight:700;}
+.article hr{border:0;height:6px;width:110px;margin:52px auto;border-radius:6px;background:linear-gradient(90deg,var(--violet) 0 20%,var(--pink) 20% 40%,var(--mint) 40% 60%,var(--sun) 60% 80%,var(--sky) 80% 100%);}
+.article code{font-family:var(--font-m);font-size:.84em;background:var(--pink-soft);padding:.12em .4em;border-radius:6px;color:var(--pink-text);}
+.article blockquote{margin:22px 0;padding:16px 20px;border-left:5px solid var(--sun);background:var(--sun-soft);border-radius:0 var(--r-m) var(--r-m) 0;color:var(--ink);}
+.article blockquote p{margin:0;color:inherit;}
+
+.table-wrap{overflow-x:auto;margin:22px 0 28px;border-radius:var(--r-m);border:2px solid var(--violet-soft);background:var(--surface);}
+.article table{width:100%;border-collapse:collapse;font-size:.9rem;}
+.article thead th{background:var(--violet);color:#fff;font-family:var(--font-d);font-weight:700;text-align:left;padding:12px 16px;white-space:nowrap;font-size:.9rem;}
+.article tbody td{padding:11px 16px;border-bottom:1px solid var(--line);vertical-align:top;}
+.article tbody tr:last-child td{border-bottom:none;}
+.article tbody tr:nth-child(even){background:#F5F9FD;}
+.article tbody td code{white-space:nowrap;}
+
+/* ---------- Code ---------- */
+.code-card{margin:22px 0 26px;border-radius:var(--r-m);overflow:hidden;background:var(--code-bg);box-shadow:0 6px 0 var(--violet-soft);}
+.code-card .code-head{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:var(--code-head);border-bottom:1px solid var(--code-line);}
+.code-card .dots{display:flex;gap:6px;}
+.code-card .dots span{width:10px;height:10px;border-radius:50%;display:block;}
+.code-card .dots span:nth-child(1){background:var(--pink);}
+.code-card .dots span:nth-child(2){background:var(--sun);}
+.code-card .dots span:nth-child(3){background:var(--mint);}
+.code-card .lang{font-family:var(--font-m);font-size:.72rem;color:#7E9CC0;}
+.code-card .copy-btn{font-family:var(--font-b);font-weight:600;font-size:.76rem;color:#DCEBFA;background:rgba(255,255,255,.06);border:1px solid #23456B;border-radius:7px;padding:4px 10px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .15s,border-color .15s;}
+.code-card .copy-btn:hover{background:var(--violet);border-color:var(--violet);color:#fff;}
+.code-card .copy-btn .icon{width:.95em;height:.95em;}
+.code-card pre{margin:0;padding:16px 20px;overflow-x:auto;font-size:.85rem;line-height:1.6;}
+.code-card code{font-family:var(--font-m);font-size:1em;line-height:inherit;color:#E6F1FF;background:none;padding:0;border-radius:0;}
+.code-card .k,.code-card .kn,.code-card .kd,.code-card .kc,.code-card .ow{color:#5CC8FF;}
+.code-card .nb,.code-card .bp{color:#9FD6FF;}
+.code-card .nf,.code-card .fm{color:#A6E36B;}
+.code-card .s,.code-card .s1,.code-card .s2,.code-card .sa,.code-card .sd,.code-card .se{color:#FFD166;}
+.code-card .si{color:#6EE7D8;}
+.code-card .mi,.code-card .mf{color:#6EE7D8;}
+.code-card .o,.code-card .p{color:#9FB6CF;}
+.code-card .c,.code-card .c1,.code-card .cm{color:#6F8BA8;font-style:italic;}
+.code-card .n{color:#E6F1FF;}
+.code-card .nc,.code-card .ne{color:#FFB86B;font-weight:600;}
+
+.output-card{margin:-26px 0 26px;border-radius:0 0 var(--r-m) var(--r-m);overflow:hidden;background:var(--out-bg);border-top:2px dashed #23456B;box-shadow:0 6px 0 var(--violet-soft);position:relative;z-index:1;}
+.output-card::before{content:"Output";display:block;font-family:var(--font-b);font-weight:700;font-size:.74rem;color:#A6E36B;padding:9px 20px 0;}
+.output-card pre{margin:0;padding:4px 20px 16px;overflow-x:auto;font-size:.82rem;line-height:1.6;}
+.output-card code{font-family:var(--font-m);font-size:1em;line-height:inherit;color:#BFD6EE;background:none;padding:0;border-radius:0;}
+
+.diagram-card{margin:22px 0 26px;border-radius:var(--r-m);overflow:hidden;position:relative;border:2.5px dashed var(--line-strong);background:var(--surface);}
+.diagram-card::before{content:"diagram";position:absolute;top:10px;right:14px;font-family:var(--font-b);font-weight:700;font-size:.74rem;color:var(--violet);}
+.diagram-card pre{margin:0;padding:26px 22px 20px;overflow-x:auto;}
+.diagram-card pre{line-height:1.3;font-size:.84rem;}
+.diagram-card code{font-family:var(--font-m);font-size:1em;line-height:inherit;color:var(--violet-deep);font-weight:500;background:none;padding:0;white-space:pre;}
+
+.svg-diagram{margin:24px 0 28px;padding:22px 20px 18px;background:var(--surface);border:2px solid var(--violet-soft);border-radius:var(--r-m);}
+.svg-diagram{overflow-x:auto;}
+.svg-diagram svg{width:100%;min-width:560px;height:auto;display:block;}
+.svg-diagram .cap{font-size:.86rem;font-weight:500;color:var(--ink-faint);text-align:center;margin-top:12px;}
+
+.article-end{margin-top:56px;padding:30px 30px;border-radius:var(--r-l);background:var(--violet);color:#fff;position:relative;overflow:hidden;}
+.article-end::after{content:"";position:absolute;width:140px;height:140px;border-radius:50%;background:var(--sun);right:-50px;bottom:-60px;}
+.article-end p{margin:0;font-size:1.06rem;color:rgba(255,255,255,.92);position:relative;z-index:1;max-width:62ch;}
+.article-end p strong{color:#fff;}
+
+footer.site-footer{border-top:2px solid var(--violet-soft);margin-top:30px;padding:22px clamp(16px,4vw,44px) 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+footer.site-footer .f-left{font-size:.88rem;font-weight:500;color:var(--ink-faint);}
+footer.site-footer a{font-size:.9rem;font-weight:600;}
+
+@media(max-width:960px){
+  .topbar{display:flex;}
+  .layout{grid-template-columns:1fr;}
+  .article{max-width:none;}
+  .sidebar{position:fixed;inset:60px 0 0 0;z-index:35;background:var(--paper);padding:18px clamp(16px,4vw,44px) 24px;transform:translateX(-100%);transition:transform .2s;max-height:none;height:calc(100vh - 60px);}
+  .sidebar.open{transform:translateX(0);}
+  .hero{grid-template-columns:1fr;}
+}
+@media(max-width:520px){
+  .article h2 .h-icon{width:2.2rem;height:2.2rem;}
+  .obj{font-size:.66rem;padding:9px 8px;}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}.sidebar{transition:none;}.obj{animation:none;}}
+
+/* NumPy hero illustration */
+.cells{display:grid;grid-template-columns:repeat(4,1fr);border:2px solid rgba(255,255,255,.8);border-radius:8px;overflow:hidden;margin-top:4px;}
+.cells span{text-align:center;padding:7px 0;font-weight:700;color:#fff;}
+.cells span+span{border-left:2px solid rgba(255,255,255,.8);}
+.objs.four{grid-template-columns:repeat(4,1fr);width:min(380px,100%);gap:9px;}
+.objs.four .obj{text-align:center;padding:10px 4px 9px;}
+.o4{background:#9FD6FF;transform:rotate(3deg);animation-delay:.85s;}
+
+/* Article 11 extras */
+.cells.three{grid-template-columns:repeat(3,1fr);}
+.cells.three span{font-size:.72rem;padding:6px 0;}
+.objs .obj{min-width:0;}
+.obj.seq{text-align:center;padding:10px 6px 9px;}
+.obj.seq code{display:block;font-family:var(--font-m);font-size:.74rem;font-weight:700;margin:2px 0 4px;color:var(--ink);background:none;padding:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.obj.seq span{font-size:.68rem;white-space:normal;}
+.code-card.term .code-head{background:#06121F;}
+.code-card .lang{text-transform:none;}
+.diagram-card.textfile::before{content:"text";}
+@media(max-width:520px){.obj.seq code{font-size:.62rem;}}
+
+.article h2 code,.article h3 code,.article p code,.article li code{overflow-wrap:anywhere;}
+</style>
+</head>
+<body>
+<svg style="display:none" aria-hidden="true"><defs>
+<symbol id="icon-leak" viewBox="0 0 24 24"><path d="M12 2s6 7 6 12a6 6 0 0 1-12 0c0-5 6-12 6-12z"/><path d="M9.5 15a2.5 2.5 0 0 0 2.5 2.5"/></symbol>
+<symbol id="icon-door" viewBox="0 0 24 24"><path d="M4 21V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v17"/><path d="M2 21h20"/><circle cx="12.5" cy="12" r="1" fill="currentColor"/><path d="M19 8l3 3-3 3M16 11h6"/></symbol>
+<symbol id="icon-build" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></symbol>
+<symbol id="icon-key" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3L21 2M17 6l3 3M14.5 8.5l2 2"/></symbol>
+<symbol id="icon-shield" viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z"/><path d="M9 12l2 2 4-4"/></symbol>
+<symbol id="icon-stopwatch" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M10 2h4M12 2v3"/></symbol>
+<symbol id="icon-layers" viewBox="0 0 24 24"><path d="M3 7c0-2 4-3 9-3s9 1 9 3"/><path d="M3 7h18"/><path d="M4 12h16" stroke-dasharray="2 2"/><path d="M3 17h18c0 2-4 3-9 3s-9-1-9-3z"/></symbol>
+<symbol id="icon-scale" viewBox="0 0 24 24"><path d="M12 3v18M7 21h10M5 7h14"/><path d="M5 7l-3 7a3 3 0 0 0 6 0zM19 7l-3 7a3 3 0 0 0 6 0z"/></symbol>
+<symbol id="icon-toolbox" viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="12" rx="1.5"/><path d="M8 8V5h8v3M2 13h20M10 13v2h4v-2"/></symbol>
+<symbol id="icon-stack" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="5" rx="1"/><rect x="4" y="10" width="16" height="5" rx="1"/><rect x="4" y="17" width="16" height="4" rx="1"/></symbol>
+<symbol id="icon-undo" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></symbol>
+<symbol id="icon-exitstack" viewBox="0 0 24 24"><rect x="3" y="12" width="7" height="9" rx="1"/><rect x="8.5" y="7" width="7" height="9" rx="1"/><rect x="14" y="2" width="7" height="9" rx="1"/></symbol>
+<symbol id="icon-loop" viewBox="0 0 24 24"><path d="M17 2l3 3-3 3"/><path d="M4 11V9a4 4 0 0 1 4-4h12"/><path d="M7 22l-3-3 3-3"/><path d="M20 13v2a4 4 0 0 1-4 4H4"/></symbol>
+<symbol id="icon-func" viewBox="0 0 24 24"><path d="M15 4h-2a3 3 0 0 0-3 3v10a3 3 0 0 1-3 3H5"/><path d="M7 11h8"/><path d="M16 14l4 5M20 14l-4 5"/></symbol>
+<symbol id="icon-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8 14h2M14 14h2M8 17h2"/></symbol>
+<symbol id="icon-puzzle" viewBox="0 0 24 24"><path d="M4 7h4a2 2 0 1 1 4 0h4v4a2 2 0 1 1 0 4v4h-4a2 2 0 1 0-4 0H4v-4a2 2 0 1 0 0-4z"/></symbol>
+<symbol id="icon-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/><path d="M8 10.5h5"/></symbol>
+<symbol id="icon-brackets" viewBox="0 0 24 24"><path d="M8 3C4 6 4 18 8 21"/><path d="M16 3c4 3 4 15 0 18"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></symbol>
+<symbol id="icon-ban" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></symbol>
+<symbol id="icon-warn" viewBox="0 0 24 24"><path d="M12 3l10 18H2z"/><path d="M12 10v5"/><circle cx="12" cy="18" r=".8" fill="currentColor"/></symbol>
+<symbol id="icon-table" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="1.5"/><line x1="2" y1="9" x2="22" y2="9"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15.5" y1="3" x2="15.5" y2="21"/></symbol>
+<symbol id="icon-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="13" rx="1.6"/><path d="M5 16H4.5A1.5 1.5 0 0 1 3 14.5v-10A1.5 1.5 0 0 1 4.5 3h10A1.5 1.5 0 0 1 16 4.5V5"/></symbol>
+<symbol id="icon-check" viewBox="0 0 24 24"><path d="M4 12.5 L9.5 18 L20 5"/></symbol>
+<symbol id="icon-menu" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
+<symbol id="icon-close" viewBox="0 0 24 24"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></symbol>
+</defs></svg>
+
+
+<div class="topbar">
+  <span class="brand">§16 &nbsp;<span>Regular Expressions</span></span>
+  <button id="navToggle" aria-label="Toggle navigation">
+    <svg class="icon"><use href="#icon-menu"></use></svg>
+  </button>
+</div>
+
+<div class="shell" id="top">
+  <section class="hero">
+  <div class="hero-copy">
+    <div class="hero-eyebrow"><span class="badge">Article 16</span> Python Programming Series</div>
+    <h1 class="title">Regular Expressions: Finding Patterns in Text</h1>
+    <p class="hero-sub">A <strong>regular expression</strong>, or <strong>regex</strong> for short, is a small language for describing <strong>patterns in text</strong>. You describe what the text looks like ("a <code>#</code> followed by some letters", "four digits, a dash, two digits, a dash, two digits"), and Python finds every place where that pattern appears. This guide explains regex from the ground up, in plain language, with every example run for real.</p>
+    <div class="hero-chips">
+      <div class="chip"><svg class="icon"><use href="#icon-search"></use></svg> search, findall, sub, split</div>
+      <div class="chip"><svg class="icon"><use href="#icon-build"></use></svg> Classes, quantifiers, anchors</div>
+      <div class="chip"><svg class="icon"><use href="#icon-brackets"></use></svg> Groups and named groups</div>
+      <div class="chip"><svg class="icon"><use href="#icon-ban"></use></svg> When not to use a regex</div>
+    </div>
+  </div>
+  <div class="hero-art" aria-hidden="true">
+    <div class="blueprint">
+      <div class="bp-title"><span class="kw">re</span>.<span class="cn">findall</span>(r"#\w+", caption)</div>
+      <div class="cells three"><span>what</span><span>how many</span><span>where</span></div>
+    </div>
+    <svg class="fan" viewBox="0 0 330 44" preserveAspectRatio="none"><path d="M165 0 C165 24 55 18 55 44"/><path d="M165 0 L165 44"/><path d="M165 0 C165 24 275 18 275 44"/></svg>
+    <div class="objs">
+      <div class="obj seq o1"><b>tags</b><code>#\w+</code><span>every hashtag</span></div>
+      <div class="obj seq o2"><b>dates</b><code>\d{4}-\d{2}</code><span>a shape, not text</span></div>
+      <div class="obj seq o3"><b>words</b><code>\bcat\b</code><span>whole words only</span></div>
+    </div>
+    <p class="art-cap">Describe the shape, find every match</p>
+  </div>
+</section>
+
+  <div class="layout">
+    <nav class="sidebar" id="sidebar">
+      <div class="toc-label">On this page</div>
+      <ul class="toc">
+<li><a href="#part-1-where-plain-string-methods-run-out"><svg class="icon"><use href="#icon-search"></use></svg><span>Part 1: Where Plain String Methods Run Out</span></a></li>
+<li><a href="#part-2-raw-strings-and-why-every-pattern-starts-with-r"><svg class="icon"><use href="#icon-shield"></use></svg><span>Part 2: Raw Strings, and Why Every Pattern Starts with r</span></a></li>
+<li><a href="#part-3-the-main-functions"><svg class="icon"><use href="#icon-func"></use></svg><span>Part 3: The Main Functions</span></a></li>
+<li><a href="#part-4-the-building-blocks"><svg class="icon"><use href="#icon-build"></use></svg><span>Part 4: The Building Blocks</span></a></li>
+<li><a href="#part-5-groups-pulling-out-the-pieces"><svg class="icon"><use href="#icon-brackets"></use></svg><span>Part 5: Groups: Pulling Out the Pieces</span></a></li>
+<li><a href="#part-6-greedy-and-lazy"><svg class="icon"><use href="#icon-scale"></use></svg><span>Part 6: Greedy and Lazy</span></a></li>
+<li><a href="#part-7-compiling-and-flags"><svg class="icon"><use href="#icon-toolbox"></use></svg><span>Part 7: Compiling, and Flags</span></a></li>
+<li><a href="#part-8-real-world-examples"><svg class="icon"><use href="#icon-puzzle"></use></svg><span>Part 8: Real-World Examples</span></a></li>
+<li><a href="#part-9-when-a-regex-is-the-wrong-tool"><svg class="icon"><use href="#icon-ban"></use></svg><span>Part 9: When a Regex Is the Wrong Tool</span></a></li>
+<li><a href="#part-10-redoing-chapter-2-properly"><svg class="icon"><use href="#icon-undo"></use></svg><span>Part 10: Redoing Chapter 2, Properly</span></a></li>
+<li><a href="#part-11-common-mistakes"><svg class="icon"><use href="#icon-warn"></use></svg><span>Part 11: Common Mistakes</span></a></li>
+<li><a href="#quick-reference-summary"><svg class="icon"><use href="#icon-table"></use></svg><span>Quick Reference Summary</span></a></li>
+      </ul>
+    </nav>
+
+    <main class="article">
+<p><strong>Analogy:</strong> a normal text search is like asking a friend, "Find me the word <code>cat</code> in this book." A regex is like saying, "Find me <strong>every phone number</strong> in this book." You don't know the actual numbers in advance. You only know what a phone number <strong>looks like</strong>, and that description is enough to find all of them.</p>
+<p>Regex comes with Python as the <code>re</code> module, so there's nothing to install. You'll meet it all over data work:</p>
+<ul>
+<li><strong>cleaning</strong> messy columns (prices typed as <code>"$59.98"</code>, <code>"USD 45"</code>, <code>"1,299.00 INR"</code>),</li>
+<li><strong>pulling fields out</strong> of log lines,</li>
+<li><strong>checking</strong> that input looks right (is this a date? an order ID?),</li>
+<li><strong>splitting</strong> text that a plain <code>.split()</code> can't handle.</li>
+</ul>
+<h3 id="where-we-left-off-in-chapter-2">Where We Left Off in Chapter 2</h3>
+<p>Back in chapter 2, we wrote two small text parsers using only plain string methods. One looked for a mention (like <code>@guido</code>) in an Instagram caption:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">mention_start</span> <span class="o">=</span> <span class="n">caption</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">"@"</span><span class="p">)</span>
+<span class="n">mention</span> <span class="o">=</span> <span class="n">caption</span><span class="p">[</span><span class="n">mention_start</span><span class="p">:]</span>
+</code></pre></div>
+
+<p>The other turned a Google search box entry into a <strong>URL slug</strong>, the readable part of a web address like <code>how-to-learn-python</code>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">url_slug</span> <span class="o">=</span> <span class="n">search_query</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">" "</span><span class="p">,</span> <span class="s2">"-"</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Each one worked on the single example it was written for. In this guide, we'll first give them a harder example and watch them struggle, and then build the tool that handles both properly.</p>
+<p>Here is what we will cover:</p>
+<ol>
+<li>Where chapter 2's string methods run out</li>
+<li>Raw strings, and why every pattern starts with <code>r</code></li>
+<li>The main <code>re</code> functions you'll actually use</li>
+<li>Character classes, quantifiers and anchors: the building blocks of a pattern</li>
+<li>Groups, and named groups that keep patterns readable</li>
+<li>Greedy and lazy matching</li>
+<li><code>re.compile</code>, flags, and <code>re.escape</code></li>
+<li>Real examples: log files, messy currency values, checking emails, splitting sentences</li>
+<li>When a regex is the wrong tool</li>
+<li>Redoing chapter 2's parsers properly</li>
+</ol>
+<hr />
+<h2 id="part-1-where-plain-string-methods-run-out"><span class="h-icon"><svg class="icon"><use href="#icon-search"></use></svg></span>Part 1: Where Plain String Methods Run Out</h2>
+<p>Here's chapter 2's caption parser again. This time we give it a more realistic caption, with <strong>several</strong> hashtags and <strong>several</strong> mentions:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">caption</span> <span class="o">=</span> <span class="s2">"Learning #Python and #pandas! Thanks @guido and @raymondh for the help. #100DaysOfCode"</span>
+
+<span class="n">has_python</span> <span class="o">=</span> <span class="s2">"#Python"</span> <span class="ow">in</span> <span class="n">caption</span>          <span class="c1"># chapter 2's hashtag check</span>
+<span class="n">mention_start</span> <span class="o">=</span> <span class="n">caption</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">"@"</span><span class="p">)</span>          <span class="c1"># chapter 2's mention finder</span>
+<span class="n">mention</span> <span class="o">=</span> <span class="n">caption</span><span class="p">[</span><span class="n">mention_start</span><span class="p">:]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Hashtag present:"</span><span class="p">,</span> <span class="n">has_python</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"User mentioned :"</span><span class="p">,</span> <span class="n">mention</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Hashtag present: True
+User mentioned : @guido and @raymondh for the help. #100DaysOfCode
+</code></pre></div>
+
+<p>There are two problems here:</p>
+<ol>
+<li><strong>The mention is wrong.</strong> We wanted <code>@guido</code>, but we got everything from the first <code>@</code> to the very end of the caption. <code>caption[mention_start:]</code> means "from this position to the end", and nothing told it where the name stops.</li>
+<li><strong>The hashtag check is too narrow.</strong> <code>"#Python" in caption</code> only checks for <strong>one</strong> hashtag whose name we already knew. Instagram needs to find <strong>every</strong> hashtag in a caption, including ones nobody has thought of yet.</li>
+</ol>
+<h3 id="doing-it-by-hand">Doing It by Hand</h3>
+<p>Finding every hashtag with plain string methods means writing the search loop yourself, one character at a time:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">find_hashtags</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="n">tags</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">word</span> <span class="o">=</span> <span class="s2">""</span>
+
+    <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">text</span> <span class="o">+</span> <span class="s2">" "</span><span class="p">:</span>                <span class="c1"># the trailing space closes the last word</span>
+        <span class="k">if</span> <span class="n">char</span> <span class="o">==</span> <span class="s2">"#"</span><span class="p">:</span>
+            <span class="n">word</span> <span class="o">=</span> <span class="s2">"#"</span>
+        <span class="k">elif</span> <span class="n">word</span> <span class="ow">and</span> <span class="p">(</span><span class="n">char</span><span class="o">.</span><span class="n">isalnum</span><span class="p">()</span> <span class="ow">or</span> <span class="n">char</span> <span class="o">==</span> <span class="s2">"_"</span><span class="p">):</span>
+            <span class="n">word</span> <span class="o">+=</span> <span class="n">char</span>
+        <span class="k">elif</span> <span class="n">word</span><span class="p">:</span>
+            <span class="n">tags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
+            <span class="n">word</span> <span class="o">=</span> <span class="s2">""</span>
+
+    <span class="k">return</span> <span class="n">tags</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="n">find_hashtags</span><span class="p">(</span><span class="n">caption</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>['#Python', '#pandas', '#100DaysOfCode']
+</code></pre></div>
+
+<p>It works, but look at what it took:</p>
+<ul>
+<li>a dozen lines of code,</li>
+<li>three <code>if</code>/<code>elif</code> branches,</li>
+<li>and a sneaky trick: adding an extra space to the end of the text (<code>text + " "</code>) so the last hashtag isn't lost.</li>
+</ul>
+<p>Worse, it has a <strong>bug</strong>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="s2">"with a space   :"</span><span class="p">,</span> <span class="n">find_hashtags</span><span class="p">(</span><span class="s2">"#python #pandas"</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"without a space:"</span><span class="p">,</span> <span class="n">find_hashtags</span><span class="p">(</span><span class="s2">"#python#pandas"</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>with a space   : ['#python', '#pandas']
+without a space: ['#pandas']
+</code></pre></div>
+
+<p>When two hashtags are written with no space between them, the first one silently disappears. Here's why: when the loop reaches the second <code>#</code>, the first branch (<code>if char == "#"</code>) runs and <strong>restarts</strong> the word as <code>"#"</code>, throwing away <code>#python</code> without ever saving it.</p>
+<p>One hashtag missing, and nothing told us. That's the real cost of writing loops like this by hand. The problem isn't the length. It's <strong>the cases you didn't think of</strong>.</p>
+<h3 id="the-same-job-with-a-regex">The Same Job with a Regex</h3>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">"#\w+"</span><span class="p">,</span> <span class="n">caption</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">"@\w+"</span><span class="p">,</span> <span class="n">caption</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">"#\w+"</span><span class="p">,</span> <span class="s2">"#python#pandas"</span><span class="p">))</span>    <span class="c1"># the case the loop got wrong</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>['#Python', '#pandas', '#100DaysOfCode']
+['@guido', '@raymondh']
+['#python', '#pandas']
+</code></pre></div>
+
+<p>One line each, and the tricky case works too.</p>
+<p>Let's read the pattern <code>#\w+</code> piece by piece:</p>
+<div class="diagram-card"><pre><code>   #\w+
+   │ │ └── + : "one or more of the thing before me"
+   │ └──── \w : "a word character" (a letter, a digit or an underscore)
+   └────── # : just a real # character
+
+   In words: "a #, followed by one or more word characters"
+</code></pre></div>
+
+<p><code>re.findall</code> then returns <strong>every</strong> piece of text that fits this description. Notice the pattern stops automatically at the first character that isn't a word character (a space, a <code>!</code>, another <code>#</code>), which is exactly where a hashtag ends.</p>
+<p><strong>Analogy:</strong> writing the loop by hand is like giving someone step-by-step directions: "walk forward, if you see a <code>#</code> start writing, if you see a letter keep writing, if you see a space stop...". A regex is like showing them <strong>a photo of what you're looking for</strong>. You describe the target, and the search is done for you.</p>
+<h3 id="the-url-slug-has-the-same-kind-of-problem">The URL Slug Has the Same Kind of Problem</h3>
+<p>Chapter 2's slug code assumed the search text was clean. Real search text rarely is:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">query</span> <span class="o">=</span> <span class="s2">"How to learn Python in 2026?  (beginner guide)"</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">" "</span><span class="p">,</span> <span class="s2">"-"</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>how-to-learn-python-in-2026?--(beginner-guide)
+</code></pre></div>
+
+<p>A question mark and a pair of brackets ended up in the URL, and the double space became a double hyphen. Fixing that with <code>.replace()</code> would mean one call for every punctuation mark you can think of, and you won't think of them all.</p>
+<p>The regex version takes a different approach. Instead of <strong>listing the exceptions</strong>, it <strong>states the rule</strong>: "replace every run of characters that isn't a lowercase letter or a digit with a single hyphen". Then <code>.strip("-")</code> removes any hyphens left over at the two ends:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">slug</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">"[^a-z0-9]+"</span><span class="p">,</span> <span class="s2">"-"</span><span class="p">,</span> <span class="n">query</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">"-"</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">slug</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>how-to-learn-python-in-2026-beginner-guide
+</code></pre></div>
+
+<p>Let's read <code>[^a-z0-9]+</code>:</p>
+<ul>
+<li><code>[a-z0-9]</code> would mean "one lowercase letter or one digit".</li>
+<li>The <code>^</code> just inside the square brackets flips it: <code>[^a-z0-9]</code> means "<strong>any one character that is NOT</strong> a lowercase letter or digit".</li>
+<li>The <code>+</code> means "one or more of those in a row".</li>
+</ul>
+<p>So <code>"?  ("</code> (a question mark, two spaces and a bracket, all next to each other) counts as <strong>one</strong> run and becomes <strong>one</strong> hyphen. That's why there's no double hyphen anymore.</p>
+<hr />
+<h2 id="part-2-raw-strings-and-why-every-pattern-starts-with-r"><span class="h-icon"><svg class="icon"><use href="#icon-shield"></use></svg></span>Part 2: Raw Strings, and Why Every Pattern Starts with <code>r</code></h2>
+<p>Every pattern above was written as <code>r"..."</code>, with a letter <code>r</code> before the opening quote. That <code>r</code> makes a <strong>raw string</strong>: a string where a backslash is just a backslash.</p>
+<p>Why does that matter? Because <strong>two different programs</strong> both treat backslashes as special:</p>
+<ol>
+<li><strong>Python itself</strong>, when it reads a normal string. For example, <code>"\n"</code> becomes a newline character.</li>
+<li><strong>The regex engine</strong>, when it reads a pattern. For example, <code>\d</code> means "a digit".</li>
+</ol>
+<p>Without the <code>r</code>, Python reads the string first and converts any backslash sequence it recognises (like <code>\n</code>, <code>\t</code> or <code>\b</code>) <strong>before</strong> the regex engine ever sees it:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="s2">"normal string:"</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="s2">"</span><span class="se">\b</span><span class="s2">"</span><span class="p">),</span> <span class="s2">"length"</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="s2">"</span><span class="se">\b</span><span class="s2">"</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"raw string   :"</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\b"</span><span class="p">),</span> <span class="s2">"length"</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\b"</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>normal string: '\x08' length 1
+raw string   : '\\b' length 2
+</code></pre></div>
+
+<ul>
+<li>In a normal string, <code>"\b"</code> is turned into <strong>one</strong> character: a "backspace" character (shown as <code>'\x08'</code>), left over from old typewriter-style terminals.</li>
+<li>In a raw string, <code>r"\b"</code> stays as <strong>two</strong> characters: a backslash and a <code>b</code>. That's what the regex engine needs to see, because to regex <code>\b</code> means "word boundary" (Part 4 explains what that is).</li>
+</ul>
+<p><strong>Analogy:</strong> imagine passing a note through a translator to reach a second person. You write <code>\b</code> meaning "word boundary" for the second person, but the <strong>first translator</strong> sees <code>\b</code>, decides it means "backspace", and changes it before passing it on. The raw string <code>r"..."</code> is like writing "<strong>don't translate this, pass it on exactly as written</strong>" on the note.</p>
+<div class="diagram-card"><pre><code>   "\bPython"   ──► Python reads it ──► [backspace]Python ──► regex looks for a backspace ✗
+   r"\bPython"  ──► Python leaves it ──► \bPython          ──► regex sees "word boundary" ✓
+</code></pre></div>
+
+<p>This isn't a matter of style. Leave the <code>r</code> off, and the pattern quietly stops working:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">text</span> <span class="o">=</span> <span class="s2">"I like Python"</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"without r:"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">"</span><span class="se">\b</span><span class="s2">Python"</span><span class="p">,</span> <span class="n">text</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"with r   :"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\bPython"</span><span class="p">,</span> <span class="n">text</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>without r: []
+with r   : ['Python']
+</code></pre></div>
+
+<p>No error, no warning, just an empty list. Python turned <code>\b</code> into a backspace character before <code>re</code> saw the pattern, and the sentence <code>"I like Python"</code> has no backspace characters in it.</p>
+<p>What about a pattern like <code>"\d+"</code> written without the <code>r</code>? <code>\d</code> isn't one of Python's own escape sequences, so Python leaves it alone and the pattern happens to work. But you're relying on luck: recent versions of Python (3.12 and later) print <code>SyntaxWarning: invalid escape sequence '\d'</code> for it, and the plan is to turn that into an error in a future version.</p>
+<p><strong>The rule:</strong> write <code>r"..."</code> for <strong>every</strong> pattern, even ones with no backslash yet. You'll add one sooner or later, and the <code>r</code> will already be there.</p>
+<hr />
+<h2 id="part-3-the-main-functions"><span class="h-icon"><svg class="icon"><use href="#icon-func"></use></svg></span>Part 3: The Main Functions</h2>
+<p>The <code>re</code> module has a lot in it, but these five functions do almost all of the work:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Returns</th>
+<th>Use it for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>re.search</code></td>
+<td>the first match, or <code>None</code></td>
+<td>"is it in there, and where?"</td>
+</tr>
+<tr>
+<td><code>re.findall</code></td>
+<td>a list of strings</td>
+<td>"give me all of them"</td>
+</tr>
+<tr>
+<td><code>re.finditer</code></td>
+<td>an iterator of match objects</td>
+<td>all of them, with positions</td>
+</tr>
+<tr>
+<td><code>re.sub</code></td>
+<td>a new string</td>
+<td>find and replace</td>
+</tr>
+<tr>
+<td><code>re.split</code></td>
+<td>a list of strings</td>
+<td>splitting on a pattern</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="31-research-the-first-match-or-nothing">3.1 <code>re.search</code>: The First Match, or Nothing</h3>
+<p><code>re.search</code> scans the text from left to right and stops at the <strong>first</strong> place the pattern matches. It gives back a <strong>match object</strong>: a small object that holds the matched text and where it was found.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">"@\w+"</span><span class="p">,</span> <span class="n">caption</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">match</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"matched text:"</span><span class="p">,</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"position    :"</span><span class="p">,</span> <span class="n">match</span><span class="o">.</span><span class="n">start</span><span class="p">(),</span> <span class="s2">"to"</span><span class="p">,</span> <span class="n">match</span><span class="o">.</span><span class="n">end</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"span        :"</span><span class="p">,</span> <span class="n">match</span><span class="o">.</span><span class="n">span</span><span class="p">())</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>&lt;re.Match object; span=(37, 43), match='@guido'&gt;
+matched text: @guido
+position    : 37 to 43
+span        : (37, 43)
+</code></pre></div>
+
+<p>What each line shows:</p>
+<ul>
+<li><code>print(match)</code> shows the whole match object: what matched (<code>'@guido'</code>) and its <code>span</code>.</li>
+<li><code>match.group()</code> gives you just the <strong>matched text</strong>.</li>
+<li><code>match.start()</code> and <code>match.end()</code> give the <strong>positions</strong>: the match begins at character 37 and ends just before character 43 (the end position is "one past the last character", the same way slicing works, so <code>caption[37:43]</code> is <code>'@guido'</code>).</li>
+<li><code>match.span()</code> gives both positions together as a tuple.</li>
+</ul>
+<h3 id="always-check-for-none">Always Check for <code>None</code></h3>
+<p>That <code>if match:</code> in the code isn't just for show. When nothing matches, <code>re.search</code> returns <strong><code>None</code></strong> instead of a match object.</p>
+<p>A match object counts as <code>True</code> in an <code>if</code>, and <code>None</code> counts as <code>False</code> (you saw this "truthy" and "falsy" idea in chapter 14), so a simple <code>if</code> is the normal way to check.</p>
+<p>If you call <code>.group()</code> without checking, you get an error as soon as a search finds nothing. In this example, <code>[0-9]</code> means "any digit" (Part 4 covers this kind of pattern), so <code>@[0-9]+</code> looks for a mention made only of digits, and there isn't one:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">try</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">"@[0-9]+"</span><span class="p">,</span> <span class="n">caption</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">())</span>    <span class="c1"># no mention in the caption is all digits</span>
+<span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"AttributeError:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>AttributeError: 'NoneType' object has no attribute 'group'
+</code></pre></div>
+
+<p>The error message is worth learning to recognise: <code>'NoneType' object has no attribute 'group'</code> almost always means "<strong>your search found nothing, and you didn't check</strong>".</p>
+<p><strong>Analogy:</strong> asking <code>re.search</code> is like sending someone to fetch a parcel. If they come back <strong>empty-handed</strong>, you can't open the parcel. You have to check whether they're holding anything before you start unwrapping.</p>
+<p>With the <code>if</code> in place, a missing match is just another case to handle:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="p">[</span><span class="sa">r</span><span class="s2">"@\w+"</span><span class="p">,</span> <span class="sa">r</span><span class="s2">"@[0-9]+"</span><span class="p">]:</span>
+    <span class="n">found</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">caption</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">found</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">pattern</span><span class="si">:</span><span class="s2">&lt;10</span><span class="si">}</span><span class="s2"> matched </span><span class="si">{</span><span class="n">found</span><span class="o">.</span><span class="n">group</span><span class="p">()</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">pattern</span><span class="si">:</span><span class="s2">&lt;10</span><span class="si">}</span><span class="s2"> no match"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>@\w+       matched '@guido'
+@[0-9]+    no match
+</code></pre></div>
+
+<p>(<code>!r</code> inside the f-string prints the value with its quotes, which makes it clear exactly what text matched.)</p>
+<h3 id="rematch-and-refullmatch"><code>re.match</code> and <code>re.fullmatch</code></h3>
+<p><code>re.match</code> is a different function, and its name is easy to misunderstand. It doesn't search the whole text. It <strong>only checks at the very start</strong> of the string.</p>
+<p><code>re.fullmatch</code> goes further: the pattern has to match <strong>the whole string</strong>, from the first character to the last. That's what you want when you're <strong>checking that a value has the right format</strong>. In the example below, <code>\d{4}</code> means "exactly four digits":</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="s2">"search    'Python'  :"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">"Python"</span><span class="p">,</span> <span class="n">caption</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"match     'Python'  :"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">"Python"</span><span class="p">,</span> <span class="n">caption</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"match     'Learning':"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">"Learning"</span><span class="p">,</span> <span class="n">caption</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"fullmatch '2026'    :"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\d</span><span class="si">{4}</span><span class="s2">"</span><span class="p">,</span> <span class="s2">"2026"</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"fullmatch '2026a'   :"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\d</span><span class="si">{4}</span><span class="s2">"</span><span class="p">,</span> <span class="s2">"2026a"</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>search    'Python'  : &lt;re.Match object; span=(10, 16), match='Python'&gt;
+match     'Python'  : None
+match     'Learning': &lt;re.Match object; span=(0, 8), match='Learning'&gt;
+
+fullmatch '2026'    : &lt;re.Match object; span=(0, 4), match='2026'&gt;
+fullmatch '2026a'   : None
+</code></pre></div>
+
+<p>Look at each result:</p>
+<ul>
+<li><code>re.search(r"Python", caption)</code> found <code>Python</code> at position 10, in the middle of the caption.</li>
+<li><code>re.match(r"Python", caption)</code> returned <code>None</code>, because the caption <strong>starts</strong> with <code>Learning</code>, not <code>Python</code>.</li>
+<li><code>re.match(r"Learning", caption)</code> found it, because <code>Learning</code> is right at the start.</li>
+<li><code>re.fullmatch(r"\d{4}", "2026")</code> matched, because the whole string is four digits.</li>
+<li><code>re.fullmatch(r"\d{4}", "2026a")</code> returned <code>None</code>, because of the extra <code>a</code> at the end.</li>
+</ul>
+<p><strong>Analogy:</strong> think of three ways a security guard could check a visitor list.</p>
+<ul>
+<li><code>search</code>: "Is this name <strong>anywhere</strong> on the list?"</li>
+<li><code>match</code>: "Is this name the <strong>first</strong> entry on the list?"</li>
+<li><code>fullmatch</code>: "Is this name the <strong>only</strong> entry, with nothing else written on the page?"</li>
+</ul>
+<div class="diagram-card"><pre><code>   text: "Learning #Python and #pandas! ..."
+
+   re.search("Python")     scans everywhere        ──► found at 10 ✓
+   re.match("Python")      checks the start only   ──► "Learning..." ✗ None
+   re.fullmatch(r"\d{4}")  must cover everything   ──► "2026" ✓   "2026a" ✗
+</code></pre></div>
+
+<h3 id="32-refindall-and-refinditer">3.2 <code>re.findall</code> and <code>re.finditer</code></h3>
+<p><code>findall</code> gives you a list of the <strong>matching text and nothing else</strong>. <code>finditer</code> gives you <strong>match objects</strong> one at a time, so you also get the positions.</p>
+<p><code>finditer</code> is also <strong>lazy</strong>, in the sense you met in chapter 12 on iterators: it only finds each match when you ask for the next one, instead of finding them all up front.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">for</span> <span class="n">found</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="sa">r</span><span class="s2">"#\w+"</span><span class="p">,</span> <span class="n">caption</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">found</span><span class="o">.</span><span class="n">group</span><span class="p">()</span><span class="si">:</span><span class="s2">&lt;16</span><span class="si">}</span><span class="s2"> at characters </span><span class="si">{</span><span class="n">found</span><span class="o">.</span><span class="n">start</span><span class="p">()</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">found</span><span class="o">.</span><span class="n">end</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>  #Python          at characters 9-16
+  #pandas          at characters 21-28
+  #100DaysOfCode   at characters 72-86
+</code></pre></div>
+
+<p>Use <code>findall</code> when you only want the text, and <code>finditer</code> when you also need to know <strong>where</strong> each match is (for example, to highlight it, or to show the surrounding context).</p>
+<h3 id="33-resub-find-and-replace">3.3 <code>re.sub</code>: Find and Replace</h3>
+<p><code>re.sub</code> is like <code>str.replace()</code>, but it replaces <strong>anything that fits a pattern</strong>, not just one fixed piece of text. A common use is hiding personal data (like card or phone numbers) before it goes into a log file or a shared notebook:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">record</span> <span class="o">=</span> <span class="s2">"Card 4111 1111 1111 1234, phone 98765 43210"</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\d"</span><span class="p">,</span> <span class="s2">"X"</span><span class="p">,</span> <span class="n">record</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\d{4,}"</span><span class="p">,</span> <span class="s2">"[redacted]"</span><span class="p">,</span> <span class="n">record</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Card XXXX XXXX XXXX XXXX, phone XXXXX XXXXX
+Card [redacted] [redacted] [redacted] [redacted], phone [redacted] [redacted]
+</code></pre></div>
+
+<ul>
+<li><code>\d</code> matches <strong>one</strong> digit, so every single digit became an <code>X</code>.</li>
+<li><code>\d{4,}</code> means "<strong>four or more</strong> digits in a row", so each block of 4 or 5 digits was replaced as one unit.</li>
+</ul>
+<h3 id="replacing-with-a-function">Replacing with a Function</h3>
+<p>The replacement doesn't have to be fixed text. It can also be a <strong>function</strong>. <code>re.sub</code> calls the function once for each match, passes the match object in, and puts whatever the function returns in its place. So the replacement can depend on what was matched.</p>
+<p>Two new pieces in this pattern:</p>
+<ul>
+<li><code>\$</code> means "a real dollar sign". A bare <code>$</code> has a special meaning in regex ("end of the string", covered in Part 4), so the backslash tells regex to treat it as an ordinary character.</li>
+<li>The round brackets around <code>\d+\.\d\d</code> <strong>capture</strong> the number, and <code>found.group(1)</code> reads it back. Part 5 covers groups properly.</li>
+</ul>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">prices</span> <span class="o">=</span> <span class="s2">"Books $59.98, Electronics $45.00, Appliances $89.99"</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">add_tax</span><span class="p">(</span><span class="n">found</span><span class="p">):</span>
+    <span class="n">amount</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">found</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"$</span><span class="si">{</span><span class="n">amount</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">1.18</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">"</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\$(\d+\.\d\d)"</span><span class="p">,</span> <span class="n">add_tax</span><span class="p">,</span> <span class="n">prices</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Books $70.78, Electronics $53.10, Appliances $106.19
+</code></pre></div>
+
+<p>Each price was found, passed to <code>add_tax</code>, multiplied by 1.18 (adding 18% tax), and the new value was written back in its place.</p>
+<p><strong>Analogy:</strong> a normal find-and-replace is like a stamp: every match gets exactly the same new text. A replacement function is like a <strong>person reading each match</strong> and writing a suitable replacement for that particular one.</p>
+<h3 id="34-resplit-splitting-on-a-pattern">3.4 <code>re.split</code>: Splitting on a Pattern</h3>
+<p><code>str.split()</code> takes one <strong>fixed</strong> separator. <code>re.split</code> takes a <strong>pattern</strong>, which is what you need when the separator changes from place to place:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">messy</span> <span class="o">=</span> <span class="s2">"Books;Electronics, Appliances|Toys , Garden"</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"str.split:"</span><span class="p">,</span> <span class="n">messy</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">","</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"re.split :"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\s*[;,|]\s*"</span><span class="p">,</span> <span class="n">messy</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>str.split: ['Books;Electronics', ' Appliances|Toys ', ' Garden']
+re.split : ['Books', 'Electronics', 'Appliances', 'Toys', 'Garden']
+</code></pre></div>
+
+<p>The pattern <code>\s*[;,|]\s*</code> reads as:</p>
+<ul>
+<li><code>\s*</code>: zero or more whitespace characters (spaces, tabs),</li>
+<li><code>[;,|]</code>: then <strong>one</strong> of a semicolon, a comma or a pipe,</li>
+<li><code>\s*</code>: then zero or more whitespace characters again.</li>
+</ul>
+<p>So it treats <code>";"</code>, <code>", "</code>, <code>"|"</code> and <code>" , "</code> as separators, and swallows the spaces around them too. That's why the results come out clean, with no extra spaces.</p>
+<hr />
+<h2 id="part-4-the-building-blocks"><span class="h-icon"><svg class="icon"><use href="#icon-build"></use></svg></span>Part 4: The Building Blocks</h2>
+<p>Every pattern is built from three kinds of piece:</p>
+<ol>
+<li><strong>What</strong> to match (a digit? a letter? one of a few characters?)</li>
+<li><strong>How many</strong> of it (one? several? optional?)</li>
+<li><strong>Where</strong> it should be (at the start? at a word edge?)</li>
+</ol>
+<p><strong>Analogy:</strong> describing a pattern is like describing a car number plate to a friend: "<strong>two letters</strong>, then <strong>two digits</strong>, then <strong>four more digits</strong>, and it's <strong>on the back of the car</strong>". The "letters" and "digits" are the <em>what</em>, the "two" and "four" are the <em>how many</em>, and "on the back" is the <em>where</em>.</p>
+<h3 id="41-what-to-match">4.1 What to Match</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Matches</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>\d</code></td>
+<td>a digit, <code>0-9</code></td>
+</tr>
+<tr>
+<td><code>\w</code></td>
+<td>a word character: letter, digit or underscore</td>
+</tr>
+<tr>
+<td><code>\s</code></td>
+<td>whitespace: space, tab, newline</td>
+</tr>
+<tr>
+<td><code>\D</code> <code>\W</code> <code>\S</code></td>
+<td>the opposite of each</td>
+</tr>
+<tr>
+<td><code>.</code></td>
+<td>any character except a newline</td>
+</tr>
+<tr>
+<td><code>[abc]</code></td>
+<td>one of <code>a</code>, <code>b</code>, <code>c</code></td>
+</tr>
+<tr>
+<td><code>[a-z]</code></td>
+<td>any lowercase letter</td>
+</tr>
+<tr>
+<td><code>[^abc]</code></td>
+<td>any character that is <strong>not</strong> <code>a</code>, <code>b</code> or <code>c</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Two patterns make these easy to remember:</p>
+<ul>
+<li>The <strong>capital letter</strong> always means the <strong>opposite</strong>: <code>\d</code> is a digit, <code>\D</code> is anything that isn't a digit.</li>
+<li>A <code>^</code> at the <strong>start of square brackets</strong> means "<strong>not</strong>": <code>[abc]</code> is one of these, <code>[^abc]</code> is anything except these.</li>
+</ul>
+<p>Square brackets are called a <strong>character class</strong>. However many characters you put inside, a character class always matches <strong>exactly one</strong> character from the text.</p>
+<p>One small extra detail: in Python, <code>\d</code> and <code>\w</code> understand more than English. <code>\d</code> also matches digits from other writing systems (such as Devanagari <code>२०२६</code>), and <code>\w</code> matches accented letters like the <code>é</code> in <code>café</code>. When you only want the plain digits 0 to 9, write <code>[0-9]</code>.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">sample</span> <span class="o">=</span> <span class="s2">"Order A001 shipped on 2024-03-01 for $59.98"</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"digits      :"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\d"</span><span class="p">,</span> <span class="n">sample</span><span class="p">)[:</span><span class="mi">6</span><span class="p">],</span> <span class="s2">"..."</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"numbers     :"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\d+"</span><span class="p">,</span> <span class="n">sample</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"words       :"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\w+"</span><span class="p">,</span> <span class="n">sample</span><span class="p">)[:</span><span class="mi">4</span><span class="p">],</span> <span class="s2">"..."</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"not digits  :"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">"[^\d\s]+"</span><span class="p">,</span> <span class="n">sample</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"vowels      :"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">"[aeiou]"</span><span class="p">,</span> <span class="n">sample</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>digits      : ['0', '0', '1', '2', '0', '2'] ...
+numbers     : ['001', '2024', '03', '01', '59', '98']
+words       : ['Order', 'A001', 'shipped', 'on'] ...
+not digits  : ['Order', 'A', 'shipped', 'on', '-', '-', 'for', '$', '.']
+vowels      : ['e', 'i', 'e', 'o', 'o']
+</code></pre></div>
+
+<p>Look at what each pattern picked out:</p>
+<ul>
+<li><code>\d</code> found <strong>single</strong> digits, one at a time (we print only the first six).</li>
+<li><code>\d+</code> found <strong>whole numbers</strong>, because <code>+</code> keeps going while there are more digits.</li>
+<li><code>\w+</code> found <strong>whole words</strong>. <code>A001</code> counts as one word, because digits are word characters.</li>
+<li><code>[^\d\s]+</code> found runs of characters that are <strong>neither digits nor spaces</strong>: words, dashes, the <code>$</code> and the dot.</li>
+<li><code>[aeiou]</code> found each lowercase vowel. The capital <code>O</code> in <code>Order</code> isn't there, because regex is case-sensitive unless you tell it not to be (Part 7 shows how).</li>
+</ul>
+<h3 id="42-how-many">4.2 How Many</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Means</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>*</code></td>
+<td>zero or more</td>
+</tr>
+<tr>
+<td><code>+</code></td>
+<td>one or more</td>
+</tr>
+<tr>
+<td><code>?</code></td>
+<td>zero or one, so "optional"</td>
+</tr>
+<tr>
+<td><code>{3}</code></td>
+<td>exactly three</td>
+</tr>
+<tr>
+<td><code>{2,4}</code></td>
+<td>between two and four</td>
+</tr>
+<tr>
+<td><code>{2,}</code></td>
+<td>two or more</td>
+</tr>
+</tbody>
+</table></div>
+<p>These are called <strong>quantifiers</strong>. A quantifier applies only to <strong>whatever comes right before it</strong>. In <code>A\d+</code>, the <code>+</code> applies to <code>\d</code>, not to the <code>A</code>, so it means "an <code>A</code>, then one or more digits".</p>
+<p>In the code below, <code>str(...)</code> turns <code>True</code>/<code>False</code> into text so that <code>:&lt;6</code> can line up the columns:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">codes</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"A1"</span><span class="p">,</span> <span class="s2">"A001"</span><span class="p">,</span> <span class="s2">"A"</span><span class="p">,</span> <span class="s2">"AB12345"</span><span class="p">,</span> <span class="s2">"2024-03-01"</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">codes</span><span class="p">:</span>
+    <span class="n">is_order_id</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="sa">r</span><span class="s2">"A\d+"</span><span class="p">,</span> <span class="n">code</span><span class="p">))</span>
+    <span class="n">is_date</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\d</span><span class="si">{4}</span><span class="s2">-\d</span><span class="si">{2}</span><span class="s2">-\d</span><span class="si">{2}</span><span class="s2">"</span><span class="p">,</span> <span class="n">code</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">code</span><span class="si">:</span><span class="s2">&lt;12</span><span class="si">}</span><span class="s2"> A + digits: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">is_order_id</span><span class="p">)</span><span class="si">:</span><span class="s2">&lt;6</span><span class="si">}</span><span class="s2"> date shape: </span><span class="si">{</span><span class="n">is_date</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>  A1           A + digits: True   date shape: False
+  A001         A + digits: True   date shape: False
+  A            A + digits: False  date shape: False
+  AB12345      A + digits: False  date shape: False
+  2024-03-01   A + digits: False  date shape: True
+</code></pre></div>
+
+<ul>
+<li><code>A\d+</code> accepts <code>A1</code> and <code>A001</code> (an <code>A</code> and at least one digit), but not <code>A</code> alone (no digits) or <code>AB12345</code> (a <code>B</code> where a digit should be).</li>
+<li><code>\d{4}-\d{2}-\d{2}</code> describes the <strong>shape</strong> of a date: four digits, dash, two digits, dash, two digits. Only <code>2024-03-01</code> has that shape.</li>
+</ul>
+<p>Remember that <code>fullmatch</code> needs the <strong>whole</strong> string to fit, which is why <code>AB12345</code> fails instead of matching some part of it.</p>
+<h3 id="makes-something-optional"><code>?</code> Makes Something Optional</h3>
+<p><code>?</code> means "zero or one", which is a neat way to accept two spellings with one pattern:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"color"</span><span class="p">,</span> <span class="s2">"colour"</span><span class="p">,</span> <span class="s2">"colouur"</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">value</span><span class="si">:</span><span class="s2">&lt;10</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="nb">bool</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="sa">r</span><span class="s1">'colou?r'</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">))</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>  color      True
+  colour     True
+  colouur    False
+</code></pre></div>
+
+<p>In <code>colou?r</code>, the <code>?</code> applies only to the <code>u</code>. So the <code>u</code> can appear <strong>once or not at all</strong>: <code>color</code> and <code>colour</code> both match. <code>colouur</code> has two, so it doesn't.</p>
+<h3 id="43-where-anchors">4.3 Where: Anchors</h3>
+<p>These are called <strong>anchors</strong>. They match a <strong>position</strong> in the text, not a character, so they don't use up any of the text.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Matches at</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>^</code></td>
+<td>the start of the string (or of each line, with <code>re.MULTILINE</code>)</td>
+</tr>
+<tr>
+<td><code>$</code></td>
+<td>the end of the string (or of each line, with <code>re.MULTILINE</code>)</td>
+</tr>
+<tr>
+<td><code>\b</code></td>
+<td>a word boundary: the edge between a word character and a non-word character</td>
+</tr>
+</tbody>
+</table></div>
+<p>Notice that <code>^</code> has <strong>two different jobs</strong> depending on where it is: at the start of a pattern it means "start of the string", and just inside square brackets (<code>[^...]</code>) it means "not". The position tells you which one it is.</p>
+<p>One small detail about <code>$</code>: it also matches <strong>just before a newline at the very end</strong> of the string. So <code>re.search(r"^\d{4}$", "2026\n")</code> finds a match, even though the string has a newline after the digits. <code>re.fullmatch</code> is stricter and says no, which is another reason to prefer it when checking a value.</p>
+<p><code>\b</code> is the anchor you'll use most. It's what stops you matching inside a longer word:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">text</span> <span class="o">=</span> <span class="s2">"cat catalogue concatenate the cat sat"</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"without </span><span class="se">\\</span><span class="s2">b:"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">"cat"</span><span class="p">,</span> <span class="n">text</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"with    </span><span class="se">\\</span><span class="s2">b:"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\bcat\b"</span><span class="p">,</span> <span class="n">text</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>without \b: ['cat', 'cat', 'cat', 'cat']
+with    \b: ['cat', 'cat']
+</code></pre></div>
+
+<p>Without <code>\b</code>, <code>cat</code> was found <strong>four</strong> times: twice as the real word, once inside <code>catalogue</code> and once inside <code>concatenate</code>. With <code>\bcat\b</code>, there must be a <strong>word edge</strong> on both sides, so only the two real <code>cat</code>s match.</p>
+<div class="diagram-card"><pre><code>   "cat catalogue concatenate the cat sat"
+    ───                           ───      ← \bcat\b : whole words only
+        ───          ───                   ← plain "cat" also hits these
+                   (inside catalogue, inside concatenate)
+</code></pre></div>
+
+<p><strong>Analogy:</strong> <code>\b</code> is like the <strong>spaces between words</strong> in a crossword clue. It doesn't match a letter itself; it marks where one word ends and the next begins.</p>
+<h3 id="44-alternation-this-or-that">4.4 Alternation: "This or That"</h3>
+<p>The <code>|</code> character means "<strong>or</strong>". There's a catch: it splits <strong>the whole pattern</strong> in two, unless you put round brackets around the part that should have the choice. Compare these two:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">log</span> <span class="o">=</span> <span class="s2">"level=ERROR level=INFO level=WARNING note=WARNING"</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"no brackets  :"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">"level=ERROR|WARNING"</span><span class="p">,</span> <span class="n">log</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"with brackets:"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">"level=(ERROR|WARNING)"</span><span class="p">,</span> <span class="n">log</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>no brackets  : ['level=ERROR', 'WARNING', 'WARNING']
+with brackets: ['ERROR', 'WARNING']
+</code></pre></div>
+
+<div class="diagram-card"><pre><code>   r"level=ERROR|WARNING"        means   (level=ERROR)   OR   (WARNING anywhere)
+   r"level=(ERROR|WARNING)"      means   level=  followed by  (ERROR or WARNING)
+</code></pre></div>
+
+<ul>
+<li><strong>Without brackets</strong>, the pattern means "<code>level=ERROR</code>, <strong>or</strong> <code>WARNING</code> anywhere at all". So it also matched the <code>WARNING</code> after <code>note=</code>, which we didn't want.</li>
+<li><strong>With brackets</strong>, the choice is only between <code>ERROR</code> and <code>WARNING</code>, and <code>level=</code> is required either way.</li>
+</ul>
+<p><strong>Analogy:</strong> it's like the difference between ordering "<strong>pasta with tomato or cheese sauce</strong>" and "<strong>pasta with tomato, or cheese</strong>". Without the brackets, the waiter might bring you a plate of plain cheese.</p>
+<p>You might also notice that the second version returned only <code>ERROR</code> and <code>WARNING</code>, not <code>level=ERROR</code>. That's because round brackets have a second job, <strong>capturing</strong>, which is what the next part is about.</p>
+<hr />
+<h2 id="part-5-groups-pulling-out-the-pieces"><span class="h-icon"><svg class="icon"><use href="#icon-brackets"></use></svg></span>Part 5: Groups: Pulling Out the Pieces</h2>
+<p>Round brackets do <strong>two jobs</strong>:</p>
+<ol>
+<li>They <strong>keep part of a pattern together</strong> (like the <code>(ERROR|WARNING)</code> above).</li>
+<li>They <strong>capture</strong> whatever matched inside them, so you can read it back afterwards.</li>
+</ol>
+<p>A date is a good first example, because often you only want <strong>part</strong> of it, like the year:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">found</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">"(\d</span><span class="si">{4}</span><span class="s2">)-(\d</span><span class="si">{2}</span><span class="s2">)-(\d</span><span class="si">{2}</span><span class="s2">)"</span><span class="p">,</span> <span class="n">sample</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">found</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"whole match:"</span><span class="p">,</span> <span class="n">found</span><span class="o">.</span><span class="n">group</span><span class="p">())</span>      <span class="c1"># group 0</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"year       :"</span><span class="p">,</span> <span class="n">found</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"month      :"</span><span class="p">,</span> <span class="n">found</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"all groups :"</span><span class="p">,</span> <span class="n">found</span><span class="o">.</span><span class="n">groups</span><span class="p">())</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>whole match: 2024-03-01
+year       : 2024
+month      : 03
+all groups : ('2024', '03', '01')
+</code></pre></div>
+
+<ul>
+<li><code>found.group()</code> (also written <code>found.group(0)</code>) is always <strong>the whole match</strong>.</li>
+<li><code>found.group(1)</code> is what the <strong>first</strong> pair of brackets captured, <code>found.group(2)</code> the second, and so on.</li>
+<li><code>found.groups()</code> gives you <strong>all</strong> the captured pieces together as a tuple.</li>
+</ul>
+<p>Groups are numbered <strong>from left to right</strong>, in the order their <strong>opening</strong> brackets appear:</p>
+<div class="diagram-card"><pre><code>   (\d{4})-(\d{2})-(\d{2})
+   └──1──┘ └──2──┘ └──3──┘
+
+   "2024-03-01"  ──►  group(1) = "2024"   group(2) = "03"   group(3) = "01"
+</code></pre></div>
+
+<p><strong>Analogy:</strong> capturing groups are like the <strong>labelled boxes on a paper form</strong>. The whole form is group 0, and each box (year, month, day) holds one piece you can read separately.</p>
+<h3 id="51-named-groups">5.1 Named Groups</h3>
+<p>Counting brackets gets confusing quickly. Was the log level group 3 or group 4? <code>(?P&lt;name&gt;...)</code> gives a group a <strong>name</strong> instead, and <code>.groupdict()</code> gives you all of them back as a dictionary:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">line</span> <span class="o">=</span> <span class="s2">"2024-03-01 09:14:22 WARNING Payment retry 1 for order A002"</span>
+
+<span class="n">pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">"(?P&lt;date&gt;\S+) (?P&lt;time&gt;\S+) (?P&lt;level&gt;\w+) (?P&lt;message&gt;.*)"</span>
+<span class="n">found</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">found</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">found</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">"level"</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">field</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">found</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">field</span><span class="si">:</span><span class="s2">&lt;8</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>WARNING
+  date     2024-03-01
+  time     09:14:22
+  level    WARNING
+  message  Payment retry 1 for order A002
+</code></pre></div>
+
+<p>Here's what the pattern says, piece by piece:</p>
+<ul>
+<li><code>(?P&lt;date&gt;\S+)</code>: one or more non-space characters, saved as <code>date</code>,</li>
+<li>a space,</li>
+<li><code>(?P&lt;time&gt;\S+)</code>: the next run of non-space characters, saved as <code>time</code>,</li>
+<li>a space,</li>
+<li><code>(?P&lt;level&gt;\w+)</code>: a word, saved as <code>level</code>,</li>
+<li>a space,</li>
+<li><code>(?P&lt;message&gt;.*)</code>: <strong>everything else</strong> on the line, saved as <code>message</code>.</li>
+</ul>
+<p>The pattern is longer than one with numbered groups, but anyone reading it can now see what each field is. And <code>found.group("level")</code> is much clearer than <code>found.group(3)</code>. <strong>Use named groups for any pattern you'll come back to.</strong></p>
+<h3 id="52-non-capturing-groups">5.2 Non-Capturing Groups</h3>
+<p>In Part 4.4, the brackets around <code>ERROR|WARNING</code> were only there to <strong>contain</strong> the <code>|</code>. They captured as a side effect, which is why <code>findall</code> returned only the level.</p>
+<p><code>(?:...)</code> makes a group that <strong>groups without capturing</strong>. Then <code>findall</code> gives you the whole match again:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="s2">"capturing    :"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">"level=(ERROR|WARNING)"</span><span class="p">,</span> <span class="n">log</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"non-capturing:"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">"level=(?:ERROR|WARNING)"</span><span class="p">,</span> <span class="n">log</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>capturing    : ['ERROR', 'WARNING']
+non-capturing: ['level=ERROR', 'level=WARNING']
+</code></pre></div>
+
+<p><strong>Analogy:</strong> normal brackets are like a <strong>highlighter</strong>: they group the words together <em>and</em> mark them to be copied out. <code>(?:...)</code> is like a <strong>pencil circle</strong>: it groups the words together, but marks nothing to be copied.</p>
+<h3 id="53-the-findall-trap">5.3 The <code>findall</code> Trap</h3>
+<p><code>findall</code> <strong>changes what it returns</strong> depending on how many capturing groups the pattern has:</p>
+<ul>
+<li><strong>no groups</strong>: a list of whole matches,</li>
+<li><strong>one group</strong>: a list of just that group,</li>
+<li><strong>two or more groups</strong>: a list of <strong>tuples</strong>, one value per group.</li>
+</ul>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">text</span> <span class="o">=</span> <span class="s2">"orders: A001, A002, B003"</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"no groups :"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">"[AB]\d+"</span><span class="p">,</span> <span class="n">text</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"one group :"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">"[AB](\d+)"</span><span class="p">,</span> <span class="n">text</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"two groups:"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">"([AB])(\d+)"</span><span class="p">,</span> <span class="n">text</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>no groups : ['A001', 'A002', 'B003']
+one group : ['001', '002', '003']
+two groups: [('A', '001'), ('A', '002'), ('B', '003')]
+</code></pre></div>
+
+<p>Nothing warns you about this. A pattern that returned strings yesterday can return tuples today, just because someone added a pair of brackets to it. If you want the whole match but still need brackets for grouping, either make them non-capturing with <code>(?:...)</code>, or use <code>finditer</code> and read <code>.group()</code> yourself.</p>
+<hr />
+<h2 id="part-6-greedy-and-lazy"><span class="h-icon"><svg class="icon"><use href="#icon-scale"></use></svg></span>Part 6: Greedy and Lazy</h2>
+<p>Quantifiers like <code>+</code> and <code>*</code> are <strong>greedy</strong>: they grab <strong>as much text as they possibly can</strong>, and only give some back if they have to. This surprises a lot of people the first time they try to match an HTML tag:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">html</span> <span class="o">=</span> <span class="s1">'&lt;p class="lead"&gt;Regex&lt;/p&gt; and &lt;b&gt;bold&lt;/b&gt;'</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"greedy:"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">"&lt;.+&gt;"</span><span class="p">,</span> <span class="n">html</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>greedy: ['&lt;p class="lead"&gt;Regex&lt;/p&gt; and &lt;b&gt;bold&lt;/b&gt;']
+</code></pre></div>
+
+<p>One match, and it's <strong>the whole string</strong>! Here's what happened, step by step:</p>
+<ol>
+<li><code>&lt;</code> matched the first <code>&lt;</code> in the text.</li>
+<li><code>.+</code> (one or more of any character) ran <strong>all the way to the end</strong> of the string, grabbing everything.</li>
+<li>Then the pattern still needed a <code>&gt;</code>, so the engine <strong>stepped back</strong> one character at a time until it found one. The first <code>&gt;</code> it found going backwards was the <strong>last</strong> <code>&gt;</code> in the string.</li>
+</ol>
+<p>Every <code>&gt;</code> in between was simply skipped over.</p>
+<p><strong>Analogy:</strong> greedy matching is like a <strong>hungry person at a buffet</strong> who piles everything onto their plate first, and then puts things back one at a time only if they've taken too much. They'll always end up with the biggest plate that still fits the rules.</p>
+<h3 id="lazy-matching-with">Lazy Matching with <code>?</code></h3>
+<p>Putting <code>?</code> <strong>after</strong> a quantifier makes it <strong>lazy</strong>: it takes <strong>as little as possible</strong>, and only grabs more if it has to.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="s2">"lazy  :"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">"&lt;.+?&gt;"</span><span class="p">,</span> <span class="n">html</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>lazy  : ['&lt;p class="lead"&gt;', '&lt;/p&gt;', '&lt;b&gt;', '&lt;/b&gt;']
+</code></pre></div>
+
+<p>Four matches, which is probably what you expected the first time.</p>
+<div class="diagram-card"><pre><code>   text:   &lt;p class="lead"&gt;Regex&lt;/p&gt; and &lt;b&gt;bold&lt;/b&gt;
+
+   greedy  ├───────────────────────────────────────┤   &lt;.+&gt;  : one huge match
+   lazy    ├──────────────┤     ├──┤     ├─┤    ├──┤   &lt;.+?&gt; : four small matches
+</code></pre></div>
+
+<p>Every quantifier has a lazy version: <code>*?</code>, <code>+?</code>, <code>??</code>, <code>{2,4}?</code>. When a pattern matches far more than you meant, greediness is usually the reason.</p>
+<p><strong>Analogy:</strong> a lazy quantifier is the <strong>careful person at the buffet</strong> who takes one spoonful at a time and stops as soon as the plate is acceptable.</p>
+<h3 id="often-better-say-what-you-dont-want">Often Better: Say What You Don't Want</h3>
+<p>There's a third option that's often better than either: describe what the match <strong>can't contain</strong>. <code>[^&gt;]+</code> means "one or more characters that <strong>aren't</strong> <code>&gt;</code>", so it can never run past the end of a tag:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="s2">"negated:"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">"&lt;[^&gt;]+&gt;"</span><span class="p">,</span> <span class="n">html</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>negated: ['&lt;p class="lead"&gt;', '&lt;/p&gt;', '&lt;b&gt;', '&lt;/b&gt;']
+</code></pre></div>
+
+<p>Same result as the lazy version, but the pattern itself says exactly where a tag stops. There's no "grab and step back" at all, which makes it both clearer and usually faster.</p>
+<hr />
+<h2 id="part-7-compiling-and-flags"><span class="h-icon"><svg class="icon"><use href="#icon-toolbox"></use></svg></span>Part 7: Compiling, and Flags</h2>
+<h3 id="71-recompile">7.1 <code>re.compile</code></h3>
+<p><code>re.compile</code> turns a pattern into a <strong>pattern object</strong> that you can keep and reuse. The object has the same matching methods as the module: <code>.search()</code>, <code>.findall()</code>, <code>.sub()</code> and so on, without the pattern argument.</p>
+<p>The <code>re</code> module already remembers recently used patterns behind the scenes, so compiling doesn't make much difference to <strong>speed</strong>. The real reason to do it is <strong>readability</strong>: the pattern gets a <strong>name</strong>, and it's written <strong>once</strong> instead of being retyped in every place it's used.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">HASHTAG</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"#\w+"</span><span class="p">)</span>
+<span class="n">ORDER_ID</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\b[AB]\d</span><span class="si">{3}</span><span class="s2">\b"</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">HASHTAG</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">caption</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ORDER_ID</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">"orders A001, B003 and the number 1234"</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>['#Python', '#pandas', '#100DaysOfCode']
+['A001', 'B003']
+</code></pre></div>
+
+<p>Notice <code>ORDER_ID</code> uses <code>\b</code> on both sides. That's why <code>1234</code> wasn't matched: it doesn't start with <code>A</code> or <code>B</code>, and the <code>\b</code>s stop the pattern from matching part of a longer word.</p>
+<p>Writing the names in CAPITALS is a common Python habit for values that are set once and never changed, like these patterns.</p>
+<p><strong>Analogy:</strong> compiling a pattern is like <strong>saving a phone number as a contact</strong>. You could type the full number every time, but giving it a name makes it quicker to use and much easier to read later.</p>
+<h3 id="72-flags">7.2 Flags</h3>
+<p><strong>Flags</strong> change how a pattern is read. Three are worth knowing.</p>
+<h3 id="reignorecase"><code>re.IGNORECASE</code></h3>
+<p>It does exactly what it says: uppercase and lowercase letters count as the same.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">"python"</span><span class="p">,</span> <span class="n">caption</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">"python"</span><span class="p">,</span> <span class="n">caption</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>[]
+['Python']
+</code></pre></div>
+
+<p>The caption has <code>Python</code> with a capital <code>P</code>, so plain <code>python</code> found nothing. With <code>re.IGNORECASE</code>, it found <code>Python</code>.</p>
+<h3 id="remultiline"><code>re.MULTILINE</code></h3>
+<p>Normally <code>^</code> means "the start of the <strong>whole</strong> string" and <code>$</code> means "the end of the whole string". <code>re.MULTILINE</code> makes them match at the start and end of <strong>each line</strong> instead.</p>
+<p>A triple-quoted string (<code>"""..."""</code>) can span several lines, which is handy for test data like this sample log:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">log_text</span> <span class="o">=</span> <span class="s2">"""2024-03-01 09:14:22 INFO Order A001 placed</span>
+<span class="s2">2024-03-01 09:15:03 WARNING Payment retry 1 for order A002</span>
+<span class="s2">2024-03-01 09:15:40 ERROR Payment failed for order A002</span>
+<span class="s2">2024-03-01 09:16:00 INFO Order A003 placed"""</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"without MULTILINE:"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">"^\S+"</span><span class="p">,</span> <span class="n">log_text</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"with MULTILINE   :"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">"^\S+"</span><span class="p">,</span> <span class="n">log_text</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">MULTILINE</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>without MULTILINE: ['2024-03-01']
+with MULTILINE   : ['2024-03-01', '2024-03-01', '2024-03-01', '2024-03-01']
+</code></pre></div>
+
+<p><code>^\S+</code> means "non-space characters at the start". Without the flag, there's only one "start" (the start of the whole text), so only the first date was found. With <code>re.MULTILINE</code>, every line has its own start, so we got four.</p>
+<div class="diagram-card"><pre><code>   without MULTILINE                with MULTILINE
+   ^2024-03-01 09:14:22 INFO ...    ^2024-03-01 09:14:22 INFO ...
+    2024-03-01 09:15:03 WARN ...    ^2024-03-01 09:15:03 WARN ...
+    2024-03-01 09:15:40 ERROR ...   ^2024-03-01 09:15:40 ERROR ...
+    2024-03-01 09:16:00 INFO ...    ^2024-03-01 09:16:00 INFO ...
+   (one start)                      (a start on every line)
+</code></pre></div>
+
+<h3 id="reverbose"><code>re.VERBOSE</code></h3>
+<p><code>re.VERBOSE</code> lets you spread a pattern over <strong>several lines</strong>, with <strong>comments</strong> explaining each part. Whitespace inside the pattern is ignored (except inside square brackets), and <code>#</code> starts a comment. Any pattern that someone else will have to read and maintain should be written like this:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">LOG_LINE</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"""</span>
+<span class="s2">    (?P&lt;date&gt;\d</span><span class="si">{4}</span><span class="s2">-\d</span><span class="si">{2}</span><span class="s2">-\d</span><span class="si">{2}</span><span class="s2">)     # 2024-03-01</span>
+<span class="s2">    \s</span>
+<span class="s2">    (?P&lt;time&gt;\d</span><span class="si">{2}</span><span class="s2">:\d</span><span class="si">{2}</span><span class="s2">:\d</span><span class="si">{2}</span><span class="s2">)     # 09:14:22</span>
+<span class="s2">    \s</span>
+<span class="s2">    (?P&lt;level&gt;[A-Z]+)               # INFO, WARNING, ERROR</span>
+<span class="s2">    \s</span>
+<span class="s2">    (?P&lt;message&gt;.+)                 # the rest of the line</span>
+<span class="s2">"""</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">VERBOSE</span><span class="p">)</span>
+
+<span class="n">found</span> <span class="o">=</span> <span class="n">LOG_LINE</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">log_text</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">found</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">found</span><span class="o">.</span><span class="n">groupdict</span><span class="p">())</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>{'date': '2024-03-01', 'time': '09:14:22', 'level': 'INFO', 'message': 'Order A001 placed'}
+</code></pre></div>
+
+<p>Compare this with the one-line version in Part 5.1. The two do the same job, but this one is far easier to understand at a glance, because every part has a comment showing an example of what it matches. It's also stricter: <code>\d{4}-\d{2}-\d{2}</code> only accepts something shaped like a date, where <code>\S+</code> would accept any word.</p>
+<p>(<code>.search()</code> stopped at the first matching line. Part 8 uses <code>.finditer()</code> to go through every line.)</p>
+<p><strong>Analogy:</strong> a one-line regex is like a <strong>recipe written as one long sentence</strong>. <code>re.VERBOSE</code> lets you write it as a proper recipe card, with one ingredient per line and a note beside each.</p>
+<h3 id="one-rule-to-remember-with-reverbose">One Rule to Remember with <code>re.VERBOSE</code></h3>
+<p>Because ordinary spaces inside the pattern are <strong>ignored</strong>, you have to write a real space differently:</p>
+<ul>
+<li><code>\s</code> matches <strong>any</strong> whitespace (that's what the pattern above uses),</li>
+<li><code>[ ]</code> or <code>\</code> matches <strong>exactly one</strong> space.</li>
+</ul>
+<p>The same goes for <code>#</code>: since it starts a comment in verbose mode, a pattern that needs a real <code>#</code> (like a hashtag) must write it as <code>\#</code> or <code>[#]</code>.</p>
+<h3 id="73-reescape-when-the-pattern-comes-from-data">7.3 <code>re.escape</code>: When the Pattern Comes from Data</h3>
+<p>Anything you put into a pattern is read <strong>as a pattern</strong>. That's fine when you type the pattern yourself. But a search term typed by a user, or read from a file, will sooner or later contain a character that means something special to regex:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">term</span> <span class="o">=</span> <span class="s2">"a.c"</span>                            <span class="c1"># a literal string someone typed</span>
+<span class="n">haystack</span> <span class="o">=</span> <span class="s2">"abc and a.c"</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"used as a pattern:"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">term</span><span class="p">,</span> <span class="n">haystack</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>used as a pattern: ['abc', 'a.c']
+</code></pre></div>
+
+<p>Someone searched for the exact text <code>a.c</code>, but the <strong>dot</strong> means "any character" in regex. So it matched <code>abc</code> too, even though <code>abc</code> doesn't contain the search term at all.</p>
+<p><code>re.escape</code> puts a backslash in front of <strong>every special character</strong>, so the text matches itself and nothing else:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="s2">"escaped     :"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">term</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"used escaped:"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">term</span><span class="p">),</span> <span class="n">haystack</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>escaped     : a\.c
+used escaped: ['a.c']
+</code></pre></div>
+
+<p><code>a\.c</code> means "an <code>a</code>, a <strong>real</strong> dot, a <code>c</code>", so now only <code>a.c</code> matches.</p>
+<p><strong>Analogy:</strong> <code>re.escape</code> is like putting <strong>quotation marks</strong> around someone's words when you write them down. It makes clear that these are the exact words they said, not instructions to follow.</p>
+<p><strong>Use it whenever the pattern is built from a value</strong> instead of typed by you: search terms, filenames, product codes, or anything else that might contain a dot, a bracket or a plus sign.</p>
+<hr />
+<h2 id="part-8-real-world-examples"><span class="h-icon"><svg class="icon"><use href="#icon-puzzle"></use></svg></span>Part 8: Real-World Examples</h2>
+<h3 id="81-reading-a-log-file">8.1 Reading a Log File</h3>
+<p>The <code>LOG_LINE</code> pattern from Part 7 plus chapter 15's <code>Counter</code> and <code>defaultdict</code> turns a whole log into a summary. A lot of real log-processing scripts follow this same shape:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">defaultdict</span>
+
+<span class="n">levels</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">()</span>
+<span class="n">by_level</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">LOG_LINE</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">log_text</span><span class="p">):</span>
+    <span class="n">fields</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()</span>
+    <span class="n">levels</span><span class="p">[</span><span class="n">fields</span><span class="p">[</span><span class="s2">"level"</span><span class="p">]]</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">by_level</span><span class="p">[</span><span class="n">fields</span><span class="p">[</span><span class="s2">"level"</span><span class="p">]]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="s2">"time"</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"counts:"</span><span class="p">,</span> <span class="n">levels</span><span class="o">.</span><span class="n">most_common</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">level</span><span class="p">,</span> <span class="n">times</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">by_level</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">level</span><span class="si">:</span><span class="s2">&lt;8</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">times</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>counts: [('INFO', 2), ('WARNING', 1), ('ERROR', 1)]
+
+  ERROR    ['09:15:40']
+  INFO     ['09:14:22', '09:16:00']
+  WARNING  ['09:15:03']
+</code></pre></div>
+
+<p>How it works:</p>
+<ol>
+<li><code>LOG_LINE.finditer(log_text)</code> goes through the log and gives back <strong>one match per line</strong>.</li>
+<li><code>entry.groupdict()</code> turns each match into a dictionary like <code>{"date": ..., "time": ..., "level": ..., "message": ...}</code>.</li>
+<li><code>levels[fields["level"]] += 1</code> counts how many lines there are at each level.</li>
+<li><code>by_level[fields["level"]].append(fields["time"])</code> collects the times for each level.</li>
+</ol>
+<p>The regex does the hard part (splitting each line into named fields), and the <code>collections</code> tools do the counting and grouping.</p>
+<h3 id="82-cleaning-a-currency-column">8.2 Cleaning a Currency Column</h3>
+<p>Amounts typed into spreadsheets come in whatever format the person felt like using. One simple approach is to <strong>remove everything that isn't a digit or a dot</strong>, and then convert what's left to a number. Watch the last value closely:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">raw_amounts</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"$59.98"</span><span class="p">,</span> <span class="s2">"1,299.00 INR"</span><span class="p">,</span> <span class="s2">"USD 45"</span><span class="p">,</span> <span class="s2">"  89.99  "</span><span class="p">,</span> <span class="s2">"free"</span><span class="p">,</span> <span class="s2">"Rs. 500"</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">raw</span> <span class="ow">in</span> <span class="n">raw_amounts</span><span class="p">:</span>
+    <span class="n">digits</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">"[^\d.]"</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="n">raw</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">raw</span><span class="si">!r:</span><span class="s2">&lt;16</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">digits</span><span class="p">)</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">digits</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="kc">None</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>  '$59.98'         -&gt; 59.98
+  '1,299.00 INR'   -&gt; 1299.0
+  'USD 45'         -&gt; 45.0
+  '  89.99  '      -&gt; 89.99
+  'free'           -&gt; None
+  'Rs. 500'        -&gt; 0.5
+</code></pre></div>
+
+<p><code>[^\d.]</code> means "any character that isn't a digit or a dot" (inside square brackets, a dot is just a real dot). Replacing those with <code>""</code> deletes them.</p>
+<p>The first five came out right. <code>"free"</code> has no digits at all, so <code>digits</code> is an empty string and we print <code>None</code> instead of crashing.</p>
+<p>But <strong><code>Rs. 500</code> became <code>0.5</code></strong>. The dot after <code>Rs</code> is kept too, because it's a dot, which leaves the text <code>.500</code>, and <code>float(".500")</code> is <code>0.5</code>. Nothing raised an error.</p>
+<p>This is an important lesson: <strong>a regex does exactly what the pattern says, not what you meant.</strong> Always check the output on real data before you trust a cleaning rule.</p>
+<p><strong>Analogy:</strong> a cleaning pattern is like a <strong>sieve</strong>. It lets through exactly what the holes allow. If a bit of grit happens to be the same size as the grain you want, it goes straight through with it.</p>
+<h3 id="83-checking-emails-and-knowing-when-to-stop">8.3 Checking Emails, and Knowing When to Stop</h3>
+<p>Regexes are good at <strong>rejecting obvious rubbish</strong>, and bad at deciding what's <strong>truly valid</strong>. Email addresses are the classic example. Here's the kind of pattern people usually write first:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">SIMPLE_EMAIL</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"[\w.]+@\w+\.\w+"</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">address</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"shikhar@example.com"</span><span class="p">,</span> <span class="s2">"first.last@example.co.uk"</span><span class="p">,</span>
+                <span class="s2">"a+tag@example.com"</span><span class="p">,</span> <span class="s2">"not-an-email"</span><span class="p">,</span> <span class="s2">"@example.com"</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">address</span><span class="si">:</span><span class="s2">&lt;28</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="nb">bool</span><span class="p">(</span><span class="n">SIMPLE_EMAIL</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">address</span><span class="p">))</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>  shikhar@example.com          True
+  first.last@example.co.uk     False
+  a+tag@example.com            False
+  not-an-email                 False
+  @example.com                 False
+</code></pre></div>
+
+<p>The pattern <code>[\w.]+@\w+\.\w+</code> reads as "letters, digits, underscores or dots; then <code>@</code>; then a word; then a real dot; then another word".</p>
+<p>It correctly rejects the two obvious failures (<code>not-an-email</code> has no <code>@</code>, and <code>@example.com</code> has nothing before the <code>@</code>).</p>
+<p>But it also rejects two <strong>perfectly normal</strong> addresses that real people use:</p>
+<ul>
+<li><code>first.last@example.co.uk</code>, because the part after <code>@</code> has <strong>two</strong> dots, and the pattern only allows one.</li>
+<li><code>a+tag@example.com</code>, because <code>+</code> isn't allowed before the <code>@</code> in this pattern.</li>
+</ul>
+<p>A pattern that follows the full official rules for email addresses is <strong>thousands of characters long</strong>. And even that would only prove that the address is <strong>written</strong> correctly, not that anyone actually reads mail there.</p>
+<p>In practice, the sensible approach is: check for an <code>@</code> with something on each side, and confirm the rest by <strong>sending an email</strong> to it (that's why websites send you a "confirm your email" link).</p>
+<h3 id="84-splitting-text-into-sentences-and-words">8.4 Splitting Text into Sentences and Words</h3>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">review</span> <span class="o">=</span> <span class="s2">"The book arrived fast! Was it worth 59.98? Yes... mostly. I'd buy again."</span>
+
+<span class="n">sentences</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s2">"(?&lt;=[.!?])\s+"</span><span class="p">,</span> <span class="n">review</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sentences</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">words:"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\b[\w']+\b"</span><span class="p">,</span> <span class="n">review</span><span class="o">.</span><span class="n">lower</span><span class="p">())[:</span><span class="mi">8</span><span class="p">],</span> <span class="s2">"..."</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>  The book arrived fast!
+  Was it worth 59.98?
+  Yes...
+  mostly.
+  I'd buy again.
+
+words: ['the', 'book', 'arrived', 'fast', 'was', 'it', 'worth', '59'] ...
+</code></pre></div>
+
+<p>Two new ideas here.</p>
+<p><strong>The lookbehind.</strong> <code>(?&lt;=[.!?])</code> is called a <strong>lookbehind</strong>. It says "<strong>right before this point, there must be</strong> a <code>.</code>, <code>!</code> or <code>?</code>", but it <strong>doesn't use up</strong> that character. So the split happens on the spaces that come after sentence-ending punctuation, and the punctuation stays attached to the end of its sentence.</p>
+<div class="diagram-card"><pre><code>   "The book arrived fast! Was it worth 59.98? ..."
+                         ↑                   ↑
+           split here: a space with ! or ? right before it
+
+   "59.98" is not split: the dot inside it isn't followed by a space
+</code></pre></div>
+
+<p><strong>Analogy:</strong> a lookbehind is like checking <strong>over your shoulder</strong> before stepping forward. You look at what's behind you, but you don't pick it up.</p>
+<p><strong>The judgement calls.</strong> Look carefully at the results:</p>
+<ul>
+<li><code>Yes...</code> was split off from <code>mostly.</code>. Is <code>Yes... mostly.</code> one sentence or two? That's a judgement call, and the pattern quietly made it for you.</li>
+<li>The word pattern <code>\b[\w']+\b</code> (word characters or apostrophes, so <code>I'd</code> stays whole) broke <code>59.98</code> into <code>59</code> and <code>98</code>, because a dot isn't a word character. Whether that's right depends on what you're counting.</li>
+</ul>
+<p>Patterns make these choices <strong>silently</strong>, so always look at the output instead of assuming it's right.</p>
+<hr />
+<h2 id="part-9-when-a-regex-is-the-wrong-tool"><span class="h-icon"><svg class="icon"><use href="#icon-ban"></use></svg></span>Part 9: When a Regex Is the Wrong Tool</h2>
+<p>A regex is great at matching text that follows a <strong>simple, regular shape</strong>. Plenty of everyday text doesn't follow one.</p>
+<h3 id="91-dont-read-html-with-a-regex">9.1 Don't Read HTML with a Regex</h3>
+<p>The patterns from Part 6 looked convincing on a tidy example. Give one some real-world HTML, and it falls apart:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">page</span> <span class="o">=</span> <span class="s1">'&lt;a href="/p1"&gt;first&lt;/a&gt; &lt;!-- &lt;a href="/hidden"&gt;skip&lt;/a&gt; --&gt; &lt;a</span><span class="se">\n</span><span class="s1">   href="/p2"&gt;second&lt;/a&gt;'</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"regex   :"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s1">'&lt;a href="([^"]+)"&gt;'</span><span class="p">,</span> <span class="n">page</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>regex   : ['/p1', '/hidden']
+</code></pre></div>
+
+<p>The page has <strong>three</strong> <code>&lt;a&gt;</code> tags, the pattern found <strong>two</strong> matches, and it made <strong>two</strong> mistakes:</p>
+<ol>
+<li>It returned <code>/hidden</code>, which is inside an <strong>HTML comment</strong> (<code>&lt;!-- ... --&gt;</code>). Comments aren't shown on the page, so that isn't a real link at all.</li>
+<li>It <strong>missed <code>/p2</code> completely</strong>, because that tag has a line break between <code>&lt;a</code> and <code>href</code> (the <code>\n</code> in the string). That's perfectly valid HTML, but it doesn't fit the pattern.</li>
+</ol>
+<p>Neither mistake would be noticed without checking. Fixing those two cases means adding rules for comments, attribute order, single versus double quotes, and extra whitespace, and every fix uncovers the next gap.</p>
+<p>An <strong>HTML parser</strong> already knows all of those rules. Chapter 18 uses one called BeautifulSoup, which reads this page correctly without a single pattern.</p>
+<p><strong>Analogy:</strong> reading HTML with a regex is like trying to understand a <strong>sentence's grammar by looking only for certain letters</strong>. It works on simple sentences, then falls apart the moment someone uses a comma in a new way. A parser actually understands the grammar.</p>
+<h3 id="92-dont-read-csv-with-a-regex">9.2 Don't Read CSV with a Regex</h3>
+<p>Cases like this are why chapter 10's <code>csv</code> module exists:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">row</span> <span class="o">=</span> <span class="s1">'A001,"Sharma, Alice",Books,59.98'</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"str.split:"</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">","</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"re.split :"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s2">","</span><span class="p">,</span> <span class="n">row</span><span class="p">))</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">csv</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"csv      :"</span><span class="p">,</span> <span class="nb">next</span><span class="p">(</span><span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">row</span><span class="p">))))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>str.split: ['A001', '"Sharma', ' Alice"', 'Books', '59.98']
+re.split : ['A001', '"Sharma', ' Alice"', 'Books', '59.98']
+csv      : ['A001', 'Sharma, Alice', 'Books', '59.98']
+</code></pre></div>
+
+<p>The comma inside the quoted name <code>"Sharma, Alice"</code> is <strong>part of the name</strong>, not a separator. Both <code>str.split</code> and <code>re.split</code> broke it in two. Only the <code>csv</code> module understands the quoting rules and keeps it whole.</p>
+<p>(<code>io.StringIO(row)</code> makes the string behave like a file, because <code>csv.reader</code> expects to read from a file.)</p>
+<h3 id="93-dont-use-a-regex-where-a-string-method-will-do">9.3 Don't Use a Regex Where a String Method Will Do</h3>
+<p><code>re.search(r"^https://", url)</code> is a slower, harder-to-read way of writing <code>url.startswith("https://")</code>. For <strong>fixed</strong> text, string methods are clearer:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Instead of</th>
+<th>Write</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>re.search(r"^abc", s)</code></td>
+<td><code>s.startswith("abc")</code></td>
+</tr>
+<tr>
+<td><code>re.search(r"abc$", s)</code></td>
+<td><code>s.endswith("abc")</code></td>
+</tr>
+<tr>
+<td><code>re.search(r"abc", s)</code></td>
+<td><code>"abc" in s</code></td>
+</tr>
+<tr>
+<td><code>re.sub(r"abc", "x", s)</code></td>
+<td><code>s.replace("abc", "x")</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>One small difference in the second row: <code>$</code> also matches just before a final newline (Part 4.3), so the regex accepts <code>"xabc\n"</code> where <code>endswith</code> doesn't. The string method is the more exact of the two.</p>
+<p><strong>The rule of thumb:</strong> use <code>re</code> when you're describing a <strong>shape</strong> ("some digits, then a dash"). Use string methods when you're looking for a <strong>fixed piece of text</strong> ("https://").</p>
+<h3 id="94-patterns-that-can-freeze-your-program">9.4 Patterns That Can Freeze Your Program</h3>
+<p>Some patterns slow down <strong>enormously</strong> on text that <em>almost</em> matches. <code>(a+)+b</code> run against a string made only of <code>a</code>s is the standard example.</p>
+<p>Here's why. The pattern needs a <code>b</code> at the end, and there isn't one, so it can never match. But before giving up, the engine tries <strong>every possible way</strong> of sharing the <code>a</code>s between the inner <code>+</code> and the outer <code>+</code>. With 3 <code>a</code>s there are only a few ways to share them, but the number of ways <strong>doubles with every extra character</strong>. This is called <strong>catastrophic backtracking</strong>, and it has taken real websites down.</p>
+<p><strong>Analogy:</strong> imagine trying to open a combination lock by trying every combination. A 3-digit lock is quick. Each extra digit multiplies the work, and soon you'd be there for days. The engine is stuck doing the same thing, trying every combination before it can say "no match".</p>
+<p>We can watch it grow safely by timing short strings:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">time_it</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+    <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">"(a+)+b"</span><span class="p">,</span> <span class="s2">"a"</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
+
+<span class="n">short</span><span class="p">,</span> <span class="n">longer</span> <span class="o">=</span> <span class="n">time_it</span><span class="p">(</span><span class="mi">18</span><span class="p">),</span> <span class="n">time_it</span><span class="p">(</span><span class="mi">22</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"4 more characters made it more than 5 times slower:"</span><span class="p">,</span> <span class="n">longer</span> <span class="o">&gt;</span> <span class="n">short</span> <span class="o">*</span> <span class="mi">5</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>4 more characters made it more than 5 times slower: True
+</code></pre></div>
+
+<p>The exact times depend on your computer, so the cell only prints whether the slowdown happened. On a typical machine, every 2 extra characters make it about <strong>4 times slower</strong>, so a string of 40 <code>a</code>s would take <strong>hours</strong>.</p>
+<div class="diagram-card"><pre><code>   characters:   18     20     22     24    ...    40
+   time:          1x    ~4x   ~16x   ~64x   ...   hours
+</code></pre></div>
+
+<p><strong>The fix:</strong> don't nest quantifiers. Never put a <code>+</code> or <code>*</code> around a group that already contains one. Here, <code>a+b</code> describes the same text and finishes instantly.</p>
+<hr />
+<h2 id="part-10-redoing-chapter-2-properly"><span class="h-icon"><svg class="icon"><use href="#icon-undo"></use></svg></span>Part 10: Redoing Chapter 2, Properly</h2>
+<p>Here's everything this guide started with, written the way you'd actually ship it: compiled, named patterns inside small functions.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">HASHTAG</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"#\w+"</span><span class="p">)</span>
+<span class="n">MENTION</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"@\w+"</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_caption</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"hashtags"</span><span class="p">:</span> <span class="n">HASHTAG</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">text</span><span class="p">),</span>
+            <span class="s2">"mentions"</span><span class="p">:</span> <span class="n">MENTION</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">text</span><span class="p">)}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">slugify</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">"[^a-z0-9]+"</span><span class="p">,</span> <span class="s2">"-"</span><span class="p">,</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">"-"</span><span class="p">)</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="n">parse_caption</span><span class="p">(</span><span class="n">caption</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">parse_caption</span><span class="p">(</span><span class="s2">"No tags here, just words."</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"How to learn Python in 2026?  (beginner guide)"</span><span class="p">,</span>
+          <span class="s2">"  Data Science &amp; AI: where to start!  "</span><span class="p">,</span>
+          <span class="s2">"already-a-slug"</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">q</span><span class="si">!r:</span><span class="s2">&lt;48</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">slugify</span><span class="p">(</span><span class="n">q</span><span class="p">)</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>{'hashtags': ['#Python', '#pandas', '#100DaysOfCode'], 'mentions': ['@guido', '@raymondh']}
+{'hashtags': [], 'mentions': []}
+
+  'How to learn Python in 2026?  (beginner guide)' -&gt; 'how-to-learn-python-in-2026-beginner-guide'
+  '  Data Science &amp; AI: where to start!  '         -&gt; 'data-science-ai-where-to-start'
+  'already-a-slug'                                 -&gt; 'already-a-slug'
+</code></pre></div>
+
+<ul>
+<li><code>parse_caption</code> returns <strong>empty lists</strong> instead of failing when there's nothing to find.</li>
+<li><code>slugify</code> handles punctuation, repeated spaces, spaces at the start and end, an <code>&amp;</code> sign, and text that's <strong>already</strong> a slug.</li>
+</ul>
+<p>Neither function needed a single special case for any of those. That's the real strength of a regex: you describe the <strong>rule</strong>, and the rule covers cases you never listed.</p>
+<hr />
+<h2 id="part-11-common-mistakes"><span class="h-icon"><svg class="icon"><use href="#icon-warn"></use></svg></span>Part 11: Common Mistakes</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What happens</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pattern written without <code>r"..."</code></td>
+<td>Quietly matches nothing</td>
+<td>Always use a raw string</td>
+</tr>
+<tr>
+<td><code>.group()</code> without checking for <code>None</code></td>
+<td><code>AttributeError</code> when nothing matched</td>
+<td>Check the match first</td>
+</tr>
+<tr>
+<td>Using <code>re.match</code> to search</td>
+<td>Only ever looks at the start</td>
+<td>Use <code>re.search</code></td>
+</tr>
+<tr>
+<td>Adding brackets for grouping</td>
+<td><code>findall</code> starts returning tuples or just the group</td>
+<td>Use <code>(?:...)</code></td>
+</tr>
+<tr>
+<td><code>.+</code> where the text has delimiters</td>
+<td>Matches far too much</td>
+<td>Use <code>.+?</code> or <code>[^x]+</code></td>
+</tr>
+<tr>
+<td><code>re.split</code> on CSV</td>
+<td>Breaks on quoted commas</td>
+<td>Use the <code>csv</code> module</td>
+</tr>
+<tr>
+<td>A regex for HTML</td>
+<td>Misses comments, line breaks, attribute order</td>
+<td>Use a parser, as in chapter 18</td>
+</tr>
+<tr>
+<td>A pattern built from a value</td>
+<td>Punctuation in the value acts as a pattern</td>
+<td>Wrap it in <code>re.escape</code></td>
+</tr>
+<tr>
+<td>Nested quantifiers such as <code>(a+)+</code></td>
+<td>Can freeze on near-matches</td>
+<td>Don't nest quantifiers</td>
+</tr>
+</tbody>
+</table></div>
+<p>Notice how many of these fail <strong>quietly</strong>: an empty list, a wrong number, a missing match, with no error message. With regex, the habit that protects you most is simple: <strong>print the result and look at it</strong> before you trust it.</p>
+<hr />
+<h2 id="quick-reference-summary"><span class="h-icon"><svg class="icon"><use href="#icon-table"></use></svg></span>Quick Reference Summary</h2>
+<p><strong>The functions</strong></p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+<span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>      <span class="c1"># first match object, or None</span>
+<span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>       <span class="c1"># same, but anchored at the start</span>
+<span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>   <span class="c1"># the whole string must match</span>
+<span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>     <span class="c1"># list of strings</span>
+<span class="n">re</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>    <span class="c1"># iterator of match objects</span>
+<span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">repl</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>   <span class="c1"># replace; repl may be a function</span>
+<span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>       <span class="c1"># split on a pattern</span>
+<span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">flags</span><span class="p">)</span>    <span class="c1"># a reusable pattern object</span>
+<span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>               <span class="c1"># treat text as literal, not as a pattern</span>
+</code></pre></div>
+
+<p><strong>The match object</strong></p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">found</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>        <span class="c1"># the whole match</span>
+<span class="n">found</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>       <span class="c1"># the first capture group</span>
+<span class="n">found</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">"name"</span><span class="p">)</span>  <span class="c1"># a named group</span>
+<span class="n">found</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>       <span class="c1"># every group as a tuple</span>
+<span class="n">found</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()</span>    <span class="c1"># named groups as a dict</span>
+<span class="n">found</span><span class="o">.</span><span class="n">start</span><span class="p">(),</span> <span class="n">found</span><span class="o">.</span><span class="n">end</span><span class="p">(),</span> <span class="n">found</span><span class="o">.</span><span class="n">span</span><span class="p">()</span>
+</code></pre></div>
+
+<p><strong>What to match</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Means</th>
+<th>Pattern</th>
+<th>Means</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>\d</code></td>
+<td>a digit</td>
+<td><code>\D</code></td>
+<td>not a digit</td>
+</tr>
+<tr>
+<td><code>\w</code></td>
+<td>a word character</td>
+<td><code>\W</code></td>
+<td>not a word character</td>
+</tr>
+<tr>
+<td><code>\s</code></td>
+<td>whitespace</td>
+<td><code>\S</code></td>
+<td>not whitespace</td>
+</tr>
+<tr>
+<td><code>.</code></td>
+<td>any character but newline</td>
+<td><code>[abc]</code></td>
+<td>one of these</td>
+</tr>
+<tr>
+<td><code>[a-z]</code></td>
+<td>a range</td>
+<td><code>[^abc]</code></td>
+<td>none of these</td>
+</tr>
+</tbody>
+</table></div>
+<p>A pipe between two options means "or", as in <code>(?:ERROR|WARNING)</code>, and <code>(?:...)</code> groups without capturing.</p>
+<p><strong>How many</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Means</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>*</code></td>
+<td>0 or more</td>
+</tr>
+<tr>
+<td><code>+</code></td>
+<td>1 or more</td>
+</tr>
+<tr>
+<td><code>?</code></td>
+<td>0 or 1</td>
+</tr>
+<tr>
+<td><code>{3}</code></td>
+<td>exactly 3</td>
+</tr>
+<tr>
+<td><code>{2,4}</code></td>
+<td>between 2 and 4</td>
+</tr>
+<tr>
+<td><code>+?</code></td>
+<td>lazy: as few as possible</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Where</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Means</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>^</code></td>
+<td>start</td>
+</tr>
+<tr>
+<td><code>$</code></td>
+<td>end</td>
+</tr>
+<tr>
+<td><code>\b</code></td>
+<td>word boundary</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Groups</strong></p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="sa">r</span><span class="s2">"(\d</span><span class="si">{4}</span><span class="s2">)-(\d</span><span class="si">{2}</span><span class="s2">)"</span>                    <span class="c1"># numbered: .group(1), .group(2)</span>
+<span class="sa">r</span><span class="s2">"(?P&lt;year&gt;\d</span><span class="si">{4}</span><span class="s2">)-(?P&lt;month&gt;\d</span><span class="si">{2}</span><span class="s2">)"</span>   <span class="c1"># named: .group("year"), .groupdict()</span>
+<span class="sa">r</span><span class="s2">"(?:ERROR|WARNING)"</span>                  <span class="c1"># grouped, not captured</span>
+</code></pre></div>
+
+<p><strong>Flags</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>re.IGNORECASE</code></td>
+<td>case does not matter</td>
+</tr>
+<tr>
+<td><code>re.MULTILINE</code></td>
+<td><code>^</code> and <code>$</code> match on every line</td>
+</tr>
+<tr>
+<td><code>re.VERBOSE</code></td>
+<td>whitespace ignored, <code>#</code> starts a comment</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Patterns you'll write again</strong></p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="sa">r</span><span class="s2">"#\w+"</span>                             <span class="c1"># hashtag</span>
+<span class="sa">r</span><span class="s2">"@\w+"</span>                             <span class="c1"># mention</span>
+<span class="sa">r</span><span class="s2">"\d</span><span class="si">{4}</span><span class="s2">-\d</span><span class="si">{2}</span><span class="s2">-\d</span><span class="si">{2}</span><span class="s2">"</span>                <span class="c1"># ISO date</span>
+<span class="sa">r</span><span class="s2">"[^a-z0-9]+"</span>                       <span class="c1"># runs of punctuation, for slugs</span>
+<span class="sa">r</span><span class="s2">"[^\d.]"</span>                           <span class="c1"># everything that is not part of a number</span>
+<span class="sa">r</span><span class="s2">"&lt;[^&gt;]+&gt;"</span>                          <span class="c1"># a tag, without overrunning</span>
+</code></pre></div>
+
+      <div class="article-end">
+        <p><strong>A regular expression lets you describe the <strong>shape</strong> of the text you want instead of writing a loop to hunt for it: what to match (<code>\d</code>, <code>\w</code>, <code>[...]</code>), how many (<code>+</code>, <code>*</code>, <code>?</code>, <code>{n}</code>), and where (<code>^</code>, <code>$</code>, <code>\b</code>), with groups to pull out the pieces.</strong> Always write patterns as raw strings, check for <code>None</code> before calling <code>.group()</code>, watch out for greedy matching and the <code>findall</code> trap, escape any pattern built from data, and reach for a proper parser when the text is HTML or CSV. Next up, in chapter 17, we go online and fetch real data over the internet with <code>requests</code>, the first package in this course that needs <code>pip install</code>, so chapter 11's virtual environment finally gets used.</p>
+      </div>
+    </main>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="f-left">Python Programming Series &nbsp;/&nbsp; Article 16 of the course</div>
+  <div class="f-right"><a href="#top">Back to top ↑</a></div>
+</footer>
+<script>
+(function(){
+  var t=document.getElementById('navToggle'),s=document.getElementById('sidebar');
+  if(t&&s){t.addEventListener('click',function(){s.classList.toggle('open');var o=s.classList.contains('open');t.innerHTML=o?'<svg class="icon"><use href="#icon-close"></use></svg>':'<svg class="icon"><use href="#icon-menu"></use></svg>';});s.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){s.classList.remove('open');t.innerHTML='<svg class="icon"><use href="#icon-menu"></use></svg>';});});}
+  var tl=Array.prototype.slice.call(document.querySelectorAll('.toc a')),sc=tl.map(function(a){return document.getElementById(a.getAttribute('href').slice(1));}).filter(Boolean);
+  if('IntersectionObserver' in window&&sc.length){var bi={};tl.forEach(function(a){bi[a.getAttribute('href').slice(1)]=a;});var obs=new IntersectionObserver(function(es){es.forEach(function(e){var l=bi[e.target.id];if(!l)return;if(e.isIntersecting){tl.forEach(function(a){a.classList.remove('active');});l.classList.add('active');}});},{rootMargin:'-15% 0px -70% 0px',threshold:0});sc.forEach(function(s){obs.observe(s);});}
+  document.querySelectorAll('.code-card').forEach(function(c){var b=c.querySelector('.copy-btn'),e=c.querySelector('code');if(!b||!e)return;b.addEventListener('click',function(){var tx=e.innerText,done=function(){var o=b.innerHTML;b.innerHTML='<svg class="icon"><use href="#icon-check"></use></svg> Copied';setTimeout(function(){b.innerHTML=o;},1600);};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(tx).then(done,done);else{var ta=document.createElement('textarea');ta.value=tx;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(x){}document.body.removeChild(ta);done();}});});
+})();
+</script>
+</body>
+</html>

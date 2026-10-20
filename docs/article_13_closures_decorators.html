@@ -1,0 +1,1457 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Closures and Decorators · Python Programming Series</title>
+<meta name="description" content="A beginner-friendly guide to Python closures and decorators: functions as objects, closures, nonlocal, building a decorator step by step, functools.wraps, @property, @lru_cache, decorator factories and a real retry decorator.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+
+:root{
+  --paper:#F3F8FC;--surface:#FFFFFF;--tint:#E8F2FB;
+  --ink:#0E2238;--ink-soft:#3D5570;--ink-faint:#7F95AB;
+  --violet:#0B6FCC;--violet-deep:#0A4F9E;--violet-soft:#E2EFFB;
+  --pink:#3FA34D;--pink-text:#0A7466;--pink-soft:#E0F5F2;
+  --mint:#0FA3A3;--mint-text:#08787A;--mint-soft:#DDF4F4;
+  --sun:#FFB627;--sun-soft:#FFF4D9;
+  --orange:#E89B00;--orange-text:#9A6400;--orange-soft:#FFF0D1;
+  --sky:#013243;--sky-text:#013243;--sky-soft:#E1ECF0;
+  --line:#D6E4F0;--line-strong:#B9CFE3;
+  --code-bg:#0B1E33;--code-head:#08172A;--code-line:#17304D;--out-bg:#071425;
+  --r-s:8px;--r-m:14px;--r-l:22px;
+  --font-d:'Bricolage Grotesque','Arial Rounded MT Bold',sans-serif;
+  --font-b:'Figtree',-apple-system,'Segoe UI',sans-serif;
+  --font-m:'JetBrains Mono','SFMono-Regular',Consolas,monospace;
+}
+*,*::before,*::after{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-b);font-size:17px;line-height:1.68;-webkit-font-smoothing:antialiased;}
+a{color:var(--violet-deep);text-decoration-color:rgba(11,111,204,.35);text-underline-offset:3px;text-decoration-thickness:2px;}
+a:hover{text-decoration-color:currentColor;}
+::selection{background:var(--pink);color:#fff;}
+:focus-visible{outline:3px solid var(--pink);outline-offset:2px;border-radius:4px;}
+.icon{width:1em;height:1em;display:inline-block;vertical-align:-.15em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+
+.shell{max-width:1300px;margin:0 auto;padding:0 clamp(16px,4vw,44px);}
+.topbar{display:none;position:sticky;top:0;z-index:40;align-items:center;justify-content:space-between;padding:12px clamp(16px,4vw,44px);background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-bottom:2px solid var(--violet-soft);}
+.topbar .brand{font-family:var(--font-d);font-weight:800;font-size:.98rem;color:var(--ink);}
+.topbar .brand span{color:var(--violet);}
+.topbar button{border:2px solid var(--violet-soft);background:var(--surface);border-radius:var(--r-s);width:40px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--violet);}
+
+/* ---------- Hero: the one loud moment ---------- */
+.hero{position:relative;margin:clamp(16px,2.5vw,28px) 0 clamp(36px,5vw,56px);padding:clamp(36px,5.5vw,68px) clamp(22px,4.5vw,60px);background:var(--violet);color:#fff;border-radius:var(--r-l);overflow:hidden;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:clamp(28px,4vw,56px);align-items:center;}
+.hero::before{content:"";position:absolute;width:420px;height:420px;border-radius:50%;background:var(--violet-deep);right:-120px;top:-160px;}
+.hero::after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;background:var(--pink);left:-70px;bottom:-90px;opacity:.9;}
+.hero-copy,.hero-art{position:relative;z-index:1;}
+.hero-eyebrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-weight:600;font-size:.95rem;color:rgba(255,255,255,.86);margin-bottom:20px;}
+.hero-eyebrow .badge{background:var(--sun);color:var(--ink);font-family:var(--font-d);font-weight:800;padding:4px 13px;border-radius:999px;font-size:.92rem;}
+h1.title{font-family:var(--font-d);font-weight:800;font-size:clamp(2.15rem,4.6vw,3.7rem);line-height:1.02;letter-spacing:-.025em;margin:0 0 20px;max-width:16ch;color:#fff;}
+.hero-sub{font-size:clamp(1rem,1.5vw,1.12rem);color:rgba(255,255,255,.9);max-width:58ch;margin:0 0 28px;}
+.hero-sub strong{color:#fff;font-weight:700;}
+.hero-chips{display:flex;flex-wrap:wrap;gap:10px;}
+.chip{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.13);border:1.5px solid rgba(255,255,255,.28);padding:7px 14px 7px 10px;border-radius:999px;font-size:.88rem;font-weight:600;color:#fff;}
+.chip .icon{width:1.15em;height:1.15em;}
+.chip:nth-child(1) .icon{color:var(--sun);}
+.chip:nth-child(2) .icon{color:#7FF0D2;}
+.chip:nth-child(3) .icon{color:#C5F27A;}
+.chip:nth-child(4) .icon{color:#9FD6FF;}
+
+.hero-art{display:flex;flex-direction:column;align-items:center;}
+.blueprint{width:min(250px,100%);border:2.5px dashed rgba(255,255,255,.75);border-radius:var(--r-m);padding:14px 16px 12px;font-family:var(--font-m);font-size:.8rem;color:#fff;background:rgba(255,255,255,.06);}
+.bp-title{font-weight:700;margin-bottom:8px;}
+.bp-title .kw{color:#C5F27A;}
+.bp-title .cn{color:var(--sun);}
+.bp-line{padding:2px 0 2px 14px;color:rgba(255,255,255,.82);}
+.bp-line.m{color:#7FF0D2;}
+.fan{width:min(330px,100%);height:44px;display:block;}
+.fan path{stroke:rgba(255,255,255,.7);stroke-width:2;fill:none;stroke-dasharray:4 4;vector-effect:non-scaling-stroke;}
+.objs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:min(360px,100%);}
+.obj{border-radius:12px;padding:10px 10px 9px;font-family:var(--font-m);font-size:.72rem;line-height:1.5;color:var(--ink);box-shadow:0 6px 0 rgba(14,34,56,.28);animation:stamp .5s cubic-bezier(.3,1.5,.6,1) both;}
+.obj b{display:block;font-family:var(--font-d);font-size:1rem;font-weight:800;margin-bottom:3px;}
+.obj span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.o1{background:var(--sun);transform:rotate(-4deg);animation-delay:.25s;}
+.o2{background:#7FF0D2;transform:rotate(2deg);animation-delay:.45s;}
+.o3{background:#C5F27A;transform:rotate(-1.5deg);animation-delay:.65s;}
+@keyframes stamp{from{opacity:0;translate:0 -26px;scale:.85;}to{opacity:1;translate:0 0;scale:1;}}
+.art-cap{margin:18px 0 0;font-family:var(--font-d);font-weight:700;font-size:.95rem;color:rgba(255,255,255,.9);}
+
+/* ---------- Layout + sidebar ---------- */
+.layout{display:grid;grid-template-columns:265px minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:start;padding-bottom:90px;}
+.sidebar{position:sticky;top:24px;max-height:calc(100vh - 48px);overflow-y:auto;padding:16px 10px 16px 0;}
+.sidebar::-webkit-scrollbar{width:5px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:3px;}
+.toc-label{font-family:var(--font-d);font-weight:800;font-size:1rem;color:var(--ink);margin:0 0 10px;padding-left:12px;}
+.toc{list-style:none;margin:0;padding:0;}
+.toc li{margin:0 0 2px;}
+.toc a{display:flex;align-items:center;gap:10px;padding:7px 12px;font-size:.88rem;font-weight:500;color:var(--ink-soft);text-decoration:none;border-radius:10px;transition:background .15s,color .15s;}
+.toc a .icon{width:1.05em;height:1.05em;flex:none;color:var(--violet);}
+.toc a:hover{background:var(--violet-soft);color:var(--ink);}
+.toc a.active{background:var(--violet);color:#fff;font-weight:600;}
+.toc a.active .icon{color:var(--sun);}
+
+/* ---------- Article ---------- */
+.article{min-width:0;padding-top:8px;max-width:820px;}
+.article h2{--acc:var(--violet);font-family:var(--font-d);font-weight:800;font-size:clamp(1.55rem,2.6vw,2rem);line-height:1.15;letter-spacing:-.015em;margin:64px 0 18px;scroll-margin-top:24px;display:flex;align-items:center;gap:14px;}
+.article h2:nth-of-type(5n+2){--acc:var(--pink);}
+.article h2:nth-of-type(5n+3){--acc:var(--mint);}
+.article h2:nth-of-type(5n+4){--acc:var(--orange);}
+.article h2:nth-of-type(5n+5){--acc:var(--sky);}
+.article>h2:first-of-type{margin-top:4px;}
+.article>hr:first-child{display:none;}
+.article h2 .h-icon{width:2.6rem;height:2.6rem;flex:none;display:grid;place-items:center;background:var(--acc);color:#fff;border-radius:12px;transform:rotate(-4deg);box-shadow:0 4px 0 rgba(14,34,56,.18);}
+.article h2 .h-icon .icon{width:1.35rem;height:1.35rem;stroke-width:2;}
+.article h3{font-family:var(--font-d);font-weight:700;font-size:1.2rem;margin:34px 0 10px;scroll-margin-top:24px;color:var(--ink);}
+.article p{margin:0 0 17px;}
+.article ul,.article ol{margin:0 0 20px;padding-left:1.35em;}
+.article li{margin-bottom:8px;padding-left:.2em;}
+.article ul li::marker{color:var(--pink);font-size:1.15em;}
+.article ol li::marker{color:var(--violet);font-family:var(--font-d);font-weight:800;}
+.article strong{font-weight:700;}
+.article hr{border:0;height:6px;width:110px;margin:52px auto;border-radius:6px;background:linear-gradient(90deg,var(--violet) 0 20%,var(--pink) 20% 40%,var(--mint) 40% 60%,var(--sun) 60% 80%,var(--sky) 80% 100%);}
+.article code{font-family:var(--font-m);font-size:.84em;background:var(--pink-soft);padding:.12em .4em;border-radius:6px;color:var(--pink-text);}
+.article blockquote{margin:22px 0;padding:16px 20px;border-left:5px solid var(--sun);background:var(--sun-soft);border-radius:0 var(--r-m) var(--r-m) 0;color:var(--ink);}
+.article blockquote p{margin:0;color:inherit;}
+
+.table-wrap{overflow-x:auto;margin:22px 0 28px;border-radius:var(--r-m);border:2px solid var(--violet-soft);background:var(--surface);}
+.article table{width:100%;border-collapse:collapse;font-size:.9rem;}
+.article thead th{background:var(--violet);color:#fff;font-family:var(--font-d);font-weight:700;text-align:left;padding:12px 16px;white-space:nowrap;font-size:.9rem;}
+.article tbody td{padding:11px 16px;border-bottom:1px solid var(--line);vertical-align:top;}
+.article tbody tr:last-child td{border-bottom:none;}
+.article tbody tr:nth-child(even){background:#F5F9FD;}
+.article tbody td code{white-space:nowrap;}
+
+/* ---------- Code ---------- */
+.code-card{margin:22px 0 26px;border-radius:var(--r-m);overflow:hidden;background:var(--code-bg);box-shadow:0 6px 0 var(--violet-soft);}
+.code-card .code-head{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:var(--code-head);border-bottom:1px solid var(--code-line);}
+.code-card .dots{display:flex;gap:6px;}
+.code-card .dots span{width:10px;height:10px;border-radius:50%;display:block;}
+.code-card .dots span:nth-child(1){background:var(--pink);}
+.code-card .dots span:nth-child(2){background:var(--sun);}
+.code-card .dots span:nth-child(3){background:var(--mint);}
+.code-card .lang{font-family:var(--font-m);font-size:.72rem;color:#7E9CC0;}
+.code-card .copy-btn{font-family:var(--font-b);font-weight:600;font-size:.76rem;color:#DCEBFA;background:rgba(255,255,255,.06);border:1px solid #23456B;border-radius:7px;padding:4px 10px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .15s,border-color .15s;}
+.code-card .copy-btn:hover{background:var(--violet);border-color:var(--violet);color:#fff;}
+.code-card .copy-btn .icon{width:.95em;height:.95em;}
+.code-card pre{margin:0;padding:16px 20px;overflow-x:auto;font-size:.85rem;line-height:1.6;}
+.code-card code{font-family:var(--font-m);font-size:1em;line-height:inherit;color:#E6F1FF;background:none;padding:0;border-radius:0;}
+.code-card .k,.code-card .kn,.code-card .kd,.code-card .kc,.code-card .ow{color:#5CC8FF;}
+.code-card .nb,.code-card .bp{color:#9FD6FF;}
+.code-card .nf,.code-card .fm{color:#A6E36B;}
+.code-card .s,.code-card .s1,.code-card .s2,.code-card .sa,.code-card .sd,.code-card .se{color:#FFD166;}
+.code-card .si{color:#6EE7D8;}
+.code-card .mi,.code-card .mf{color:#6EE7D8;}
+.code-card .o,.code-card .p{color:#9FB6CF;}
+.code-card .c,.code-card .c1,.code-card .cm{color:#6F8BA8;font-style:italic;}
+.code-card .n{color:#E6F1FF;}
+.code-card .nc,.code-card .ne{color:#FFB86B;font-weight:600;}
+
+.output-card{margin:-26px 0 26px;border-radius:0 0 var(--r-m) var(--r-m);overflow:hidden;background:var(--out-bg);border-top:2px dashed #23456B;box-shadow:0 6px 0 var(--violet-soft);position:relative;z-index:1;}
+.output-card::before{content:"Output";display:block;font-family:var(--font-b);font-weight:700;font-size:.74rem;color:#A6E36B;padding:9px 20px 0;}
+.output-card pre{margin:0;padding:4px 20px 16px;overflow-x:auto;font-size:.82rem;line-height:1.6;}
+.output-card code{font-family:var(--font-m);font-size:1em;line-height:inherit;color:#BFD6EE;background:none;padding:0;border-radius:0;}
+
+.diagram-card{margin:22px 0 26px;border-radius:var(--r-m);overflow:hidden;position:relative;border:2.5px dashed var(--line-strong);background:var(--surface);}
+.diagram-card::before{content:"diagram";position:absolute;top:10px;right:14px;font-family:var(--font-b);font-weight:700;font-size:.74rem;color:var(--violet);}
+.diagram-card pre{margin:0;padding:26px 22px 20px;overflow-x:auto;}
+.diagram-card pre{line-height:1.3;font-size:.84rem;}
+.diagram-card code{font-family:var(--font-m);font-size:1em;line-height:inherit;color:var(--violet-deep);font-weight:500;background:none;padding:0;white-space:pre;}
+
+.svg-diagram{margin:24px 0 28px;padding:22px 20px 18px;background:var(--surface);border:2px solid var(--violet-soft);border-radius:var(--r-m);}
+.svg-diagram{overflow-x:auto;}
+.svg-diagram svg{width:100%;min-width:560px;height:auto;display:block;}
+.svg-diagram .cap{font-size:.86rem;font-weight:500;color:var(--ink-faint);text-align:center;margin-top:12px;}
+
+.article-end{margin-top:56px;padding:30px 30px;border-radius:var(--r-l);background:var(--violet);color:#fff;position:relative;overflow:hidden;}
+.article-end::after{content:"";position:absolute;width:140px;height:140px;border-radius:50%;background:var(--sun);right:-50px;bottom:-60px;}
+.article-end p{margin:0;font-size:1.06rem;color:rgba(255,255,255,.92);position:relative;z-index:1;max-width:62ch;}
+.article-end p strong{color:#fff;}
+
+footer.site-footer{border-top:2px solid var(--violet-soft);margin-top:30px;padding:22px clamp(16px,4vw,44px) 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+footer.site-footer .f-left{font-size:.88rem;font-weight:500;color:var(--ink-faint);}
+footer.site-footer a{font-size:.9rem;font-weight:600;}
+
+@media(max-width:960px){
+  .topbar{display:flex;}
+  .layout{grid-template-columns:1fr;}
+  .article{max-width:none;}
+  .sidebar{position:fixed;inset:60px 0 0 0;z-index:35;background:var(--paper);padding:18px clamp(16px,4vw,44px) 24px;transform:translateX(-100%);transition:transform .2s;max-height:none;height:calc(100vh - 60px);}
+  .sidebar.open{transform:translateX(0);}
+  .hero{grid-template-columns:1fr;}
+}
+@media(max-width:520px){
+  .article h2 .h-icon{width:2.2rem;height:2.2rem;}
+  .obj{font-size:.66rem;padding:9px 8px;}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}.sidebar{transition:none;}.obj{animation:none;}}
+
+/* NumPy hero illustration */
+.cells{display:grid;grid-template-columns:repeat(4,1fr);border:2px solid rgba(255,255,255,.8);border-radius:8px;overflow:hidden;margin-top:4px;}
+.cells span{text-align:center;padding:7px 0;font-weight:700;color:#fff;}
+.cells span+span{border-left:2px solid rgba(255,255,255,.8);}
+.objs.four{grid-template-columns:repeat(4,1fr);width:min(380px,100%);gap:9px;}
+.objs.four .obj{text-align:center;padding:10px 4px 9px;}
+.o4{background:#9FD6FF;transform:rotate(3deg);animation-delay:.85s;}
+
+/* Article 11 extras */
+.cells.three{grid-template-columns:repeat(3,1fr);}
+.cells.three span{font-size:.72rem;padding:6px 0;}
+.objs .obj{min-width:0;}
+.obj.seq{text-align:center;padding:10px 6px 9px;}
+.obj.seq code{display:block;font-family:var(--font-m);font-size:.74rem;font-weight:700;margin:2px 0 4px;color:var(--ink);background:none;padding:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.obj.seq span{font-size:.68rem;white-space:normal;}
+.code-card.term .code-head{background:#06121F;}
+.code-card .lang{text-transform:none;}
+.diagram-card.textfile::before{content:"text";}
+@media(max-width:520px){.obj.seq code{font-size:.62rem;}}
+</style>
+</head>
+<body>
+<svg style="display:none" aria-hidden="true"><defs>
+<symbol id="icon-func" viewBox="0 0 24 24"><path d="M14 3a3 3 0 0 0-3 3v12a3 3 0 0 1-3 3"/><path d="M7 10h9"/></symbol>
+<symbol id="icon-backpack" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2z"/><path d="M9 2.5V5M15 2.5V5"/><rect x="9" y="12" width="6" height="5" rx="1"/></symbol>
+<symbol id="icon-gift" viewBox="0 0 24 24"><rect x="3" y="9" width="18" height="12" rx="1.5"/><path d="M2 9h20v-3H2z"/><path d="M12 6v15"/><path d="M12 6c-2-4-6-3-5 0M12 6c2-4 6-3 5 0"/></symbol>
+<symbol id="icon-suitcase" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V4h6v3"/><path d="M3 12h18"/></symbol>
+<symbol id="icon-tag" viewBox="0 0 24 24"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.5"/></symbol>
+<symbol id="icon-star" viewBox="0 0 24 24"><path d="M12 2l3 6.5 7 .8-5.2 4.8 1.5 7L12 17.6 5.7 21.1l1.5-7L2 9.3l7-.8z"/></symbol>
+<symbol id="icon-sliders" viewBox="0 0 24 24"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></symbol>
+<symbol id="icon-retry" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21,3 21,9 15,9"/></symbol>
+<symbol id="icon-table" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="1.5"/><line x1="2" y1="9" x2="22" y2="9"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15.5" y1="3" x2="15.5" y2="21"/></symbol>
+<symbol id="icon-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="13" rx="1.6"/><path d="M5 16H4.5A1.5 1.5 0 0 1 3 14.5v-10A1.5 1.5 0 0 1 4.5 3h10A1.5 1.5 0 0 1 16 4.5V5"/></symbol>
+<symbol id="icon-check" viewBox="0 0 24 24"><path d="M4 12.5 L9.5 18 L20 5"/></symbol>
+<symbol id="icon-menu" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
+<symbol id="icon-close" viewBox="0 0 24 24"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></symbol>
+</defs></svg>
+
+
+<div class="topbar">
+  <span class="brand">§13 &nbsp;<span>Closures &amp; Decorators</span></span>
+  <button id="navToggle" aria-label="Toggle navigation">
+    <svg class="icon"><use href="#icon-menu"></use></svg>
+  </button>
+</div>
+
+<div class="shell" id="top">
+  <section class="hero">
+  <div class="hero-copy">
+    <div class="hero-eyebrow"><span class="badge">Article 13</span> Python Programming Series</div>
+    <h1 class="title">Closures and Decorators in Python: A Complete Beginner&#x27;s Guide</h1>
+    <p class="hero-sub">If you've read any real Python code, you've probably seen lines that start with an <code>@</code> symbol, sitting right above a function. They look a bit mysterious at first. This guide explains exactly what they are and how they work, starting from ideas you already know and building up one small step at a time, in plain English.</p>
+    <div class="hero-chips">
+      <div class="chip"><svg class="icon"><use href="#icon-backpack"></use></svg> Closures: functions that remember</div>
+      <div class="chip"><svg class="icon"><use href="#icon-gift"></use></svg> What the @ really does</div>
+      <div class="chip"><svg class="icon"><use href="#icon-star"></use></svg> @property, @lru_cache and friends</div>
+      <div class="chip"><svg class="icon"><use href="#icon-retry"></use></svg> A real retry decorator</div>
+    </div>
+  </div>
+  <div class="hero-art" aria-hidden="true">
+    <div class="blueprint">
+      <div class="bp-title"><span class="kw">@</span><span class="cn">execution_timer</span></div>
+      <div class="cells three"><span>before</span><span>func()</span><span>after</span></div>
+    </div>
+    <svg class="fan" viewBox="0 0 330 44" preserveAspectRatio="none"><path d="M165 0 C165 24 55 18 55 44"/><path d="M165 0 L165 44"/><path d="M165 0 C165 24 275 18 275 44"/></svg>
+    <div class="objs">
+      <div class="obj seq o1"><b>closure</b><code>add_15(10)</code><span>remembers x</span></div>
+      <div class="obj seq o2"><b>decorator</b><code>@timer</code><span>wraps a function</span></div>
+      <div class="obj seq o3"><b>factory</b><code>@repeat(3)</code><span>takes settings</span></div>
+    </div>
+    <p class="art-cap">Functions that remember and wrap</p>
+  </div>
+</section>
+
+  <div class="layout">
+    <nav class="sidebar" id="sidebar">
+      <div class="toc-label">On this page</div>
+      <ul class="toc">
+<li><a href="#part-1-functions-are-objects"><svg class="icon"><use href="#icon-func"></use></svg><span>Part 1: Functions Are Objects</span></a></li>
+<li><a href="#part-2-nested-functions-and-closures"><svg class="icon"><use href="#icon-backpack"></use></svg><span>Part 2: Nested Functions and Closures</span></a></li>
+<li><a href="#part-3-from-a-higher-order-function-to-a-decorator"><svg class="icon"><use href="#icon-gift"></use></svg><span>Part 3: From a Higher-Order Function to a Decorator</span></a></li>
+<li><a href="#part-4-making-a-decorator-work-on-any-function"><svg class="icon"><use href="#icon-suitcase"></use></svg><span>Part 4: Making a Decorator Work on Any Function</span></a></li>
+<li><a href="#part-5-the-identity-problem-and-functoolswraps"><svg class="icon"><use href="#icon-tag"></use></svg><span>Part 5: The Identity Problem and functools.wraps</span></a></li>
+<li><a href="#part-6-decorators-youll-meet-in-real-code"><svg class="icon"><use href="#icon-star"></use></svg><span>Part 6: Decorators You&#x27;ll Meet in Real Code</span></a></li>
+<li><a href="#part-7-decorators-that-take-arguments"><svg class="icon"><use href="#icon-sliders"></use></svg><span>Part 7: Decorators That Take Arguments</span></a></li>
+<li><a href="#real-world-example-retrying-a-flaky-call"><svg class="icon"><use href="#icon-retry"></use></svg><span>Real-World Example: Retrying a Flaky Call</span></a></li>
+<li><a href="#quick-reference-summary"><svg class="icon"><use href="#icon-table"></use></svg><span>Quick Reference Summary</span></a></li>
+      </ul>
+    </nav>
+
+    <main class="article">
+<p>Here are a few examples of what these lines look like in real projects:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">"/users"</span><span class="p">)</span>
+<span class="nd">@property</span>
+<span class="nd">@lru_cache</span>
+</code></pre></div>
+
+<p>These are called <strong>decorators</strong>. Decorators let you add extra behaviour to a function (like timing it, retrying it when it fails, or remembering its answers) <strong>without changing the function's own code</strong>. They show up in web frameworks, data science libraries and almost every large Python project.</p>
+<p>We won't start with the <code>@</code>, though. We'll start with something simpler, a function that remembers things, and build up step by step until the <code>@</code> feels like the obvious next move.</p>
+<p>Here is what we will cover:</p>
+<ol>
+<li>Functions are objects you can pass around and store</li>
+<li>Nested functions and closures: how a function remembers values</li>
+<li>Turning a simple timer into a decorator, one step at a time</li>
+<li>Making a decorator work on any function with <code>*args</code> and <code>**kwargs</code></li>
+<li><code>functools.wraps</code>, and the problem it fixes</li>
+<li>Decorators you'll meet in real code: <code>@property</code>, <code>@staticmethod</code>, <code>@classmethod</code>, <code>@lru_cache</code>, <code>@abstractmethod</code></li>
+<li>Decorators that take arguments</li>
+<li>A real-world example: automatically retrying a flaky network call</li>
+</ol>
+<hr />
+<h2 id="part-1-functions-are-objects"><span class="h-icon"><svg class="icon"><use href="#icon-func"></use></svg></span>Part 1: Functions Are Objects</h2>
+<p>In Python, a function is an ordinary <strong>object</strong>, just like a string, a number or a list. That sounds like a small detail, but everything in this guide depends on it. It means you can check a function's type, ask its name, store it in a variable, and pass it around like any other value:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">greet</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"Hello, </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">!"</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">greet</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">greet</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="n">say_hello</span> <span class="o">=</span> <span class="n">greet</span>                 <span class="c1"># no parentheses -- we are naming the function, not calling it</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">say_hello</span><span class="p">(</span><span class="s2">"Shikhar"</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>&lt;class 'function'&gt;
+greet
+Hello, Shikhar!
+</code></pre></div>
+
+<p>Look at the line <code>say_hello = greet</code>. There are <strong>no parentheses</strong> after <code>greet</code>. We are not running the function; we are just giving it a second name. After that line, <code>say_hello</code> and <code>greet</code> are two labels on the very same function, so <code>say_hello("Shikhar")</code> works.</p>
+<h3 id="greet-vs-greet-the-most-important-difference"><code>greet</code> vs <code>greet()</code>: The Most Important Difference</h3>
+<p>Notice that <code>greet</code> and <code>greet()</code> are different things:</p>
+<ul>
+<li><code>greet</code> (no parentheses) is <strong>the function itself</strong>.</li>
+<li><code>greet()</code> (with parentheses) <strong>runs</strong> the function and gives you its result.</li>
+</ul>
+<p><strong>Analogy:</strong> think of a <strong>recipe card</strong> and a <strong>cooked dish</strong>. <code>greet</code> is the recipe card: you can copy it, hand it to a friend, or file it in a folder. <code>greet()</code> is actually cooking the recipe: you get the dish. Most decorator mistakes come back to mixing these two up, so keep this picture in mind.</p>
+<div class="diagram-card"><pre><code>   greet          →   the recipe card     (the function object; nothing runs)
+   greet("Amit")  →   the cooked dish     (the function runs and returns "Hello, Amit!")
+</code></pre></div>
+
+<h3 id="storing-functions-in-a-dictionary">Storing Functions in a Dictionary</h3>
+<p>Since functions are objects, you can put them anywhere you'd put any other value, like inside a list or a dictionary:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">to_upper</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">text</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">to_title</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">text</span><span class="o">.</span><span class="n">title</span><span class="p">()</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">reverse</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">text</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="n">formatters</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"upper"</span><span class="p">:</span> <span class="n">to_upper</span><span class="p">,</span> <span class="s2">"title"</span><span class="p">:</span> <span class="n">to_title</span><span class="p">,</span> <span class="s2">"reverse"</span><span class="p">:</span> <span class="n">reverse</span><span class="p">}</span>
+
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">func</span> <span class="ow">in</span> <span class="n">formatters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">:</span><span class="s2">&lt;8</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">func</span><span class="p">(</span><span class="s1">'stranger things'</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>upper    -&gt; STRANGER THINGS
+title    -&gt; Stranger Things
+reverse  -&gt; sgniht regnarts
+</code></pre></div>
+
+<p>The dictionary maps a <strong>name</strong> to the <strong>function</strong> that does the job. You pick a function by its key and call it, instead of writing a long <code>if</code>/<code>elif</code> chain to decide which formatter to run. This is called a <strong>dispatch table</strong>, and you'll see it in real code.</p>
+<p><strong>Analogy:</strong> a TV remote. Each button (the key) is linked to one action (the function). Pressing "Volume Up" doesn't make the remote check a long list of <code>if</code> statements; the button simply knows which action it triggers.</p>
+<hr />
+<h2 id="part-2-nested-functions-and-closures"><span class="h-icon"><svg class="icon"><use href="#icon-backpack"></use></svg></span>Part 2: Nested Functions and Closures</h2>
+<p>You can define a function <strong>inside</strong> another function. The inner one is <strong>local</strong> to the outer one, so code outside can't see it, just like a local variable:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">outer</span><span class="p">():</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">inner</span><span class="p">():</span>
+        <span class="k">return</span> <span class="s2">"I am the inner function"</span>
+    <span class="k">return</span> <span class="n">inner</span><span class="p">()</span>          <span class="c1"># note the parentheses: we call inner and return its result</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">outer</span><span class="p">())</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">inner</span><span class="p">()</span>
+<span class="k">except</span> <span class="ne">NameError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"NameError:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>I am the inner function
+NameError: name 'inner' is not defined
+</code></pre></div>
+
+<p><strong>Analogy:</strong> the inner function is like a room inside a house. People inside the house can use the room, but nobody standing on the street can walk straight into it.</p>
+<h3 id="returning-the-inner-function-itself">Returning the Inner Function Itself</h3>
+<p>Now change one thing: drop the parentheses after <code>inner</code> in the <code>return</code> line. The outer function now hands back <strong>the inner function itself</strong>, not its result:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">outer</span><span class="p">():</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">inner</span><span class="p">():</span>
+        <span class="k">return</span> <span class="s2">"I am the inner function"</span>
+    <span class="k">return</span> <span class="n">inner</span>            <span class="c1"># no parentheses: hand back the function</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">outer</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>         <span class="c1"># a function object, not a string</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>      <span class="c1"># and it still knows its own name</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">())</span>             <span class="c1"># now call it</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>&lt;class 'function'&gt;
+inner
+I am the inner function
+</code></pre></div>
+
+<p><code>outer()</code> returned a function object (the recipe card, not the dish). We stored it in <code>result</code>, and only when we wrote <code>result()</code> did the inner function actually run.</p>
+<h3 id="where-it-gets-interesting-remembering-values">Where It Gets Interesting: Remembering Values</h3>
+<p>Watch what the inner function can still see:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">create_adder</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">adder</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>        <span class="c1"># x belongs to create_adder, not to adder</span>
+    <span class="k">return</span> <span class="n">adder</span>
+
+<span class="n">add_15</span> <span class="o">=</span> <span class="n">create_adder</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
+<span class="n">add_100</span> <span class="o">=</span> <span class="n">create_adder</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">add_15</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">add_100</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>25
+110
+</code></pre></div>
+
+<p>Look closely at the <strong>timing</strong>. By the time we call <code>add_15(10)</code>, the function <code>create_adder(15)</code> has <strong>already finished</strong>. Normally, a function's local variables disappear once it returns, so <code>x</code> should be gone. Yet <code>adder</code> still knows that <code>x</code> is 15.</p>
+<p>A function that <strong>remembers variables from the place where it was created</strong>, even after that place has finished running, is called a <strong>closure</strong>. People say it "closes over" those variables.</p>
+<p><strong>Analogy:</strong> think of a <strong>backpack</strong>. When <code>adder</code> is created inside <code>create_adder</code>, it packs the variables it needs (here, <code>x</code>) into a backpack and carries them out. Even after <code>create_adder</code> has finished and gone home, <code>adder</code> still has <code>x</code> in its backpack, ready to use.</p>
+<div class="diagram-card"><pre><code>   create_adder(15)                         create_adder(100)
+   ┌──────────────────────┐                 ┌──────────────────────┐
+   │ x = 15               │                 │ x = 100              │
+   │ def adder(y): ...    │                 │ def adder(y): ...    │
+   └─────────┬────────────┘                 └─────────┬────────────┘
+             │ returns adder,                         │ returns adder,
+             │ with x packed in its "backpack"        │ with x packed in its "backpack"
+             ▼                                        ▼
+   add_15  = adder + backpack {x: 15}      add_100 = adder + backpack {x: 100}
+
+   add_15(10)  → 15 + 10 = 25               add_100(10) → 100 + 10 = 110
+</code></pre></div>
+
+<p>Python keeps the remembered values in a hidden attribute called <code>__closure__</code>. You won't need it in real code, but peeking inside shows the values really are there:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="n">add_15</span><span class="o">.</span><span class="vm">__closure__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cell_contents</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">add_100</span><span class="o">.</span><span class="vm">__closure__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cell_contents</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>15
+100
+</code></pre></div>
+
+<p>Same code, two functions, and each one carries its <strong>own</strong> remembered value. <code>add_15</code> and <code>add_100</code> are separate objects with separate backpacks.</p>
+<h3 id="function-factories">Function Factories</h3>
+<p>Why is this useful? A closure lets you write the logic <strong>once</strong>, and then make ready-to-use versions of it with different settings. A function that builds and returns other functions like this is often called a <strong>function factory</strong>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">make_discount</span><span class="p">(</span><span class="n">percent</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">apply</span><span class="p">(</span><span class="n">price</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="n">price</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">percent</span> <span class="o">/</span> <span class="mi">100</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">apply</span>
+
+<span class="n">diwali_sale</span> <span class="o">=</span> <span class="n">make_discount</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
+<span class="n">clearance</span> <span class="o">=</span> <span class="n">make_discount</span><span class="p">(</span><span class="mi">70</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"₹2,499 in the Diwali sale: ₹</span><span class="si">{</span><span class="n">diwali_sale</span><span class="p">(</span><span class="mi">2499</span><span class="p">)</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"₹2,499 in clearance:       ₹</span><span class="si">{</span><span class="n">clearance</span><span class="p">(</span><span class="mi">2499</span><span class="p">)</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>₹2,499 in the Diwali sale: ₹1,749.30
+₹2,499 in clearance:       ₹749.70
+</code></pre></div>
+
+<p><strong>Analogy:</strong> a coffee machine with preset buttons. The machine (the factory) knows how to make coffee. You set up one button for "strong" and another for "mild". Each button is a ready-to-use version with its own setting baked in. Here, <code>diwali_sale</code> is the "30% off" button and <code>clearance</code> is the "70% off" button.</p>
+<h3 id="a-closure-trap-to-know-about">A Closure Trap to Know About</h3>
+<p>Here's a subtle point. A closure remembers <strong>the variable itself</strong>, not the value the variable had at that moment. You won't notice the difference until you create functions <strong>inside a loop</strong>. (<code>lambda</code> is the short, one-line way to write a small function.)</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">multipliers</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]:</span>
+    <span class="n">multipliers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span>     <span class="c1"># each lambda captures n itself</span>
+
+<span class="nb">print</span><span class="p">([</span><span class="n">f</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">multipliers</span><span class="p">])</span>         <span class="c1"># not [20, 30, 40]</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>[40, 40, 40]
+</code></pre></div>
+
+<p>We expected <code>[20, 30, 40]</code> but got <code>[40, 40, 40]</code>. All three functions share the <strong>same</strong> <code>n</code>. By the time we actually call them, the loop has finished and <code>n</code> is 4. So every one of them multiplies by 4.</p>
+<p><strong>Analogy:</strong> imagine telling three friends, "Look at the scoreboard later to see the score." When they finally look, they all see the <strong>final</strong> score, not the score at the moment you spoke to each of them. If you wanted each one to remember a different score, you should have told them to <strong>write it down right away</strong>.</p>
+<p>The fix is to write the value down right away, by making it a <strong>default argument</strong>. Python works out a default value <strong>once, at the moment the function is created</strong>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">multipliers</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]:</span>
+    <span class="n">multipliers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">:</span> <span class="n">x</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span>    <span class="c1"># n=n freezes the current value</span>
+
+<span class="nb">print</span><span class="p">([</span><span class="n">f</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">multipliers</span><span class="p">])</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>[20, 30, 40]
+</code></pre></div>
+
+<p><code>n=n</code> means "create a parameter called <code>n</code> whose default value is whatever <code>n</code> is <em>right now</em>". Each lambda now carries its own frozen copy.</p>
+<p><code>make_discount</code> doesn't have this problem. Each call to it creates a fresh set of local variables with its own <code>percent</code>. So the case to watch out for is specifically <strong>creating functions inside a loop</strong>.</p>
+<h3 id="changing-a-remembered-variable-with-nonlocal">Changing a Remembered Variable with <code>nonlocal</code></h3>
+<p>A closure can <strong>read</strong> the outer variable with no trouble. <strong>Assigning</strong> to it is different. Python treats any variable you assign to inside a function as a brand-new local variable, so this fails:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">make_counter</span><span class="p">():</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">increment</span><span class="p">():</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span> <span class="mi">1</span>       <span class="c1"># Python treats count as local -- and it has no value yet</span>
+        <span class="k">return</span> <span class="n">count</span>
+    <span class="k">return</span> <span class="n">increment</span>
+
+<span class="n">counter</span> <span class="o">=</span> <span class="n">make_counter</span><span class="p">()</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">counter</span><span class="p">()</span>
+<span class="k">except</span> <span class="ne">UnboundLocalError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"UnboundLocalError:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>UnboundLocalError: cannot access local variable 'count' where it is not associated with a value
+</code></pre></div>
+
+<p>The line <code>count = count + 1</code> makes Python decide that <code>count</code> is a local variable of <code>increment</code>. But then, to work out <code>count + 1</code>, it needs to read that local <code>count</code>, which has no value yet. Hence the error.</p>
+<p><code>UnboundLocalError</code> is a more specific kind of <code>NameError</code>. It means "this local variable exists, but it doesn't have a value yet".</p>
+<p>The fix is the <code>nonlocal</code> keyword. It tells Python: "this name belongs to the outer function, don't make a new local one":</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">make_counter</span><span class="p">():</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">increment</span><span class="p">():</span>
+        <span class="k">nonlocal</span> <span class="n">count</span>          <span class="c1"># use the enclosing count, do not create a new local one</span>
+        <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">count</span>
+    <span class="k">return</span> <span class="n">increment</span>
+
+<span class="n">page_views</span> <span class="o">=</span> <span class="n">make_counter</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">page_views</span><span class="p">(),</span> <span class="n">page_views</span><span class="p">(),</span> <span class="n">page_views</span><span class="p">())</span>
+
+<span class="n">likes</span> <span class="o">=</span> <span class="n">make_counter</span><span class="p">()</span>          <span class="c1"># a separate counter with its own count</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">likes</span><span class="p">())</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>1 2 3
+1
+</code></pre></div>
+
+<p>Each counter has its own <code>count</code> in its own backpack. <code>page_views</code> went up to 3, while <code>likes</code> started fresh at 1.</p>
+<p><strong>Analogy:</strong> without <code>nonlocal</code>, the inner function writes on its <strong>own private notepad</strong>. With <code>nonlocal</code>, it writes on the <strong>shared whiteboard</strong> in the outer function's room.</p>
+<p>Python has one more keyword like this, <code>global</code>. It's for a variable that lives at the top level of your notebook or file, outside every function. You'll see it used once later in this guide, to count function calls.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Keyword</th>
+<th>What assigning to a name inside a function does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(no keyword)</td>
+<td>Creates a new variable local to this function</td>
+</tr>
+<tr>
+<td><code>nonlocal</code></td>
+<td>Changes the variable in the <strong>outer function</strong></td>
+</tr>
+<tr>
+<td><code>global</code></td>
+<td>Changes the variable at the <strong>top level</strong> of the file</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="part-3-from-a-higher-order-function-to-a-decorator"><span class="h-icon"><svg class="icon"><use href="#icon-gift"></use></svg></span>Part 3: From a Higher-Order Function to a Decorator</h2>
+<p>Now we can build a decorator, and we'll do it by improving something simple.</p>
+<p>Imagine you work at a cloud company like AWS, which <strong>bills customers for how long their code runs</strong>. You need a timer that takes a customer's function, times how long it runs, and reports the time for billing. A function that takes another function as input is called a <strong>higher-order function</strong>.</p>
+<p>This timer uses <code>time.perf_counter()</code>, which is a stopwatch made for measuring short durations accurately:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">execution_timer</span><span class="p">(</span><span class="n">customer_function</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+    <span class="n">customer_function</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">duration</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"AWS: billed for </span><span class="si">{</span><span class="n">duration</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> seconds"</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">process_data</span><span class="p">(</span><span class="n">items</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   processing </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">)</span><span class="si">}</span><span class="s2"> items..."</span><span class="p">)</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>             <span class="c1"># stand-in for real work</span>
+
+
+<span class="n">execution_timer</span><span class="p">(</span><span class="n">process_data</span><span class="p">,</span> <span class="p">[</span><span class="s2">"a"</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">,</span> <span class="s2">"c"</span><span class="p">])</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>   processing 3 items...
+AWS: billed for 0.5 seconds
+</code></pre></div>
+
+<p>It works, but it's awkward to use:</p>
+<ul>
+<li>Everyone who calls <code>process_data</code> has to remember to write <code>execution_timer(process_data, data)</code> instead of just <code>process_data(data)</code>.</li>
+<li>The timer has to know how to call the function. Here, it assumes exactly one argument.</li>
+<li>If you decide to stop timing, you have to edit every place that calls it.</li>
+</ul>
+<h3 id="step-1-return-a-new-function-instead-of-calling-it">Step 1: Return a New Function Instead of Calling It</h3>
+<p>Instead of running the customer's function straight away, we build a <strong>replacement</strong> for it: a new function that starts the clock, calls the original, and reports the time. Then we hand that replacement back:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">execution_timer</span><span class="p">(</span><span class="n">customer_function</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+        <span class="n">customer_function</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>                 <span class="c1"># the original function</span>
+        <span class="n">duration</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"AWS: billed for </span><span class="si">{</span><span class="n">duration</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> seconds"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">wrapper</span>                              <span class="c1"># hand back the replacement</span>
+
+
+<span class="n">timed_process</span> <span class="o">=</span> <span class="n">execution_timer</span><span class="p">(</span><span class="n">process_data</span><span class="p">)</span>
+<span class="n">timed_process</span><span class="p">([</span><span class="s2">"a"</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">,</span> <span class="s2">"c"</span><span class="p">])</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>   processing 3 items...
+AWS: billed for 0.5 seconds
+</code></pre></div>
+
+<p><code>wrapper</code> is a <strong>closure</strong>. It remembers <code>customer_function</code> (in its backpack) even after <code>execution_timer</code> has returned.</p>
+<h3 id="step-2-reuse-the-original-name">Step 2: Reuse the Original Name</h3>
+<p>Nothing says the replacement needs a new name. Store it back under the <strong>original</strong> name, and every existing call gets timed without any other change:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">process_data</span><span class="p">(</span><span class="n">items</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   processing </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">)</span><span class="si">}</span><span class="s2"> items..."</span><span class="p">)</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+
+<span class="n">process_data</span> <span class="o">=</span> <span class="n">execution_timer</span><span class="p">(</span><span class="n">process_data</span><span class="p">)</span>    <span class="c1"># replace the name with the timed version</span>
+
+<span class="n">process_data</span><span class="p">([</span><span class="s2">"a"</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">,</span> <span class="s2">"c"</span><span class="p">])</span>                   <span class="c1"># ordinary-looking call, now timed</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>   processing 3 items...
+AWS: billed for 0.5 seconds
+</code></pre></div>
+
+<p>Now anyone who calls <code>process_data(...)</code> is really calling the timed version, without knowing or caring.</p>
+<h3 id="step-3-the-symbol">Step 3: The <code>@</code> Symbol</h3>
+<p>That line, <code>process_data = execution_timer(process_data)</code>, is so common that Python has a shortcut for it. Write the decorator's name with an <code>@</code> on the line right above the <code>def</code>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nd">@execution_timer</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">process_data</span><span class="p">(</span><span class="n">items</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   processing </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">)</span><span class="si">}</span><span class="s2"> items..."</span><span class="p">)</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+
+
+<span class="n">process_data</span><span class="p">([</span><span class="s2">"a"</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">,</span> <span class="s2">"c"</span><span class="p">])</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>   processing 3 items...
+AWS: billed for 0.5 seconds
+</code></pre></div>
+
+<p>And that's all a decorator is.</p>
+<blockquote>
+<p><code>@decorator</code> above a <code>def</code> means exactly the same as writing <code>func = decorator(func)</code> after it.</p>
+</blockquote>
+<p>A <strong>decorator</strong> is a function that takes a function and returns a replacement for it. The <code>@</code> is just a shorter way to write the reassignment.</p>
+<p><strong>Analogy:</strong> a decorator is like <strong>gift wrapping</strong>. The gift inside (your function) doesn't change at all. The wrapping adds something around it: a nice look, a label, a bow. When someone receives the package, they deal with the wrapping first, and then they get to the gift inside. Here, the "wrapping" starts a stopwatch, hands over the gift (runs your function), and then reports the time.</p>
+<div class="diagram-card"><pre><code>   BEFORE decorating                     AFTER  @execution_timer
+
+   process_data ──► [ your code ]        process_data ──► ┌─ wrapper ───────────────────┐
+                                                          │ start the stopwatch         │
+                                                          │   ┌─────────────────────┐   │
+                                                          │   │ your original code  │   │
+                                                          │   └─────────────────────┘   │
+                                                          │ stop, print the bill        │
+                                                          └─────────────────────────────┘
+</code></pre></div>
+
+<p>Keep this in mind, and lines like <code>@app.route(...)</code> and <code>@property</code> in other people's code will start to make sense.</p>
+<h3 id="when-does-a-decorator-run">When Does a Decorator Run?</h3>
+<p>This clears up a lot of confusion. The decorator itself runs <strong>once, when the function is defined</strong>, not every time the function is called. Only <code>wrapper</code> runs on each call.</p>
+<p>Put a <code>print</code> in both places and you can see the order:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">noisy_decorator</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   [decorating </span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> -- happens once, at definition]"</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   [calling </span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> -- happens on every call]"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">func</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">wrapper</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"about to define the function..."</span><span class="p">)</span>
+
+<span class="nd">@noisy_decorator</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">ping</span><span class="p">():</span>
+    <span class="k">return</span> <span class="s2">"pong"</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"function defined; nothing has been called yet"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>about to define the function...
+   [decorating ping -- happens once, at definition]
+function defined; nothing has been called yet
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="n">ping</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ping</span><span class="p">())</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>   [calling ping -- happens on every call]
+pong
+   [calling ping -- happens on every call]
+pong
+</code></pre></div>
+
+<p>The <code>[decorating ...]</code> line printed while the cell <strong>defining</strong> <code>ping</code> ran, and never again. The <code>[calling ...]</code> line prints on <strong>every</strong> call.</p>
+<p><strong>Analogy:</strong> putting a case on your phone happens <strong>once</strong>. Using the phone (with the case on) happens <strong>many times</strong>. The decorator is putting on the case; the wrapper is the case doing its job every time you pick up the phone.</p>
+<p>So if a decorator has some slow setup work, put it in the decorator's body, outside <code>wrapper</code>. That way it runs once instead of on every call.</p>
+<hr />
+<h2 id="part-4-making-a-decorator-work-on-any-function"><span class="h-icon"><svg class="icon"><use href="#icon-suitcase"></use></svg></span>Part 4: Making a Decorator Work on Any Function</h2>
+<p>Our timer has a hidden limit. <code>wrapper(data)</code> accepts <strong>exactly one</strong> argument, so it breaks as soon as we decorate a function that takes something different:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nd">@execution_timer</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">upload_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">bucket</span><span class="p">):</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">upload_file</span><span class="p">(</span><span class="s2">"report.csv"</span><span class="p">,</span> <span class="s2">"analytics-bucket"</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"TypeError:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>TypeError: execution_timer.&lt;locals&gt;.wrapper() takes 1 positional argument but 2 were given
+</code></pre></div>
+
+<p>Python calls the function <code>execution_timer.&lt;locals&gt;.wrapper</code>, which means "the <code>wrapper</code> that was defined inside <code>execution_timer</code>". It accepts one argument, and we gave it two.</p>
+<p>A decorator can't know ahead of time what the functions it wraps will look like. So it needs to <strong>accept anything</strong> and <strong>pass it all through</strong>. That's the job of <code>*args</code> and <code>**kwargs</code>.</p>
+<h3 id="a-quick-recap-of-args-and-kwargs">A Quick Recap of <code>*args</code> and <code>**kwargs</code></h3>
+<ul>
+<li><code>*args</code> collects any number of <strong>positional</strong> arguments into a <strong>tuple</strong>.</li>
+<li><code>**kwargs</code> collects any number of <strong>keyword</strong> arguments (like <code>user="amit"</code>) into a <strong>dictionary</strong>.</li>
+</ul>
+<p>The names <code>args</code> and <code>kwargs</code> are just a habit everyone follows. The <code>*</code> and <code>**</code> are what actually do the work. A function can use both at once:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">log_event</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"event:           "</span><span class="p">,</span> <span class="n">event</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"extra positional:"</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>        <span class="c1"># a tuple</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"extra keyword:   "</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>      <span class="c1"># a dict</span>
+
+
+<span class="n">log_event</span><span class="p">(</span><span class="s2">"purchase"</span><span class="p">,</span> <span class="mi">499</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="s2">"amit"</span><span class="p">,</span> <span class="n">currency</span><span class="o">=</span><span class="s2">"INR"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>event:            purchase
+extra positional: (499, 2)
+extra keyword:    {'user': 'amit', 'currency': 'INR'}
+</code></pre></div>
+
+<p><code>"purchase"</code> filled the normal <code>event</code> parameter. The extra positional values <code>499, 2</code> went into <code>args</code>, and the extra keyword values went into <code>kwargs</code>.</p>
+<h3 id="and-also-work-the-other-way-round"><code>*</code> and <code>**</code> Also Work the Other Way Round</h3>
+<p>Here's the new part. In a <code>def</code>, <code>*</code> and <code>**</code> <strong>collect</strong> arguments. When you <strong>call</strong> a function, they do the opposite: they <strong>spread</strong> a list or a dictionary out into separate arguments:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">settings</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"user"</span><span class="p">:</span> <span class="s2">"sara"</span><span class="p">,</span> <span class="s2">"currency"</span><span class="p">:</span> <span class="s2">"USD"</span><span class="p">}</span>
+<span class="n">extras</span> <span class="o">=</span> <span class="p">[</span><span class="mi">99</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+
+<span class="n">log_event</span><span class="p">(</span><span class="s2">"refund"</span><span class="p">,</span> <span class="o">*</span><span class="n">extras</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span><span class="p">)</span>    <span class="c1"># unpack the list and the dict into arguments</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>event:            refund
+extra positional: (99, 1)
+extra keyword:    {'user': 'sara', 'currency': 'USD'}
+</code></pre></div>
+
+<p><code>*extras</code> turned <code>[99, 1]</code> into two separate arguments, and <code>**settings</code> turned the dictionary into <code>user="sara", currency="USD"</code>.</p>
+<p><strong>Analogy:</strong> think of a <strong>suitcase</strong>. In a <code>def</code>, <code>*</code> and <code>**</code> <strong>pack</strong> loose items into a suitcase. In a call, they <strong>unpack</strong> a suitcase back into loose items.</p>
+<h3 id="a-wrapper-that-accepts-anything">A Wrapper That Accepts Anything</h3>
+<p>Put those two ideas together and you get the shape that almost every decorator uses:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">execution_timer</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>                   <span class="c1"># accept anything</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>              <span class="c1"># pass it all straight through</span>
+        <span class="n">duration</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"AWS: billed for </span><span class="si">{</span><span class="n">duration</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> seconds"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>                               <span class="c1"># and give back what the function returned</span>
+    <span class="k">return</span> <span class="n">wrapper</span>
+</code></pre></div>
+
+<p>The wrapper <strong>packs</strong> whatever it receives (<code>*args, **kwargs</code> in the <code>def</code>), then <strong>unpacks</strong> it all into the original function (<code>func(*args, **kwargs)</code> in the call). It's like a courier who passes along whatever parcel you hand them, without opening it.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nd">@execution_timer</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">upload_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">bucket</span><span class="p">):</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"uploaded </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">bucket</span><span class="si">}</span><span class="s2">"</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="n">upload_file</span><span class="p">(</span><span class="s2">"report.csv"</span><span class="p">,</span> <span class="n">bucket</span><span class="o">=</span><span class="s2">"analytics-bucket"</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>AWS: billed for 0.2 seconds
+uploaded report.csv to analytics-bucket
+</code></pre></div>
+
+<p>Two arguments now, one positional and one keyword, and it works.</p>
+<h3 id="dont-forget-return-result">Don't Forget <code>return result</code></h3>
+<p>Look at the <code>return result</code> line in the wrapper. Forgetting it is one of the most common decorator bugs. Without it, the wrapper returns <code>None</code>, so every decorated function quietly loses its return value:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">broken_timer</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>           <span class="c1"># runs the function but throws the answer away</span>
+    <span class="k">return</span> <span class="n">wrapper</span>
+
+
+<span class="nd">@broken_timer</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>                        <span class="c1"># None, not 5 -- and nothing warned us</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>None
+</code></pre></div>
+
+<p><strong>Analogy:</strong> it's like a waiter who goes to the kitchen, collects your dish, and then forgets to bring it to your table. The cooking happened, but you never get the result.</p>
+<hr />
+<h2 id="part-5-the-identity-problem-and-functoolswraps"><span class="h-icon"><svg class="icon"><use href="#icon-tag"></use></svg></span>Part 5: The Identity Problem and <code>functools.wraps</code></h2>
+<p>A decorated function has quietly turned into a <strong>different object</strong>. To see it, we'll give a function a <strong>docstring</strong>: a short description in triple quotes on the line right under the <code>def</code>. Python stores it in <code>__doc__</code>. Now ask the decorated function its name and description:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nd">@execution_timer</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_report</span><span class="p">(</span><span class="n">month</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Build the monthly billing report."""</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"report for </span><span class="si">{</span><span class="n">month</span><span class="si">}</span><span class="s2">"</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="n">generate_report</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">generate_report</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>wrapper
+None
+</code></pre></div>
+
+<p>It calls itself <code>wrapper</code>, because that's what it is now. The original function is hidden inside the closure, and so is its docstring.</p>
+<p>That matters more than it looks. <code>help()</code>, documentation tools, and log messages that print a function's name all read <code>__name__</code> and <code>__doc__</code>. If every decorated function in your project calls itself <code>wrapper</code> and has no description, those tools stop being useful.</p>
+<p><strong>Analogy:</strong> imagine wrapping a gift so well that the <strong>name tag</strong> is hidden inside. Everyone at the party now sees a pile of boxes that all say "wrapper", and nobody knows which gift is which.</p>
+<p><code>functools.wraps</code> fixes it. You put it on the wrapper with <code>@</code>, like any decorator. (Strictly speaking, <code>functools.wraps(func)</code> is a call that <em>returns</em> a decorator, the kind of "decorator that takes arguments" you'll meet in Part 7. Here, the argument is the original function.) It copies the original function's name, docstring and a few other details onto the wrapper, like sticking the name tag back on the <strong>outside</strong> of the wrapping:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">execution_timer</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>                      <span class="c1"># copy the original's identity onto wrapper</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"AWS: billed for </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> seconds"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+    <span class="k">return</span> <span class="n">wrapper</span>
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nd">@execution_timer</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_report</span><span class="p">(</span><span class="n">month</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Build the monthly billing report."""</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"report for </span><span class="si">{</span><span class="n">month</span><span class="si">}</span><span class="s2">"</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="n">generate_report</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">generate_report</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>generate_report
+Build the monthly billing report.
+</code></pre></div>
+
+<p>Same behaviour, correct name and description. Use <code>@functools.wraps</code> in every decorator you write. It's one line, and there's no reason to leave it out.</p>
+<hr />
+<h2 id="part-6-decorators-youll-meet-in-real-code"><span class="h-icon"><svg class="icon"><use href="#icon-star"></use></svg></span>Part 6: Decorators You'll Meet in Real Code</h2>
+<p>You'll write your own decorators now and then. You'll <strong>use</strong> other people's all the time. These are the ones worth recognising on sight.</p>
+<h3 id="property-methods-that-look-like-attributes"><code>@property</code>: Methods That Look Like Attributes</h3>
+<p>Imagine a bank <code>Account</code> class. You want to protect the balance, so that nobody can set it to a negative number. One way is to write <code>get_balance()</code> and <code>set_balance()</code> methods, so that every change goes through a check. It works, but then everyone has to write <code>account.get_balance()</code> for something that feels like a plain value.</p>
+<p><code>@property</code> gives you both. Callers use it <strong>like an attribute</strong>, and your method still runs behind the scenes:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">class</span><span class="w"> </span><span class="nc">Account</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">balance</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_balance</span> <span class="o">=</span> <span class="n">balance</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">balance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Runs when someone READS account.balance</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_balance</span>
+
+    <span class="nd">@balance</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">balance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">amount</span><span class="p">):</span>
+        <span class="c1"># Runs when someone WRITES account.balance = ...</span>
+        <span class="k">if</span> <span class="n">amount</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"balance cannot be negative"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_balance</span> <span class="o">=</span> <span class="n">amount</span>
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">acc</span> <span class="o">=</span> <span class="n">Account</span><span class="p">(</span><span class="s2">"Shikhar"</span><span class="p">,</span> <span class="mi">5000</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">acc</span><span class="o">.</span><span class="n">balance</span><span class="p">)</span>              <span class="c1"># no parentheses -- but the getter ran</span>
+
+<span class="n">acc</span><span class="o">.</span><span class="n">balance</span> <span class="o">=</span> <span class="mi">7500</span>              <span class="c1"># looks like assignment -- but the setter ran</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">acc</span><span class="o">.</span><span class="n">balance</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">acc</span><span class="o">.</span><span class="n">balance</span> <span class="o">=</span> <span class="o">-</span><span class="mi">100</span>          <span class="c1"># and the validation still applies</span>
+<span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"ValueError:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>5000
+7500
+ValueError: balance cannot be negative
+</code></pre></div>
+
+<ul>
+<li><code>acc.balance</code> has no parentheses, but the <strong>getter</strong> method ran.</li>
+<li><code>acc.balance = 7500</code> looks like a simple assignment, but the <strong>setter</strong> method ran.</li>
+<li><code>acc.balance = -100</code> was blocked by the setter's check.</li>
+</ul>
+<p><strong>Analogy:</strong> a <strong>thermostat</strong>. To you, it looks like you're just reading or setting a number on a display. But behind the display, a little mechanism checks what you typed. Try to set your room to 500 degrees, and it refuses.</p>
+<p><strong>Why <code>_balance</code> with one underscore?</strong> The property is called <code>balance</code>, so the actual stored value needs a different name. A single underscore at the start is Python's usual way of saying "this is internal, please leave it alone". (Python won't stop anyone from touching it; it's a polite convention.) The property itself already does the protecting: nobody can set a negative balance, because every write goes through the setter.</p>
+<p>This is the usual way to do encapsulation (protecting an object's data) in Python today: the class still controls its data, and callers get to write plain, readable code.</p>
+<h3 id="a-property-can-be-calculated-on-the-fly">A Property Can Be Calculated on the Fly</h3>
+<p>A property doesn't need a stored value behind it. It can work out its answer each time you ask:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">class</span><span class="w"> </span><span class="nc">Movie</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">runtime_minutes</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">title</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">runtime_minutes</span> <span class="o">=</span> <span class="n">runtime_minutes</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">runtime_hours</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runtime_minutes</span> <span class="o">/</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+
+<span class="n">dune</span> <span class="o">=</span> <span class="n">Movie</span><span class="p">(</span><span class="s2">"Dune"</span><span class="p">,</span> <span class="mi">155</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">dune</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">dune</span><span class="o">.</span><span class="n">runtime_minutes</span><span class="si">}</span><span class="s2"> min = </span><span class="si">{</span><span class="n">dune</span><span class="o">.</span><span class="n">runtime_hours</span><span class="si">}</span><span class="s2"> hours"</span><span class="p">)</span>
+
+<span class="n">dune</span><span class="o">.</span><span class="n">runtime_minutes</span> <span class="o">=</span> <span class="mi">166</span>      <span class="c1"># change the source...</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"after the extended cut:"</span><span class="p">,</span> <span class="n">dune</span><span class="o">.</span><span class="n">runtime_hours</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Dune: 155 min = 2.6 hours
+after the extended cut: 2.8
+</code></pre></div>
+
+<p><code>runtime_hours</code> is never stored. It's worked out each time you ask for it, so it can <strong>never get out of step</strong> with <code>runtime_minutes</code>. When we changed the minutes to 166, the hours updated automatically.</p>
+<h3 id="staticmethod-and-classmethod"><code>@staticmethod</code> and <code>@classmethod</code></h3>
+<p>Normal methods take <code>self</code> as their first parameter, because they work on <strong>one particular object</strong>. These two decorators change what a method receives:</p>
+<ul>
+<li>A <code>@staticmethod</code> gets <strong>no <code>self</code> at all</strong>. It's a plain function that lives inside the class because that's where it logically belongs.</li>
+<li>A <code>@classmethod</code> gets <strong>the class itself</strong> instead of an object. By convention that parameter is called <code>cls</code>. Its most common use is giving the class a <strong>second way to create objects</strong>, often called an <strong>alternative constructor</strong>.</li>
+</ul>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">class</span><span class="w"> </span><span class="nc">Temperature</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">celsius</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">celsius</span> <span class="o">=</span> <span class="n">celsius</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_freezing</span><span class="p">(</span><span class="n">celsius</span><span class="p">):</span>
+        <span class="c1"># No self: this does not depend on any particular Temperature object.</span>
+        <span class="k">return</span> <span class="n">celsius</span> <span class="o">&lt;=</span> <span class="mi">0</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_fahrenheit</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+        <span class="c1"># cls is the Temperature class -- so this builds and returns an instance.</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">f</span> <span class="o">-</span> <span class="mi">32</span><span class="p">)</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">/</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="n">Temperature</span><span class="o">.</span><span class="n">is_freezing</span><span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="p">))</span>              <span class="c1"># called on the class, no object needed</span>
+
+<span class="n">body</span> <span class="o">=</span> <span class="n">Temperature</span><span class="o">.</span><span class="n">from_fahrenheit</span><span class="p">(</span><span class="mf">98.6</span><span class="p">)</span>        <span class="c1"># an alternative constructor</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">body</span><span class="o">.</span><span class="n">celsius</span><span class="si">}</span><span class="s2">°C"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>True
+37.0°C
+</code></pre></div>
+
+<ul>
+<li><code>Temperature.is_freezing(-4)</code> was called on the class directly. No <code>Temperature</code> object was needed, because checking whether a number is below zero doesn't depend on any particular temperature object.</li>
+<li><code>Temperature.from_fahrenheit(98.6)</code> converted Fahrenheit to Celsius and then built a normal <code>Temperature</code> object from it.</li>
+</ul>
+<p><strong>Analogy:</strong> think of a shop. A normal method is a salesperson helping <strong>one specific customer</strong>. A static method is a <strong>calculator kept on the counter</strong>: anyone can use it, and it doesn't care which customer you are. A class method is a <strong>second entrance</strong> to the shop: a different way in, but you still end up inside the same shop.</p>
+<p>Inside <code>from_fahrenheit</code>, <code>cls(...)</code> does the same thing as <code>Temperature(...)</code>. Writing <code>cls</code> instead of the class name means a subclass of <code>Temperature</code> would get objects of its own type back, without rewriting the method.</p>
+<h3 id="functoolslru_cache-remember-earlier-results"><code>@functools.lru_cache</code>: Remember Earlier Results</h3>
+<p>Some functions get called again and again with the <strong>same arguments</strong>. <code>lru_cache</code> saves what they returned and skips the work the next time. (LRU stands for "least recently used": when the cache is full, it throws away the answer that hasn't been used for the longest time.)</p>
+<p><strong>Analogy:</strong> a student who <strong>remembers their times tables</strong> doesn't recalculate 7 × 8 every time. They just recall 56. A cache is the function's memory of answers it has already worked out.</p>
+<p><strong>Fibonacci numbers</strong> show this well. Each number is the sum of the two before it: 0, 1, 1, 2, 3, 5, 8, 13 and so on. Written as a <strong>recursive</strong> function (a function that calls itself), <code>fib(n)</code> calls <code>fib(n - 1)</code> and <code>fib(n - 2)</code>, and those calls ask for the same smaller numbers over and over.</p>
+<div class="diagram-card"><pre><code>                     fib(5)
+                  ┌────┴────┐
+               fib(4)      fib(3)        ← fib(3) is worked out here...
+              ┌──┴──┐      ┌──┴──┐
+           fib(3) fib(2) fib(2) fib(1)   ← ...and again here. fib(2) three times!
+            ┌─┴─┐
+        fib(2) fib(1)
+
+   Without a cache, the same answers are worked out again and again.
+   With a cache, each fib(n) is worked out once, then simply looked up.
+</code></pre></div>
+
+<p>Let's count the calls. <code>calls</code> lives at the top level, so the function needs <code>global</code> to change it:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">calls</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">fib</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">calls</span>          <span class="c1"># change the top-level calls, not a new local one</span>
+    <span class="n">calls</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">n</span>
+    <span class="k">return</span> <span class="n">fib</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">fib</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
+
+
+<span class="n">fib</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"without a cache: </span><span class="si">{</span><span class="n">calls</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> calls"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>without a cache: 242,785 calls
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">calls</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="nd">@functools</span><span class="o">.</span><span class="n">lru_cache</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">fib_cached</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">calls</span>
+    <span class="n">calls</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">n</span>
+    <span class="k">return</span> <span class="n">fib_cached</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">fib_cached</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
+
+
+<span class="n">fib_cached</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"with a cache:    </span><span class="si">{</span><span class="n">calls</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> calls"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>with a cache:    26 calls
+</code></pre></div>
+
+<p>Same function, same answer, <strong>one extra line</strong>. Without the cache, each step up in <code>n</code> makes about 60% more calls than the last (<code>fib(24)</code> needs 150,049 calls, and <code>fib(25)</code> needs 242,785). With the cache, each number from 0 to 25 is worked out only once, which is why there are exactly 26 calls.</p>
+<p>You can ask the cache how it did:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="n">fib_cached</span><span class="o">.</span><span class="n">cache_info</span><span class="p">())</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>CacheInfo(hits=23, misses=26, maxsize=128, currsize=26)
+</code></pre></div>
+
+<ul>
+<li><code>hits</code> counts how often a saved answer was <strong>reused</strong>.</li>
+<li><code>misses</code> counts how often the work was <strong>actually done</strong>.</li>
+<li><code>maxsize=128</code> means the cache keeps the answers for the last 128 different calls. Use <code>@functools.lru_cache(maxsize=1000)</code> to change that, or <code>@functools.cache</code> (Python 3.9 and later) for a cache with no limit.</li>
+</ul>
+<p>Notice that <code>lru_cache</code> works both <strong>with and without</strong> parentheses (since Python 3.8). Most decorators only work one way, and we'll come back to that in Part 7.</p>
+<p><strong>Two things to watch out for:</strong></p>
+<ol>
+<li>A cache with <strong>no limit</strong> keeps everything for as long as your program runs, and it grows with every new argument.</li>
+<li>Only cache <strong>pure calculations</strong>, the kind that always give the same answer for the same input. Never cache something that reads changing data like a file or an API, or you'll get stale, out-of-date answers.</li>
+</ol>
+<p>Also, the cache uses the arguments as <strong>dictionary keys</strong> to look up saved answers. So every argument has to be something a dictionary accepts as a key, and a list isn't:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">try</span><span class="p">:</span>
+    <span class="n">fib_cached</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"TypeError:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>TypeError: unhashable type: 'list'
+</code></pre></div>
+
+<p>"Unhashable" is Python's way of saying "can't be used as a dictionary key". Lists, dictionaries and sets are unhashable (because they can change). Numbers, strings and tuples are fine.</p>
+<h3 id="abstractmethod-forcing-subclasses-to-fill-in-a-method"><code>@abstractmethod</code>: Forcing Subclasses to Fill in a Method</h3>
+<p>Imagine a payment system where every payment gateway (UPI, cards, wallets) must have a <code>charge()</code> method. Without decorators, the best you could do is put <code>raise NotImplementedError</code> inside the base class's <code>charge()</code>. But that only complains <strong>when the missing method is called</strong>, which could be long after someone wrote the broken class.</p>
+<p><code>@abstractmethod</code> is stricter: it <strong>refuses to create an object</strong> from an incomplete class at all. The simplest way to switch this on is to make the base class inherit from <code>ABC</code> (short for "abstract base class"). Without that, <code>@abstractmethod</code> on its own has no effect. The <code>...</code> in the method body is a placeholder that means "nothing here", just like <code>pass</code>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">PaymentGateway</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">charge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">amount</span><span class="p">):</span>
+        <span class="o">...</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">UPIGateway</span><span class="p">(</span><span class="n">PaymentGateway</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">charge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">amount</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"Charged ₹</span><span class="si">{</span><span class="n">amount</span><span class="si">}</span><span class="s2"> via UPI"</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">BrokenGateway</span><span class="p">(</span><span class="n">PaymentGateway</span><span class="p">):</span>
+    <span class="k">pass</span>                                <span class="c1"># forgot to implement charge()</span>
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="n">UPIGateway</span><span class="p">()</span><span class="o">.</span><span class="n">charge</span><span class="p">(</span><span class="mi">499</span><span class="p">))</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">BrokenGateway</span><span class="p">()</span>
+<span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"TypeError:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Charged ₹499 via UPI
+TypeError: Can't instantiate abstract class BrokenGateway without an implementation for abstract method 'charge'
+</code></pre></div>
+
+<p>The error shows up <strong>the moment someone tries to create</strong> a <code>BrokenGateway</code>, not later when some code happens to call <code>charge()</code>. (The exact wording of this error is from Python 3.12 and newer; older versions phrase it slightly differently but mean the same thing.)</p>
+<p><strong>Analogy:</strong> a <strong>building inspector</strong> who won't let anyone move into a house until it has a front door. It's much better to find out on day one than on the first rainy night.</p>
+<h3 id="decorating-methods">Decorating Methods</h3>
+<p>Your own decorators work on methods too, with no changes. A method is just a function whose first argument is <code>self</code>, and <code>*args</code> collects it like any other argument:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">class</span><span class="w"> </span><span class="nc">PlaylistService</span><span class="p">:</span>
+    <span class="nd">@execution_timer</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rebuild</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"rebuilt </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="n">PlaylistService</span><span class="p">()</span><span class="o">.</span><span class="n">rebuild</span><span class="p">(</span><span class="s2">"Road Trip"</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>AWS: billed for 0.2 seconds
+rebuilt Road Trip
+</code></pre></div>
+
+<p><code>self</code> arrives as the first item in <code>args</code> and gets passed straight through. You don't need to do anything special.</p>
+<h3 id="when-not-to-use-a-decorator">When <em>Not</em> to Use a Decorator</h3>
+<p>A decorator adds a layer between the caller and the function, and that makes code a little harder to follow. Skip it when:</p>
+<ul>
+<li><strong>Only one function needs the behaviour.</strong> Just write the behaviour into that function.</li>
+<li><strong>The wrapper needs to know too much.</strong> If your decorator starts checking argument names or doing different things for different functions, it should probably be a normal function instead.</li>
+<li><strong>It changes what the function does.</strong> A decorator should add something <em>around</em> the function, like timing, retrying, caching or logging. If it changes the function's main job, hiding that above the <code>def</code> makes the code harder to read.</li>
+</ul>
+<p>A good test: someone who reads the <code>def</code> and <strong>ignores the <code>@</code> lines</strong> should still understand what the function does.</p>
+<hr />
+<h2 id="part-7-decorators-that-take-arguments"><span class="h-icon"><svg class="icon"><use href="#icon-sliders"></use></svg></span>Part 7: Decorators That Take Arguments</h2>
+<p><em>This part is a step up. The decorators above cover most everyday use, so feel free to come back to this one when you need it.</em></p>
+<p>Sometimes you want to <strong>configure</strong> a decorator: retry <strong>how many</strong> times, cache <strong>how many</strong> results. <code>@something(...)</code> has parentheses, so it's a <strong>call</strong>, and that call has to <strong>return a decorator</strong>. That means three functions nested inside each other:</p>
+<div class="diagram-card"><pre><code>repeat(3)          -&gt;  returns decorator
+decorator(func)    -&gt;  returns wrapper
+wrapper(*args)     -&gt;  runs the function
+</code></pre></div>
+
+<p>The outer function, the one that builds and returns a decorator, is often called a <strong>decorator factory</strong>.</p>
+<p><strong>Analogy:</strong> a <strong>gift-wrapping counter</strong>. First you <strong>choose the paper</strong> (<code>repeat(3)</code>: the settings). The counter hands you back a wrapper of that style (<code>decorator</code>). Then that wrapper is <strong>put around your gift</strong> (<code>decorator(func)</code>), giving you the wrapped package (<code>wrapper</code>).</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">repeat</span><span class="p">(</span><span class="n">times</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">times</span><span class="p">):</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">result</span>
+        <span class="k">return</span> <span class="n">wrapper</span>
+    <span class="k">return</span> <span class="n">decorator</span>
+
+
+<span class="nd">@repeat</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">send_reminder</span><span class="p">(</span><span class="n">email</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   reminder sent to </span><span class="si">{</span><span class="n">email</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+
+<span class="n">send_reminder</span><span class="p">(</span><span class="s2">"user@example.com"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>   reminder sent to user@example.com
+   reminder sent to user@example.com
+   reminder sent to user@example.com
+</code></pre></div>
+
+<p>Read the layers from the outside in:</p>
+<ol>
+<li><code>repeat(3)</code> runs first and returns <code>decorator</code> (which remembers <code>times = 3</code> in its backpack).</li>
+<li>Then <code>decorator(send_reminder)</code> runs and returns <code>wrapper</code>.</li>
+<li>From then on, the name <code>send_reminder</code> points to that <code>wrapper</code>, which calls the original function 3 times.</li>
+</ol>
+<p>It's the same <code>func = decorator(func)</code> rule, with one extra step at the front.</p>
+<p>You've actually been using one of these already: <code>@functools.wraps(func)</code> from Part 5 has parentheses because it takes a setting (the original function) and returns a decorator, exactly like <code>repeat(3)</code>.</p>
+<h3 id="the-mistake-this-sets-up">The Mistake This Sets Up</h3>
+<p><code>@repeat(3)</code> has parentheses and <code>@execution_timer</code> doesn't, so it's easy to write one when you meant the other. Leave off the <code>(3)</code> and the error is confusing the first time you see it:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nd">@repeat</span>                          <span class="c1"># oops -- no (3)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">announce</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"announcement sent"</span><span class="p">)</span>
+
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">announce</span><span class="p">()</span>
+<span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"TypeError:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>TypeError: repeat.&lt;locals&gt;.decorator() missing 1 required positional argument: 'func'
+</code></pre></div>
+
+<p>Work through it with the rule and it makes sense. <code>@repeat</code> means <code>announce = repeat(announce)</code>. So the <code>announce</code> function was passed in as <code>times</code> (!), and <code>repeat</code> handed back <code>decorator</code>, which now sits under the name <code>announce</code>. Calling <code>announce()</code> calls <code>decorator()</code> with no function to decorate.</p>
+<p>The opposite mistake is writing <code>@execution_timer()</code> for a decorator that takes no arguments. This one fails <strong>straight away</strong>, while the function is being defined, because <code>execution_timer()</code> gets called with no function at all:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">try</span><span class="p">:</span>
+    <span class="nd">@execution_timer</span><span class="p">()</span>            <span class="c1"># oops -- this decorator takes no settings</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">announce</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"announcement sent"</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"TypeError:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>TypeError: execution_timer() missing 1 required positional argument: 'func'
+</code></pre></div>
+
+<p><strong>The rule:</strong> use parentheses only if the decorator takes settings. <code>lru_cache</code> is one of the few that accepts both forms. When a decorated function gives you a confusing <code>TypeError</code>, <strong>check the parentheses first</strong>.</p>
+<hr />
+<h2 id="real-world-example-retrying-a-flaky-call"><span class="h-icon"><svg class="icon"><use href="#icon-retry"></use></svg></span>Real-World Example: Retrying a Flaky Call</h2>
+<p>Network calls sometimes fail for no real reason (a busy server, a brief Wi-Fi drop) and then work when you try again. Writing retry code by hand around every call gets repetitive. A decorator lets you write it <strong>once</strong>.</p>
+<p><strong>Analogy:</strong> when a phone number is busy, you <strong>redial</strong> a couple of times before giving up. You don't want to write "redial three times" instructions next to every number in your phone book. You want your phone to just do it automatically for any number.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">retry</span><span class="p">(</span><span class="n">attempts</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">attempt</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">attempts</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">ConnectionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   attempt </span><span class="si">{</span><span class="n">attempt</span><span class="si">}</span><span class="s2"> failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"gave up after </span><span class="si">{</span><span class="n">attempts</span><span class="si">}</span><span class="s2"> attempts"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">wrapper</span>
+    <span class="k">return</span> <span class="n">decorator</span>
+</code></pre></div>
+
+<p>How <code>retry</code> works:</p>
+<ul>
+<li><code>retry(attempts=3)</code> is the decorator factory; <code>attempts</code> is the setting.</li>
+<li>Inside <code>wrapper</code>, the <code>for</code> loop tries the function up to <code>attempts</code> times.</li>
+<li>If the function succeeds, <code>return func(*args, **kwargs)</code> hands back its result immediately and the loop ends.</li>
+<li>If it raises a <code>ConnectionError</code>, the error is caught, a message is printed, and the loop tries again.</li>
+<li>If every attempt fails, the loop ends and the wrapper raises a <code>RuntimeError</code> instead of trying forever.</li>
+</ul>
+<p>To fake a flaky network, the function below counts how many times it's been called and fails the first two times. The count lives <strong>inside a dictionary</strong>, so the function can change it without <code>global</code>. Changing an item inside a dictionary doesn't assign a new value to the <strong>name</strong> <code>state</code>, so Python doesn't treat <code>state</code> as a new local variable.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">state</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"calls"</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+
+<span class="nd">@retry</span><span class="p">(</span><span class="n">attempts</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">fetch_user</span><span class="p">(</span><span class="n">user_id</span><span class="p">):</span>
+    <span class="c1"># Fails the first two times, then succeeds -- standing in for a flaky network.</span>
+    <span class="n">state</span><span class="p">[</span><span class="s2">"calls"</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">state</span><span class="p">[</span><span class="s2">"calls"</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="s2">"network unreachable"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="n">user_id</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"amit"</span><span class="p">}</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="n">fetch_user</span><span class="p">(</span><span class="mi">42</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>   attempt 1 failed: network unreachable
+   attempt 2 failed: network unreachable
+{'id': 42, 'name': 'amit'}
+</code></pre></div>
+
+<p><code>fetch_user</code> has <strong>no retry code in it at all</strong>. It only says <em>what</em> to fetch, and the decorator decides what happens when that fails. Adding retries to another function now takes one line.</p>
+<p>If every attempt fails, the wrapper gives up and raises an error instead of trying forever:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nd">@retry</span><span class="p">(</span><span class="n">attempts</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">fetch_orders</span><span class="p">(</span><span class="n">user_id</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="s2">"network unreachable"</span><span class="p">)</span>    <span class="c1"># this one never works</span>
+
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">fetch_orders</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"RuntimeError:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>   attempt 1 failed: network unreachable
+   attempt 2 failed: network unreachable
+RuntimeError: gave up after 2 attempts
+</code></pre></div>
+
+<p>This split is what decorators are for: <strong>the function does the work, and the decorator adds a rule around it.</strong> Logging, timing, caching, permission checks, rate limits and retries all work this way, and you'll see all of them written as decorators in real projects.</p>
+<h3 id="stacking-decorators">Stacking Decorators</h3>
+<p>You can put more than one decorator on a function. They're applied <strong>from the bottom up</strong>: the one closest to the <code>def</code> wraps the function first, and the one above it wraps the result.</p>
+<p><strong>Analogy:</strong> getting dressed for rain. You put on a <strong>sweater first</strong> (closest to you), then a <strong>raincoat over it</strong>. The raincoat wraps the sweater, not the other way round. And the order matters: a sweater over a raincoat would get soaked.</p>
+<div class="diagram-card"><pre><code>   @execution_timer        ← applied SECOND: wraps everything below it
+   @retry(attempts=3)      ← applied FIRST:  wraps the function directly
+   def sync_playlist(...):
+
+   same as:  sync_playlist = execution_timer( retry(attempts=3)( sync_playlist ) )
+
+   ┌─ execution_timer ─────────────────────┐
+   │  ┌─ retry ─────────────────────────┐  │
+   │  │   ┌──────────────────────────┐  │  │
+   │  │   │ sync_playlist (original) │  │  │
+   │  │   └──────────────────────────┘  │  │
+   │  └─────────────────────────────────┘  │
+   └───────────────────────────────────────┘
+   the timer sees the WHOLE retrying process, failed attempts included
+</code></pre></div>
+
+<p>The order changes what you get. Here <code>sync_playlist</code> fails on its first try and works on the second. With the timer on top, it times <strong>the whole call, retries included</strong>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">tries</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"count"</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+
+<span class="nd">@execution_timer</span>          <span class="c1"># applied second, so it wraps the retrying version</span>
+<span class="nd">@retry</span><span class="p">(</span><span class="n">attempts</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>        <span class="c1"># applied first, closest to the function</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">sync_playlist</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="n">tries</span><span class="p">[</span><span class="s2">"count"</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">tries</span><span class="p">[</span><span class="s2">"count"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="s2">"server busy"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"synced </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="n">sync_playlist</span><span class="p">(</span><span class="s2">"Road Trip"</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>   attempt 1 failed: server busy
+AWS: billed for 0.4 seconds
+synced Road Trip
+</code></pre></div>
+
+<p>Each attempt took 0.2 seconds, so the bill is 0.4 seconds. Now <strong>swap</strong> the two decorator lines, so the timer wraps <strong>each single attempt</strong> instead:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">tries</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"count"</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+
+<span class="nd">@retry</span><span class="p">(</span><span class="n">attempts</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>        <span class="c1"># now applied second</span>
+<span class="nd">@execution_timer</span>          <span class="c1"># now applied first, so it times one attempt at a time</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">sync_playlist</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="n">tries</span><span class="p">[</span><span class="s2">"count"</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">tries</span><span class="p">[</span><span class="s2">"count"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="s2">"server busy"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"synced </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="n">sync_playlist</span><span class="p">(</span><span class="s2">"Road Trip"</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>   attempt 1 failed: server busy
+AWS: billed for 0.2 seconds
+synced Road Trip
+</code></pre></div>
+
+<p>Only 0.2 seconds this time. The failed attempt raised an error <strong>inside</strong> the timer's wrapper before it reached its <code>print</code>, so that attempt was never billed. Neither order is wrong. They answer different questions: "how long did the whole call take?" versus "how long did the attempt that worked take?"</p>
+<hr />
+<h2 id="quick-reference-summary"><span class="h-icon"><svg class="icon"><use href="#icon-table"></use></svg></span>Quick Reference Summary</h2>
+<p><strong>The one rule</strong></p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nd">@decorator</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">func</span><span class="p">():</span>          <span class="c1">#  is exactly the same as writing</span>
+    <span class="o">...</span>              <span class="c1">#  func = decorator(func)</span>
+</code></pre></div>
+
+<p><strong>The decorator template (start from this every time)</strong></p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">my_decorator</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>              <span class="c1"># keeps func's name and docstring</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>       <span class="c1"># accepts any signature</span>
+        <span class="c1"># ... before ...</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>  <span class="c1"># pass everything through</span>
+        <span class="c1"># ... after ...</span>
+        <span class="k">return</span> <span class="n">result</span>                   <span class="c1"># never forget this</span>
+    <span class="k">return</span> <span class="n">wrapper</span>
+</code></pre></div>
+
+<p><strong>Collecting and spreading</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Where</th>
+<th><code>*</code></th>
+<th><code>**</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>In a <code>def</code></td>
+<td>collects extra positional arguments into a tuple</td>
+<td>collects extra keyword arguments into a dict</td>
+</tr>
+<tr>
+<td>In a call</td>
+<td>spreads a list or tuple into positional arguments</td>
+<td>spreads a dict into keyword arguments</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Closures</strong></p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">make</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">inner</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>     <span class="c1"># remembers x after make() has returned</span>
+    <span class="k">return</span> <span class="n">inner</span>
+</code></pre></div>
+
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Keyword</th>
+<th>Lets a function change a variable in</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>nonlocal</code></td>
+<td>the outer function</td>
+</tr>
+<tr>
+<td><code>global</code></td>
+<td>the top level of the file</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Key words</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Closure</td>
+<td>A function that remembers variables from where it was created</td>
+</tr>
+<tr>
+<td>Function factory</td>
+<td>A function that builds and returns other functions</td>
+</tr>
+<tr>
+<td>Decorator</td>
+<td>A function that takes a function and returns a replacement for it</td>
+</tr>
+<tr>
+<td>Wrapper</td>
+<td>The replacement function a decorator returns</td>
+</tr>
+<tr>
+<td>Decorator factory</td>
+<td>A function that takes settings and returns a decorator</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Decorators worth knowing</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Decorator</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@property</code></td>
+<td>A method you read like an attribute</td>
+</tr>
+<tr>
+<td><code>@x.setter</code></td>
+<td>The matching method for writing it, with validation</td>
+</tr>
+<tr>
+<td><code>@staticmethod</code></td>
+<td>A method with no <code>self</code></td>
+</tr>
+<tr>
+<td><code>@classmethod</code></td>
+<td>A method that gets the class as <code>cls</code></td>
+</tr>
+<tr>
+<td><code>@functools.wraps</code></td>
+<td>Keeps the wrapped function's name and docstring</td>
+</tr>
+<tr>
+<td><code>@functools.lru_cache</code></td>
+<td>Saves the results of a pure function</td>
+</tr>
+<tr>
+<td><code>@abstractmethod</code></td>
+<td>Every subclass must implement this method</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>The three classic bugs</strong></p>
+<ol>
+<li>Forgetting <code>return result</code> in the wrapper. The function quietly returns <code>None</code>.</li>
+<li>Forgetting <code>@functools.wraps</code>. Every decorated function ends up named <code>wrapper</code>.</li>
+<li>Writing <code>@decorator()</code> when the decorator takes no arguments, or <code>@decorator</code> when it does.</li>
+</ol>
+
+      <div class="article-end">
+        <p><strong>A closure is a function that carries a backpack of remembered values, and a decorator is just a closure that wraps another function and is applied with the <code>@</code> shortcut for <code>func = decorator(func)</code>.</strong> Everything in this guide follows from those two ideas: why <code>add_15</code> still knows its 15, why a forgotten <code>return result</code> gives you <code>None</code>, why <code>@repeat</code> without <code>(3)</code> fails so strangely, and how one <code>@retry</code> line can protect any function from a flaky network. Next up, in chapter 14, we look at context managers: what the <code>with</code> statement actually does, and how to write your own using the generators and decorators you now understand.</p>
+      </div>
+    </main>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="f-left">Python Programming Series &nbsp;/&nbsp; Article 13 of the course</div>
+  <div class="f-right"><a href="#top">Back to top ↑</a></div>
+</footer>
+<script>
+(function(){
+  var t=document.getElementById('navToggle'),s=document.getElementById('sidebar');
+  if(t&&s){t.addEventListener('click',function(){s.classList.toggle('open');var o=s.classList.contains('open');t.innerHTML=o?'<svg class="icon"><use href="#icon-close"></use></svg>':'<svg class="icon"><use href="#icon-menu"></use></svg>';});s.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){s.classList.remove('open');t.innerHTML='<svg class="icon"><use href="#icon-menu"></use></svg>';});});}
+  var tl=Array.prototype.slice.call(document.querySelectorAll('.toc a')),sc=tl.map(function(a){return document.getElementById(a.getAttribute('href').slice(1));}).filter(Boolean);
+  if('IntersectionObserver' in window&&sc.length){var bi={};tl.forEach(function(a){bi[a.getAttribute('href').slice(1)]=a;});var obs=new IntersectionObserver(function(es){es.forEach(function(e){var l=bi[e.target.id];if(!l)return;if(e.isIntersecting){tl.forEach(function(a){a.classList.remove('active');});l.classList.add('active');}});},{rootMargin:'-15% 0px -70% 0px',threshold:0});sc.forEach(function(s){obs.observe(s);});}
+  document.querySelectorAll('.code-card').forEach(function(c){var b=c.querySelector('.copy-btn'),e=c.querySelector('code');if(!b||!e)return;b.addEventListener('click',function(){var tx=e.innerText,done=function(){var o=b.innerHTML;b.innerHTML='<svg class="icon"><use href="#icon-check"></use></svg> Copied';setTimeout(function(){b.innerHTML=o;},1600);};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(tx).then(done,done);else{var ta=document.createElement('textarea');ta.value=tx;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(x){}document.body.removeChild(ta);done();}});});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1629 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Modules and Virtual Environments · Python Programming Series</title>
+<meta name="description" content="A beginner's guide to Python modules, imports, packages, the standard library, pip and virtual environments, with every example run and explained in simple English.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+
+:root{
+  --paper:#F3F8FC;--surface:#FFFFFF;--tint:#E8F2FB;
+  --ink:#0E2238;--ink-soft:#3D5570;--ink-faint:#7F95AB;
+  --violet:#0B6FCC;--violet-deep:#0A4F9E;--violet-soft:#E2EFFB;
+  --pink:#3FA34D;--pink-text:#0A7466;--pink-soft:#E0F5F2;
+  --mint:#0FA3A3;--mint-text:#08787A;--mint-soft:#DDF4F4;
+  --sun:#FFB627;--sun-soft:#FFF4D9;
+  --orange:#E89B00;--orange-text:#9A6400;--orange-soft:#FFF0D1;
+  --sky:#013243;--sky-text:#013243;--sky-soft:#E1ECF0;
+  --line:#D6E4F0;--line-strong:#B9CFE3;
+  --code-bg:#0B1E33;--code-head:#08172A;--code-line:#17304D;--out-bg:#071425;
+  --r-s:8px;--r-m:14px;--r-l:22px;
+  --font-d:'Bricolage Grotesque','Arial Rounded MT Bold',sans-serif;
+  --font-b:'Figtree',-apple-system,'Segoe UI',sans-serif;
+  --font-m:'JetBrains Mono','SFMono-Regular',Consolas,monospace;
+}
+*,*::before,*::after{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-b);font-size:17px;line-height:1.68;-webkit-font-smoothing:antialiased;}
+a{color:var(--violet-deep);text-decoration-color:rgba(11,111,204,.35);text-underline-offset:3px;text-decoration-thickness:2px;}
+a:hover{text-decoration-color:currentColor;}
+::selection{background:var(--pink);color:#fff;}
+:focus-visible{outline:3px solid var(--pink);outline-offset:2px;border-radius:4px;}
+.icon{width:1em;height:1em;display:inline-block;vertical-align:-.15em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+
+.shell{max-width:1300px;margin:0 auto;padding:0 clamp(16px,4vw,44px);}
+.topbar{display:none;position:sticky;top:0;z-index:40;align-items:center;justify-content:space-between;padding:12px clamp(16px,4vw,44px);background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-bottom:2px solid var(--violet-soft);}
+.topbar .brand{font-family:var(--font-d);font-weight:800;font-size:.98rem;color:var(--ink);}
+.topbar .brand span{color:var(--violet);}
+.topbar button{border:2px solid var(--violet-soft);background:var(--surface);border-radius:var(--r-s);width:40px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--violet);}
+
+/* ---------- Hero: the one loud moment ---------- */
+.hero{position:relative;margin:clamp(16px,2.5vw,28px) 0 clamp(36px,5vw,56px);padding:clamp(36px,5.5vw,68px) clamp(22px,4.5vw,60px);background:var(--violet);color:#fff;border-radius:var(--r-l);overflow:hidden;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:clamp(28px,4vw,56px);align-items:center;}
+.hero::before{content:"";position:absolute;width:420px;height:420px;border-radius:50%;background:var(--violet-deep);right:-120px;top:-160px;}
+.hero::after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;background:var(--pink);left:-70px;bottom:-90px;opacity:.9;}
+.hero-copy,.hero-art{position:relative;z-index:1;}
+.hero-eyebrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-weight:600;font-size:.95rem;color:rgba(255,255,255,.86);margin-bottom:20px;}
+.hero-eyebrow .badge{background:var(--sun);color:var(--ink);font-family:var(--font-d);font-weight:800;padding:4px 13px;border-radius:999px;font-size:.92rem;}
+h1.title{font-family:var(--font-d);font-weight:800;font-size:clamp(2.15rem,4.6vw,3.7rem);line-height:1.02;letter-spacing:-.025em;margin:0 0 20px;max-width:16ch;color:#fff;}
+.hero-sub{font-size:clamp(1rem,1.5vw,1.12rem);color:rgba(255,255,255,.9);max-width:58ch;margin:0 0 28px;}
+.hero-sub strong{color:#fff;font-weight:700;}
+.hero-chips{display:flex;flex-wrap:wrap;gap:10px;}
+.chip{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.13);border:1.5px solid rgba(255,255,255,.28);padding:7px 14px 7px 10px;border-radius:999px;font-size:.88rem;font-weight:600;color:#fff;}
+.chip .icon{width:1.15em;height:1.15em;}
+.chip:nth-child(1) .icon{color:var(--sun);}
+.chip:nth-child(2) .icon{color:#7FF0D2;}
+.chip:nth-child(3) .icon{color:#C5F27A;}
+.chip:nth-child(4) .icon{color:#9FD6FF;}
+
+.hero-art{display:flex;flex-direction:column;align-items:center;}
+.blueprint{width:min(250px,100%);border:2.5px dashed rgba(255,255,255,.75);border-radius:var(--r-m);padding:14px 16px 12px;font-family:var(--font-m);font-size:.8rem;color:#fff;background:rgba(255,255,255,.06);}
+.bp-title{font-weight:700;margin-bottom:8px;}
+.bp-title .kw{color:#C5F27A;}
+.bp-title .cn{color:var(--sun);}
+.bp-line{padding:2px 0 2px 14px;color:rgba(255,255,255,.82);}
+.bp-line.m{color:#7FF0D2;}
+.fan{width:min(330px,100%);height:44px;display:block;}
+.fan path{stroke:rgba(255,255,255,.7);stroke-width:2;fill:none;stroke-dasharray:4 4;vector-effect:non-scaling-stroke;}
+.objs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:min(360px,100%);}
+.obj{border-radius:12px;padding:10px 10px 9px;font-family:var(--font-m);font-size:.72rem;line-height:1.5;color:var(--ink);box-shadow:0 6px 0 rgba(14,34,56,.28);animation:stamp .5s cubic-bezier(.3,1.5,.6,1) both;}
+.obj b{display:block;font-family:var(--font-d);font-size:1rem;font-weight:800;margin-bottom:3px;}
+.obj span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.o1{background:var(--sun);transform:rotate(-4deg);animation-delay:.25s;}
+.o2{background:#7FF0D2;transform:rotate(2deg);animation-delay:.45s;}
+.o3{background:#C5F27A;transform:rotate(-1.5deg);animation-delay:.65s;}
+@keyframes stamp{from{opacity:0;translate:0 -26px;scale:.85;}to{opacity:1;translate:0 0;scale:1;}}
+.art-cap{margin:18px 0 0;font-family:var(--font-d);font-weight:700;font-size:.95rem;color:rgba(255,255,255,.9);}
+
+/* ---------- Layout + sidebar ---------- */
+.layout{display:grid;grid-template-columns:265px minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:start;padding-bottom:90px;}
+.sidebar{position:sticky;top:24px;max-height:calc(100vh - 48px);overflow-y:auto;padding:16px 10px 16px 0;}
+.sidebar::-webkit-scrollbar{width:5px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:3px;}
+.toc-label{font-family:var(--font-d);font-weight:800;font-size:1rem;color:var(--ink);margin:0 0 10px;padding-left:12px;}
+.toc{list-style:none;margin:0;padding:0;}
+.toc li{margin:0 0 2px;}
+.toc a{display:flex;align-items:center;gap:10px;padding:7px 12px;font-size:.88rem;font-weight:500;color:var(--ink-soft);text-decoration:none;border-radius:10px;transition:background .15s,color .15s;}
+.toc a .icon{width:1.05em;height:1.05em;flex:none;color:var(--violet);}
+.toc a:hover{background:var(--violet-soft);color:var(--ink);}
+.toc a.active{background:var(--violet);color:#fff;font-weight:600;}
+.toc a.active .icon{color:var(--sun);}
+
+/* ---------- Article ---------- */
+.article{min-width:0;padding-top:8px;max-width:820px;}
+.article h2{--acc:var(--violet);font-family:var(--font-d);font-weight:800;font-size:clamp(1.55rem,2.6vw,2rem);line-height:1.15;letter-spacing:-.015em;margin:64px 0 18px;scroll-margin-top:24px;display:flex;align-items:center;gap:14px;}
+.article h2:nth-of-type(5n+2){--acc:var(--pink);}
+.article h2:nth-of-type(5n+3){--acc:var(--mint);}
+.article h2:nth-of-type(5n+4){--acc:var(--orange);}
+.article h2:nth-of-type(5n+5){--acc:var(--sky);}
+.article>h2:first-of-type{margin-top:4px;}
+.article>hr:first-child{display:none;}
+.article h2 .h-icon{width:2.6rem;height:2.6rem;flex:none;display:grid;place-items:center;background:var(--acc);color:#fff;border-radius:12px;transform:rotate(-4deg);box-shadow:0 4px 0 rgba(14,34,56,.18);}
+.article h2 .h-icon .icon{width:1.35rem;height:1.35rem;stroke-width:2;}
+.article h3{font-family:var(--font-d);font-weight:700;font-size:1.2rem;margin:34px 0 10px;scroll-margin-top:24px;color:var(--ink);}
+.article p{margin:0 0 17px;}
+.article ul,.article ol{margin:0 0 20px;padding-left:1.35em;}
+.article li{margin-bottom:8px;padding-left:.2em;}
+.article ul li::marker{color:var(--pink);font-size:1.15em;}
+.article ol li::marker{color:var(--violet);font-family:var(--font-d);font-weight:800;}
+.article strong{font-weight:700;}
+.article hr{border:0;height:6px;width:110px;margin:52px auto;border-radius:6px;background:linear-gradient(90deg,var(--violet) 0 20%,var(--pink) 20% 40%,var(--mint) 40% 60%,var(--sun) 60% 80%,var(--sky) 80% 100%);}
+.article code{font-family:var(--font-m);font-size:.84em;background:var(--pink-soft);padding:.12em .4em;border-radius:6px;color:var(--pink-text);}
+.article blockquote{margin:22px 0;padding:16px 20px;border-left:5px solid var(--sun);background:var(--sun-soft);border-radius:0 var(--r-m) var(--r-m) 0;color:var(--ink);}
+.article blockquote p{margin:0;color:inherit;}
+
+.table-wrap{overflow-x:auto;margin:22px 0 28px;border-radius:var(--r-m);border:2px solid var(--violet-soft);background:var(--surface);}
+.article table{width:100%;border-collapse:collapse;font-size:.9rem;}
+.article thead th{background:var(--violet);color:#fff;font-family:var(--font-d);font-weight:700;text-align:left;padding:12px 16px;white-space:nowrap;font-size:.9rem;}
+.article tbody td{padding:11px 16px;border-bottom:1px solid var(--line);vertical-align:top;}
+.article tbody tr:last-child td{border-bottom:none;}
+.article tbody tr:nth-child(even){background:#F5F9FD;}
+.article tbody td code{white-space:nowrap;}
+
+/* ---------- Code ---------- */
+.code-card{margin:22px 0 26px;border-radius:var(--r-m);overflow:hidden;background:var(--code-bg);box-shadow:0 6px 0 var(--violet-soft);}
+.code-card .code-head{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:var(--code-head);border-bottom:1px solid var(--code-line);}
+.code-card .dots{display:flex;gap:6px;}
+.code-card .dots span{width:10px;height:10px;border-radius:50%;display:block;}
+.code-card .dots span:nth-child(1){background:var(--pink);}
+.code-card .dots span:nth-child(2){background:var(--sun);}
+.code-card .dots span:nth-child(3){background:var(--mint);}
+.code-card .lang{font-family:var(--font-m);font-size:.72rem;color:#7E9CC0;}
+.code-card .copy-btn{font-family:var(--font-b);font-weight:600;font-size:.76rem;color:#DCEBFA;background:rgba(255,255,255,.06);border:1px solid #23456B;border-radius:7px;padding:4px 10px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .15s,border-color .15s;}
+.code-card .copy-btn:hover{background:var(--violet);border-color:var(--violet);color:#fff;}
+.code-card .copy-btn .icon{width:.95em;height:.95em;}
+.code-card pre{margin:0;padding:16px 20px;overflow-x:auto;font-size:.85rem;line-height:1.6;}
+.code-card code{font-family:var(--font-m);font-size:1em;line-height:inherit;color:#E6F1FF;background:none;padding:0;border-radius:0;}
+.code-card .k,.code-card .kn,.code-card .kd,.code-card .kc,.code-card .ow{color:#5CC8FF;}
+.code-card .nb,.code-card .bp{color:#9FD6FF;}
+.code-card .nf,.code-card .fm{color:#A6E36B;}
+.code-card .s,.code-card .s1,.code-card .s2,.code-card .sa,.code-card .sd,.code-card .se{color:#FFD166;}
+.code-card .si{color:#6EE7D8;}
+.code-card .mi,.code-card .mf{color:#6EE7D8;}
+.code-card .o,.code-card .p{color:#9FB6CF;}
+.code-card .c,.code-card .c1,.code-card .cm{color:#6F8BA8;font-style:italic;}
+.code-card .n{color:#E6F1FF;}
+.code-card .nc,.code-card .ne{color:#FFB86B;font-weight:600;}
+
+.output-card{margin:-26px 0 26px;border-radius:0 0 var(--r-m) var(--r-m);overflow:hidden;background:var(--out-bg);border-top:2px dashed #23456B;box-shadow:0 6px 0 var(--violet-soft);position:relative;z-index:1;}
+.output-card::before{content:"Output";display:block;font-family:var(--font-b);font-weight:700;font-size:.74rem;color:#A6E36B;padding:9px 20px 0;}
+.output-card pre{margin:0;padding:4px 20px 16px;overflow-x:auto;font-size:.82rem;line-height:1.6;}
+.output-card code{font-family:var(--font-m);font-size:1em;line-height:inherit;color:#BFD6EE;background:none;padding:0;border-radius:0;}
+
+.diagram-card{margin:22px 0 26px;border-radius:var(--r-m);overflow:hidden;position:relative;border:2.5px dashed var(--line-strong);background:var(--surface);}
+.diagram-card::before{content:"diagram";position:absolute;top:10px;right:14px;font-family:var(--font-b);font-weight:700;font-size:.74rem;color:var(--violet);}
+.diagram-card pre{margin:0;padding:26px 22px 20px;overflow-x:auto;}
+.diagram-card pre{line-height:1.3;font-size:.84rem;}
+.diagram-card code{font-family:var(--font-m);font-size:1em;line-height:inherit;color:var(--violet-deep);font-weight:500;background:none;padding:0;white-space:pre;}
+
+.svg-diagram{margin:24px 0 28px;padding:22px 20px 18px;background:var(--surface);border:2px solid var(--violet-soft);border-radius:var(--r-m);}
+.svg-diagram{overflow-x:auto;}
+.svg-diagram svg{width:100%;min-width:560px;height:auto;display:block;}
+.svg-diagram .cap{font-size:.86rem;font-weight:500;color:var(--ink-faint);text-align:center;margin-top:12px;}
+
+.article-end{margin-top:56px;padding:30px 30px;border-radius:var(--r-l);background:var(--violet);color:#fff;position:relative;overflow:hidden;}
+.article-end::after{content:"";position:absolute;width:140px;height:140px;border-radius:50%;background:var(--sun);right:-50px;bottom:-60px;}
+.article-end p{margin:0;font-size:1.06rem;color:rgba(255,255,255,.92);position:relative;z-index:1;max-width:62ch;}
+.article-end p strong{color:#fff;}
+
+footer.site-footer{border-top:2px solid var(--violet-soft);margin-top:30px;padding:22px clamp(16px,4vw,44px) 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+footer.site-footer .f-left{font-size:.88rem;font-weight:500;color:var(--ink-faint);}
+footer.site-footer a{font-size:.9rem;font-weight:600;}
+
+@media(max-width:960px){
+  .topbar{display:flex;}
+  .layout{grid-template-columns:1fr;}
+  .article{max-width:none;}
+  .sidebar{position:fixed;inset:60px 0 0 0;z-index:35;background:var(--paper);padding:18px clamp(16px,4vw,44px) 24px;transform:translateX(-100%);transition:transform .2s;max-height:none;height:calc(100vh - 60px);}
+  .sidebar.open{transform:translateX(0);}
+  .hero{grid-template-columns:1fr;}
+}
+@media(max-width:520px){
+  .article h2 .h-icon{width:2.2rem;height:2.2rem;}
+  .obj{font-size:.66rem;padding:9px 8px;}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}.sidebar{transition:none;}.obj{animation:none;}}
+
+/* NumPy hero illustration */
+.cells{display:grid;grid-template-columns:repeat(4,1fr);border:2px solid rgba(255,255,255,.8);border-radius:8px;overflow:hidden;margin-top:4px;}
+.cells span{text-align:center;padding:7px 0;font-weight:700;color:#fff;}
+.cells span+span{border-left:2px solid rgba(255,255,255,.8);}
+.objs.four{grid-template-columns:repeat(4,1fr);width:min(380px,100%);gap:9px;}
+.objs.four .obj{text-align:center;padding:10px 4px 9px;}
+.o4{background:#9FD6FF;transform:rotate(3deg);animation-delay:.85s;}
+
+/* Article 11 extras */
+.cells.three{grid-template-columns:repeat(3,1fr);}
+.cells.three span{font-size:.72rem;padding:6px 0;}
+.objs .obj{min-width:0;}
+.obj.seq{text-align:center;padding:10px 6px 9px;}
+.obj.seq code{display:block;font-family:var(--font-m);font-size:.74rem;font-weight:700;margin:2px 0 4px;color:var(--ink);background:none;padding:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.obj.seq span{font-size:.68rem;white-space:normal;}
+.code-card.term .code-head{background:#06121F;}
+.code-card .lang{text-transform:none;}
+.diagram-card.textfile::before{content:"text";}
+@media(max-width:520px){.obj.seq code{font-size:.62rem;}}
+</style>
+</head>
+<body>
+<svg style="display:none" aria-hidden="true"><defs>
+<symbol id="icon-module" viewBox="0 0 24 24"><path d="M6 2h8l5 5v15H6z"/><path d="M14 2v5h5"/><path d="M9 13h6M9 17h4"/></symbol>
+<symbol id="icon-import" viewBox="0 0 24 24"><rect x="11" y="4" width="10" height="16" rx="1.5"/><path d="M3 12h11"/><polyline points="10,8 14,12 10,16"/></symbol>
+<symbol id="icon-gears" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></symbol>
+<symbol id="icon-write" viewBox="0 0 24 24"><path d="M5 2h8l5 5v6"/><path d="M5 2v20h7"/><path d="M14 21l1-4 6-6 3 3-6 6z"/></symbol>
+<symbol id="icon-main" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16" fill="currentColor" stroke="none"/></symbol>
+<symbol id="icon-package" viewBox="0 0 24 24"><path d="M2 6h7l2 2h11v12H2z"/><path d="M7 13h10M7 16h6"/></symbol>
+<symbol id="icon-battery" viewBox="0 0 24 24"><rect x="2" y="7" width="18" height="10" rx="2"/><path d="M22 10v4"/><path d="M6 10v4M10 10v4M14 10v4"/></symbol>
+<symbol id="icon-venv" viewBox="0 0 24 24"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M3 7l9 5 9-5M12 12v10"/></symbol>
+<symbol id="icon-error" viewBox="0 0 24 24"><path d="M12 3l10 18H2z"/><path d="M12 10v5"/><circle cx="12" cy="18" r=".8" fill="currentColor"/></symbol>
+<symbol id="icon-project" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="5" rx="1"/><rect x="2" y="17" width="6" height="5" rx="1"/><rect x="16" y="17" width="6" height="5" rx="1"/><path d="M12 7v5M5 17v-5h14v5"/></symbol>
+<symbol id="icon-refactor" viewBox="0 0 24 24"><rect x="2" y="3" width="8" height="18" rx="1.5"/><rect x="14" y="3" width="8" height="5" rx="1"/><rect x="14" y="10" width="8" height="5" rx="1"/><rect x="14" y="17" width="8" height="4" rx="1"/><path d="M10 12h4"/></symbol>
+<symbol id="icon-table" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="1.5"/><line x1="2" y1="9" x2="22" y2="9"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15.5" y1="3" x2="15.5" y2="21"/></symbol>
+<symbol id="icon-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="13" rx="1.6"/><path d="M5 16H4.5A1.5 1.5 0 0 1 3 14.5v-10A1.5 1.5 0 0 1 4.5 3h10A1.5 1.5 0 0 1 16 4.5V5"/></symbol>
+<symbol id="icon-check" viewBox="0 0 24 24"><path d="M4 12.5 L9.5 18 L20 5"/></symbol>
+<symbol id="icon-menu" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
+<symbol id="icon-close" viewBox="0 0 24 24"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></symbol>
+</defs></svg>
+
+
+<div class="topbar">
+  <span class="brand">§11 &nbsp;<span>Modules &amp; Environments</span></span>
+  <button id="navToggle" aria-label="Toggle navigation">
+    <svg class="icon"><use href="#icon-menu"></use></svg>
+  </button>
+</div>
+
+<div class="shell" id="top">
+  <section class="hero">
+  <div class="hero-copy">
+    <div class="hero-eyebrow"><span class="badge">Article 11</span> Python Programming Series</div>
+    <h1 class="title">Modules and Virtual Environments in Python: A Complete Beginner&#x27;s Guide</h1>
+    <p class="hero-sub">You have been writing lines like <code>import time</code>, <code>import csv</code> and <code>import os</code> for a while now. They appear at the top of almost every program. But what does that one line actually do? Where does the code come from, and how does Python find it? This guide answers those questions, step by step, in plain English.</p>
+    <div class="hero-chips">
+      <div class="chip"><svg class="icon"><use href="#icon-module"></use></svg> Write and import your own modules</div>
+      <div class="chip"><svg class="icon"><use href="#icon-package"></use></svg> Packages and __init__.py</div>
+      <div class="chip"><svg class="icon"><use href="#icon-venv"></use></svg> Virtual environments and pip</div>
+      <div class="chip"><svg class="icon"><use href="#icon-error"></use></svg> Fixing import errors</div>
+    </div>
+  </div>
+  <div class="hero-art" aria-hidden="true">
+    <div class="blueprint">
+      <div class="bp-title"><span class="kw">import</span> <span class="cn">statistics</span></div>
+      <div class="cells three"><span>1 find</span><span>2 run</span><span>3 cache</span></div>
+    </div>
+    <svg class="fan" viewBox="0 0 330 44" preserveAspectRatio="none"><path d="M165 0 C165 24 55 18 55 44"/><path d="M165 0 L165 44"/><path d="M165 0 C165 24 275 18 275 44"/></svg>
+    <div class="objs">
+      <div class="obj seq o1"><b>module</b><code>text_utils.py</code><span>one file</span></div>
+      <div class="obj seq o2"><b>package</b><code>netflix/</code><span>a folder of modules</span></div>
+      <div class="obj seq o3"><b>venv</b><code>.venv/</code><span>private packages</span></div>
+    </div>
+    <p class="art-cap">Files, folders and environments</p>
+  </div>
+</section>
+
+  <div class="layout">
+    <nav class="sidebar" id="sidebar">
+      <div class="toc-label">On this page</div>
+      <ul class="toc">
+<li><a href="#part-1-what-is-a-module"><svg class="icon"><use href="#icon-module"></use></svg><span>Part 1: What Is a Module?</span></a></li>
+<li><a href="#three-ways-to-import"><svg class="icon"><use href="#icon-import"></use></svg><span>Three Ways to Import</span></a></li>
+<li><a href="#what-import-does-behind-the-scenes"><svg class="icon"><use href="#icon-gears"></use></svg><span>What import Does Behind the Scenes</span></a></li>
+<li><a href="#part-2-writing-your-own-module"><svg class="icon"><use href="#icon-write"></use></svg><span>Part 2: Writing Your Own Module</span></a></li>
+<li><a href="#part-3-if-__name__-__main__"><svg class="icon"><use href="#icon-main"></use></svg><span>Part 3: if __name__ == &quot;__main__&quot;</span></a></li>
+<li><a href="#part-4-packages-folders-of-modules"><svg class="icon"><use href="#icon-package"></use></svg><span>Part 4: Packages, Folders of Modules</span></a></li>
+<li><a href="#part-5-the-standard-library-batteries-included"><svg class="icon"><use href="#icon-battery"></use></svg><span>Part 5: The Standard Library, Batteries Included</span></a></li>
+<li><a href="#part-6-third-party-packages-and-virtual-environments"><svg class="icon"><use href="#icon-venv"></use></svg><span>Part 6: Third-Party Packages and Virtual Environments</span></a></li>
+<li><a href="#part-7-when-an-import-fails"><svg class="icon"><use href="#icon-error"></use></svg><span>Part 7: When an Import Fails</span></a></li>
+<li><a href="#part-8-how-a-real-project-is-laid-out"><svg class="icon"><use href="#icon-project"></use></svg><span>Part 8: How a Real Project Is Laid Out</span></a></li>
+<li><a href="#real-world-example-splitting-a-script-into-a-project"><svg class="icon"><use href="#icon-refactor"></use></svg><span>Real-World Example: Splitting a Script into a Project</span></a></li>
+<li><a href="#quick-reference-summary"><svg class="icon"><use href="#icon-table"></use></svg><span>Quick Reference Summary</span></a></li>
+      </ul>
+    </nav>
+
+    <main class="article">
+<p>By the end, you will be able to split your own code into several files and reuse it, install code that other people wrote, and set up a project so that it still runs on someone else's computer. These are the skills that turn a single practice script into a real project.</p>
+<p>Here is what we will cover:</p>
+<ol>
+<li>What a module is, the different ways to import one, and what <code>import</code> does behind the scenes</li>
+<li>Writing your own module and importing it</li>
+<li><code>if __name__ == "__main__"</code>, and why so many Python files end with it</li>
+<li>Packages, which are folders of modules</li>
+<li>The standard library, the modules you get for free</li>
+<li>Third-party packages, the terminal, virtual environments and <code>pip</code></li>
+<li>How to read the error when an import fails</li>
+<li>How a real Python project is laid out</li>
+<li>A real-world example: turning one messy script into a tidy project</li>
+</ol>
+<blockquote>
+<p><strong>Before you start:</strong> in this guide we write files and then import them, and Python remembers everything it has already imported. So if you run notebook cells out of order, you might see something different from the outputs shown here. If that happens, restart the kernel and run all the cells from the top (in JupyterLab: <strong>Kernel → Restart Kernel and Run All Cells</strong>). Part 1 explains why this happens.</p>
+</blockquote>
+<hr />
+<h2 id="part-1-what-is-a-module"><span class="h-icon"><svg class="icon"><use href="#icon-module"></use></svg></span>Part 1: What Is a Module?</h2>
+<p>A <strong>module</strong> is simply a file of Python code that other code can use. Any file that ends in <code>.py</code> is a module. The <code>import</code> statement is how one file uses the code inside another file.</p>
+<p><strong>Analogy:</strong> think of a module as a <strong>recipe book on a shelf</strong>. You don't rewrite the recipe for bread every time you want bread. You take the book off the shelf, open it, and use the recipe that is already written. <code>import</code> is the act of taking the book off the shelf.</p>
+<p>Python comes with hundreds of these books already on the shelf. That's why you could write <code>import csv</code> without ever creating a file called <code>csv.py</code> yourself.</p>
+<p>Here's one in action:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+
+<span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">144</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>12.0
+</code></pre></div>
+
+<p>One line, and you get a square-root function that you didn't have to write. Someone else wrote it, tested it, and shipped it with Python, and you get to use it for free.</p>
+<h3 id="a-module-is-just-an-object">A Module Is Just an Object</h3>
+<p>There's no magic here. Once you import a module, it becomes an <strong>object</strong>, just like a list or a string is an object. The functions and values inside the module are its <strong>attributes</strong>, which is why you reach them with a dot (<code>math.sqrt</code>).</p>
+<p>You can check this yourself. It also explains why the <code>dir()</code> and <code>help()</code> tools work on modules in the same way they work on everything else:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">math</span><span class="p">))</span>          <span class="c1"># a module really is just an object</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>       <span class="c1"># every module knows its own name</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"sqrt"</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">math</span><span class="p">))</span>  <span class="c1"># dir() lists the names a module contains</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>&lt;class 'module'&gt;
+math
+True
+</code></pre></div>
+
+<p>Let's read each line of that output:</p>
+<ul>
+<li><code>type(math)</code> says <code>&lt;class 'module'&gt;</code>. So a module is a real Python object with its own type.</li>
+<li><code>math.__name__</code> says <code>math</code>. Every module knows its own name.</li>
+<li><code>"sqrt" in dir(math)</code> says <code>True</code>. <code>dir()</code> gives a list of all the names inside the module, and <code>sqrt</code> is one of them.</li>
+</ul>
+<h3 id="a-module-is-also-a-real-file">A Module Is Also a Real File</h3>
+<p>A module is not only an object in memory. It is also a real file sitting on your computer. Every module that came from a <code>.py</code> file remembers where that file is, in an attribute called <code>__file__</code>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">statistics</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">statistics</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>   <span class="c1"># the full path differs per computer, so print just the file name</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>statistics.py
+</code></pre></div>
+
+<p>So the <code>statistics</code> module is a file called <code>statistics.py</code>, sitting somewhere inside your Python installation. If you print <code>statistics.__file__</code> by itself, you'll see the full path. You can even open that file in a text editor if you're curious. Inside, you'll find normal Python code: functions, comments and all, written the same way you write yours.</p>
+<p>A few modules that need to be really fast, like <code>math</code>, are written in another language called <strong>C</strong> and then compiled. So there's no <code>math.py</code> file to open. You still import them and use them in exactly the same way, so for now you can ignore that difference.</p>
+<h3 id="looking-around-inside-a-module">Looking Around Inside a Module</h3>
+<p>Two built-in tools let you explore a module you don't know yet, without leaving your editor:</p>
+<ul>
+<li><code>dir(module)</code> lists every name inside it.</li>
+<li><code>help(module.thing)</code> prints the documentation for one of those names.</li>
+</ul>
+<p>Try <code>help(math.floor)</code> in a cell to see what it looks like. When you're wondering "what does this function do?", it's often quicker than searching online.</p>
+<h3 id="modules-youve-already-used">Modules You've Already Used</h3>
+<p>Here are the main modules used so far in this course, and what each one was used for:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Module</th>
+<th>Chapter</th>
+<th>What we used it for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>keyword</code></td>
+<td>1</td>
+<td>Listing Python's reserved words</td>
+</tr>
+<tr>
+<td><code>time</code></td>
+<td>5, 7</td>
+<td>Pausing with <code>sleep()</code>, and timing how long code takes</td>
+</tr>
+<tr>
+<td><code>functools</code></td>
+<td>7</td>
+<td><code>reduce()</code></td>
+</tr>
+<tr>
+<td><code>logging</code></td>
+<td>9</td>
+<td>Recording errors and messages</td>
+</tr>
+<tr>
+<td><code>traceback</code>, <code>sys</code></td>
+<td>9</td>
+<td>Inspecting an exception in detail</td>
+</tr>
+<tr>
+<td><code>os</code></td>
+<td>9, 10</td>
+<td>Creating folders, listing directories, deleting files</td>
+</tr>
+<tr>
+<td><code>pathlib</code></td>
+<td>10</td>
+<td>The modern <code>Path</code> object</td>
+</tr>
+<tr>
+<td><code>shutil</code></td>
+<td>10</td>
+<td>Copying, moving and deleting whole folders</td>
+</tr>
+<tr>
+<td><code>csv</code></td>
+<td>10</td>
+<td>Reading and writing spreadsheet files</td>
+</tr>
+<tr>
+<td><code>json</code></td>
+<td>10</td>
+<td>Saving and loading structured data</td>
+</tr>
+<tr>
+<td><code>collections</code></td>
+<td>10</td>
+<td><code>defaultdict</code> for grouping</td>
+</tr>
+<tr>
+<td><code>datetime</code></td>
+<td>10</td>
+<td>Timestamps</td>
+</tr>
+</tbody>
+</table></div>
+<p>None of these are built into the Python <em>language</em> itself. They all live in modules that come with Python, and <code>import</code> is how you get to them.</p>
+<hr />
+<h2 id="three-ways-to-import"><span class="h-icon"><svg class="icon"><use href="#icon-import"></use></svg></span>Three Ways to Import</h2>
+<p>You'll see three import styles all the time. The only real difference between them is <strong>what name you end up with</strong> in your file.</p>
+<p><strong>Analogy:</strong> imagine borrowing from a friend's toolbox. You can borrow the <strong>whole toolbox</strong> and say "the hammer from the toolbox" each time (style 1). You can borrow <strong>just the hammer</strong> and call it "hammer" (style 2). Or you can borrow the whole toolbox but give it a <strong>short nickname</strong> (style 3).</p>
+<div class="diagram-card"><pre><code>   import math                 from math import floor         import math as m
+   ┌──────────────┐            ┌──────────────┐               ┌──────────────┐
+   │ math         │            │              │               │ m            │
+   │  ├─ pi       │            │   floor      │               │  ├─ pi       │
+   │  ├─ floor    │            │              │               │  ├─ floor    │
+   │  └─ sqrt ... │            │              │               │  └─ sqrt ... │
+   └──────────────┘            └──────────────┘               └──────────────┘
+   use: math.floor(9.7)        use: floor(9.7)                use: m.floor(9.7)
+</code></pre></div>
+
+<p><strong>Style 1: <code>import module</code>.</strong> You get the whole module, and you use a dot to reach inside it.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="mf">9.7</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>3.141592653589793
+9
+</code></pre></div>
+
+<p><strong>Style 2: <code>from module import name</code>.</strong> You get one specific thing (or a few things), and you don't need the dot anymore.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">pi</span><span class="p">,</span> <span class="n">floor</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">pi</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">floor</span><span class="p">(</span><span class="mf">9.7</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>3.141592653589793
+9
+</code></pre></div>
+
+<p><strong>Style 3: <code>import module as alias</code>.</strong> This is the same as style 1, but you give the module a shorter name.</p>
+<p>People don't do this just to save typing. Some library names are long, and in data science everyone uses the same short names, so you'll see <code>import pandas as pd</code> and <code>import numpy as np</code> in pretty much every tutorial and every job. Using the same nicknames as everyone else makes your code easier for others to read.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">statistics</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">stats</span>
+
+<span class="n">stats</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">40</span><span class="p">])</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>25
+</code></pre></div>
+
+<h3 id="the-fourth-style-you-should-avoid-from-module-import">The Fourth Style You Should Avoid: <code>from module import *</code></h3>
+<p>This pulls <em>everything</em> from the module straight into your file. It looks handy, but it causes real bugs:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>      <span class="c1"># don't do this</span>
+</code></pre></div>
+
+<p>The problem is that you can no longer tell where any name came from. If two modules both have a function called <code>sqrt</code>, the one you imported last quietly wins, and Python doesn't warn you. Even worse, if you wrote your own function called <code>floor</code>, <code>from math import *</code> will replace it without telling you.</p>
+<p><strong>Analogy:</strong> it's like emptying a whole box of someone else's tools onto your workbench, on top of your own tools. Some of their tools have the same names as yours. Now, when you reach for "the hammer", you can't be sure whose hammer you're holding.</p>
+<p>Here's that bug in just a few lines. We write our own <code>floor()</code> that chops the decimals off a price, and then an innocent-looking <code>import *</code> replaces it:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">floor</span><span class="p">(</span><span class="n">price</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">price</span><span class="p">)</span>           <span class="c1"># our version: just chop the decimals off</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"our floor:"</span><span class="p">,</span> <span class="n">floor</span><span class="p">(</span><span class="o">-</span><span class="mf">9.99</span><span class="p">))</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>              <span class="c1"># looks harmless -- but math has a floor() too</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"after import *:"</span><span class="p">,</span> <span class="n">floor</span><span class="p">(</span><span class="o">-</span><span class="mf">9.99</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>our floor: -9
+after import *: -10
+</code></pre></div>
+
+<p>We called the same function name twice and got two different answers, with no warning at all:</p>
+<ul>
+<li>Our <code>floor()</code> uses <code>int()</code>, which chops the decimal part off and moves <strong>toward zero</strong>, so <code>-9.99</code> becomes <code>-9</code>.</li>
+<li><code>math.floor()</code> always rounds <strong>down</strong> (toward negative infinity), so <code>-9.99</code> becomes <code>-10</code>.</li>
+</ul>
+<p>In a short cell you'd spot this right away. In a 300-line file, with the <code>import *</code> at the top and the call at the bottom, it's really hard to find. So keep things clear. When you come back to your code in a few months, you'll want to see where every name came from.</p>
+<h3 id="so-which-style-should-you-use">So Which Style Should You Use?</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>You need several things from a module</td>
+<td><code>import module</code>, then <code>module.thing</code></td>
+</tr>
+<tr>
+<td>You use one or two names a lot</td>
+<td><code>from module import name</code></td>
+</tr>
+<tr>
+<td>The library has a common short name</td>
+<td><code>import pandas as pd</code></td>
+</tr>
+<tr>
+<td>Two modules have a name in common</td>
+<td><code>import module</code> (the dot keeps them apart)</td>
+</tr>
+<tr>
+<td>Ever</td>
+<td>not <code>import *</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>If you're not sure, just use <code>import module</code>. Then you can always tell where a name came from.</p>
+<hr />
+<h2 id="what-import-does-behind-the-scenes"><span class="h-icon"><svg class="icon"><use href="#icon-gears"></use></svg></span>What <code>import</code> Does Behind the Scenes</h2>
+<p>When you write <code>import statistics</code>, Python does three things, in this order:</p>
+<ol>
+<li><strong>It finds the module.</strong> It looks through a list of folders, one by one, for a file called <code>statistics.py</code> (or a compiled module with that name). A few modules, like <code>sys</code>, are built right into Python itself, so there's nothing to look for.</li>
+<li><strong>It runs the file once, from top to bottom.</strong> Every line runs. Functions get defined, and any code sitting at the top level of the file (not inside a function) runs too.</li>
+<li><strong>It caches the module</strong>, which means it saves it for later. The finished module goes into a dictionary called <code>sys.modules</code>. If you import it again, Python hands you the saved copy. That's instant, and the file does <strong>not</strong> run a second time.</li>
+</ol>
+<p>In fact, Python checks that cache <strong>before</strong> step 1. If the module is already in <code>sys.modules</code>, it skips finding and running altogether, as the diagram below shows.</p>
+<div class="diagram-card"><pre><code>   import statistics
+         │
+         ▼
+   ┌─────────────────────────────┐
+   │ Already in sys.modules?     │── YES ──► hand back the saved copy (file is NOT run again)
+   └─────────────────────────────┘
+         │ NO
+         ▼
+   1. FIND    search the folders in sys.path for statistics.py
+         │
+         ▼
+   2. RUN     execute the file once, top to bottom
+         │
+         ▼
+   3. CACHE   save the finished module in sys.modules
+         │
+         ▼
+   the name "statistics" now points to the module
+</code></pre></div>
+
+<p><strong>Analogy:</strong> think of a library. The first time you ask for a book, the librarian searches the shelves, finds it, and photocopies it for you. She also keeps a copy on her desk. The next time anyone asks for that same book, she just hands over the copy from her desk. She doesn't search the shelves again.</p>
+<p>That third point (the caching) surprises a lot of people. We'll prove it in Part 3 with a module of our own, where you can watch it happen. For now, just know that the cache is a real dictionary, and you can look inside it:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"statistics"</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">)</span>               <span class="c1"># it is in the cache...</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="s2">"statistics"</span><span class="p">]</span> <span class="ow">is</span> <span class="n">statistics</span><span class="p">)</span>   <span class="c1"># ...and the cached object is the very module we are using</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>True
+True
+</code></pre></div>
+
+<p>The first <code>True</code> says <code>statistics</code> is in the cache. The second <code>True</code> says the object in the cache <strong>is</strong> (the very same object as) the <code>statistics</code> module we've been using.</p>
+<h3 id="why-caching-matters">Why Caching Matters</h3>
+<p>Caching does more than make imports fast. Within one running program, a module only runs once, no matter how many files import it. So any setup it does at the top level (like opening a connection, loading a settings file or building a lookup table) happens one time, and everything that imports the module shares it.</p>
+<p>It also has a side effect you need to know about. <strong>If you change a module while Python is still running, importing it again won't pick up your changes.</strong> This is the most common mix-up in notebooks: you fix a bug in your <code>.py</code> file, run the import again, and nothing changes. To fix it, restart the kernel (or use <code>importlib.reload</code>). It's also why this guide works best when you run everything from the top after a restart, like the note at the beginning says.</p>
+<h3 id="where-python-looks-syspath">Where Python Looks: <code>sys.path</code></h3>
+<p>The list of folders Python searches is called <code>sys.path</code>. Python goes through it in order and stops at the first match. (Built-in modules like <code>sys</code> are found before this search even starts, because they live inside Python itself.)</p>
+<div class="diagram-card"><pre><code>   sys.path  (searched top to bottom, first match wins)
+
+   1. the folder your script is in      ◄── checked FIRST
+   2. folders from the PYTHONPATH setting (if you set any)
+   3. the standard library folders
+   4. site-packages (where pip installs third-party packages)
+</code></pre></div>
+
+<p>The first folder on the list is the one your script is in (for a notebook, the folder you opened it from). That's why a module sitting right next to your file just works, with no setup. The same rule also causes one of the most common beginner bugs, and we'll trigger it on purpose in Part 7.</p>
+<p>We'll need <code>sys.path</code> in a minute, because we're about to put a module inside a subfolder.</p>
+<hr />
+<h2 id="part-2-writing-your-own-module"><span class="h-icon"><svg class="icon"><use href="#icon-write"></use></svg></span>Part 2: Writing Your Own Module</h2>
+<p>Once a project grows past a couple of hundred lines, keeping everything in one file gets uncomfortable. You scroll up and down all day looking for things. The fix is to move related functions into their own file and import them.</p>
+<p>Here's a good rule for deciding how to split things: <strong>group code by what it's about, not by what kind of thing it is.</strong> A file called <code>text_utils.py</code> with all your text functions is easy to find your way around. A file called <code>functions.py</code> with everything in it is the same mess you started with, just in a different file.</p>
+<p><strong>Analogy:</strong> in a kitchen, you keep spices in one drawer and cutlery in another. You don't make one giant drawer labelled "small things". Each drawer has one clear purpose, so you know where to look.</p>
+<p>To keep things tidy, everything we make in this guide goes into a folder called <code>module_demo/</code>. First we delete that folder if it's already there, so every run starts with an empty folder:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="n">demo</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"module_demo"</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">demo</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">demo</span><span class="p">)</span>          <span class="c1"># start clean, so re-running gives the same output</span>
+<span class="n">demo</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">demo</span><span class="si">}</span><span class="s2">/ is ready"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>module_demo/ is ready
+</code></pre></div>
+
+<p>Now we'll write a real module. The <code>%%writefile</code> line at the top of the next cell is a Jupyter shortcut. Instead of running the cell, it <strong>saves the rest of the cell into a file</strong>. It's an easy way to make a <code>.py</code> file without leaving the notebook.</p>
+<p>Everything under that first line is normal Python, exactly what you'd type into <code>text_utils.py</code> in a regular editor:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">notebook cell</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="o">%%</span><span class="n">writefile</span> <span class="n">module_demo</span><span class="o">/</span><span class="n">text_utils</span><span class="o">.</span><span class="n">py</span>
+<span class="c1"># Small text helpers, the kind every project accumulates.</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">clean_title</span><span class="p">(</span><span class="n">title</span><span class="p">):</span>
+    <span class="c1"># "  the   MATRIX  " -&gt; "The Matrix"</span>
+    <span class="k">return</span> <span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">title</span><span class="o">.</span><span class="n">split</span><span class="p">())</span><span class="o">.</span><span class="n">title</span><span class="p">()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">slugify</span><span class="p">(</span><span class="n">title</span><span class="p">):</span>
+    <span class="c1"># "The Matrix Reloaded" -&gt; "the-matrix-reloaded"</span>
+    <span class="k">return</span> <span class="s2">"-"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">clean_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">shorten</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">30</span><span class="p">):</span>
+    <span class="c1"># Cut long text down for a preview, without cutting mid-word.</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">limit</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">text</span>
+    <span class="k">return</span> <span class="n">text</span><span class="p">[:</span><span class="n">limit</span><span class="p">]</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">" "</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">"..."</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Writing module_demo/text_utils.py
+</code></pre></div>
+
+<p>Let's understand the three functions before we use them:</p>
+<ul>
+<li><code>clean_title(title)</code> uses <code>title.split()</code> to break the text into words (this also throws away all the extra spaces), then <code>" ".join(...)</code> glues the words back together with single spaces, and <code>.title()</code> capitalises each word. So <code>"  the   MATRIX  "</code> becomes <code>"The Matrix"</code>.</li>
+<li><code>slugify(title)</code> first cleans the title, then lowercases it and joins the words with hyphens. A "slug" is the web-friendly version of a title that you see in URLs.</li>
+<li><code>shorten(text, limit=30)</code> returns the text as it is if it's short enough. Otherwise it cuts the text at the limit, then uses <code>rsplit(" ", 1)[0]</code> to keep only the part before the last space. That throws away the word that got cut in half, and then <code>"..."</code> is added at the end. So <code>"...processing genuinely pleasant"</code> cut at 30 characters ends in <code>"processing g"</code>, the stray <code>g</code> is dropped, and you get <code>"Python makes text processing..."</code>.</li>
+</ul>
+<p>The file is on disk now. But to import it, Python has to be able to <em>find</em> it, and <code>module_demo/</code> is a subfolder, not the folder we're working in. So we add that folder to <code>sys.path</code>, the list of places Python searches:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">"module_demo"</span><span class="p">)</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">text_utils</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">text_utils</span><span class="o">.</span><span class="n">clean_title</span><span class="p">(</span><span class="s2">"  the   MATRIX  "</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">text_utils</span><span class="o">.</span><span class="n">slugify</span><span class="p">(</span><span class="s2">"The Matrix Reloaded"</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">text_utils</span><span class="o">.</span><span class="n">shorten</span><span class="p">(</span><span class="s2">"Python makes text processing genuinely pleasant"</span><span class="p">,</span> <span class="mi">30</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>The Matrix
+the-matrix-reloaded
+Python makes text processing...
+</code></pre></div>
+
+<p>All three functions work, exactly as if they had come with Python.</p>
+<p><strong>About that <code>sys.path.insert</code> line:</strong> you wouldn't need it in a normal project. If <code>text_utils.py</code> were in the <strong>same folder</strong> as the file importing it, the import would just work, because Python always searches the script's own folder first. We only need it here because we put the module in a subfolder on purpose, to keep things organised. <code>insert(0, ...)</code> puts our folder at the <strong>front</strong> of the list, so it's searched first.</p>
+<h3 id="the-mysterious-__pycache__-folder">The Mysterious <code>__pycache__</code> Folder</h3>
+<p>Now look inside <code>module_demo/</code> again. There's something in there that we didn't write:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="nb">sorted</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s2">"module_demo"</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>['__pycache__', 'text_utils.py']
+</code></pre></div>
+
+<p>That <code>__pycache__/</code> folder holds <strong>bytecode</strong>, saved to disk. Bytecode is the simpler, lower-level form of your code that Python actually runs. To import <code>text_utils.py</code>, Python had to translate it into bytecode first, and it kept that translation so it can skip the step next time.</p>
+<p>You'll see one of these folders next to any module you import. You can safely delete it (Python just makes it again), and you never need to share it with anyone.</p>
+<p><strong>If you use VS Code</strong>, it might underline <code>import text_utils</code> and say <em>"Import could not be resolved"</em>. VS Code checks your code by <strong>reading</strong> it, not by <strong>running</strong> it, so it never sees the <code>sys.path.insert</code> line that tells Python where to look. Your code is fine. In a normal project, where the module sits next to the file that imports it, you won't get this warning.</p>
+<h3 id="your-modules-follow-the-same-rules">Your Modules Follow the Same Rules</h3>
+<p>Your own modules follow exactly the same import rules as <code>math</code>, so the <code>from ... import ...</code> style works here too:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">text_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">slugify</span><span class="p">,</span> <span class="n">shorten</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">slugify</span><span class="p">(</span><span class="s2">"Breaking Bad Season Five"</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">shorten</span><span class="p">(</span><span class="s2">"A very long description that needs trimming for the card"</span><span class="p">,</span> <span class="mi">25</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>breaking-bad-season-five
+A very long description...
+</code></pre></div>
+
+<p>So the standard library isn't special. <code>statistics.py</code> is a file someone wrote and shipped with Python. <code>text_utils.py</code> is a file you wrote and put in a folder. Python imports both of them the same way.</p>
+<p>Every module also knows its own name. Python stores it automatically in a variable called <code>__name__</code>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">text_utils</span><span class="o">.</span><span class="vm">__name__</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>'text_utils'
+</code></pre></div>
+
+<p>Keep this <code>__name__</code> variable in mind. It's the key to the next part.</p>
+<hr />
+<h2 id="part-3-if-__name__-__main__"><span class="h-icon"><svg class="icon"><use href="#icon-main"></use></svg></span>Part 3: <code>if __name__ == "__main__"</code></h2>
+<p>This is one of the most common patterns in Python. You'll find it at the bottom of thousands of files. It exists because of something we saw earlier: <strong>importing a module runs every line in it</strong>.</p>
+<p>For function definitions, that's fine. Defining a function doesn't <em>do</em> anything visible; it just creates the function. But for anything else, it's a problem. Watch what happens when a module has a <code>print</code> sitting at the top level:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">notebook cell</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="o">%%</span><span class="n">writefile</span> <span class="n">module_demo</span><span class="o">/</span><span class="n">greet</span><span class="o">.</span><span class="n">py</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">welcome</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"Welcome back, </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">!"</span>
+
+<span class="c1"># This line is NOT inside a function, so it runs the moment the file is imported.</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"*** greet.py is running ***"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Writing module_demo/greet.py
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">greet</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">greet</span><span class="o">.</span><span class="n">welcome</span><span class="p">(</span><span class="s2">"Shikhar"</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>*** greet.py is running ***
+Welcome back, Shikhar!
+</code></pre></div>
+
+<p>See the <code>*** greet.py is running ***</code> line? We only wanted the <code>welcome</code> function, but importing the module also ran its <code>print</code>. Imagine if that line was something slow, like downloading a file or training a model. Every program that imported this module, even one that only wanted a tiny helper function, would have to sit through that work.</p>
+<h3 id="proof-that-modules-are-cached">Proof That Modules Are Cached</h3>
+<p>Now for the proof promised in Part 1. Import the same module a second time:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="c1"># Already in sys.modules, so the file does not run a second time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">greet</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"...and this time the module did not run."</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>...and this time the module did not run.
+</code></pre></div>
+
+<p>No <code>*** greet.py is running ***</code> this time. Python found <code>greet</code> already in <code>sys.modules</code> and gave us the saved copy without opening the file again. (If you run the cell above again, the same thing happens. You'll only see that line again after you restart the kernel.)</p>
+<h3 id="one-file-two-jobs">One File, Two Jobs</h3>
+<p>So how do you write a file that works <strong>both</strong> as a module you can import <em>and</em> as a script you can run by itself?</p>
+<p>That's what <code>__name__</code> is for. Python sets this variable automatically in every file, and that includes your notebook. Run this to see what your own code is called:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>__main__
+</code></pre></div>
+
+<p><code>__main__</code> means <em>"this is the program that's running right now"</em>, and a notebook is exactly that.</p>
+<p>Python sets <code>__name__</code> to:</p>
+<ul>
+<li><code>"__main__"</code> when you <strong>run the file directly</strong>, and</li>
+<li><strong>the module's own name</strong> when the file is <strong>imported</strong> by another file.</li>
+</ul>
+<div class="diagram-card"><pre><code>   python3 report.py                      import report   (from another file)
+          │                                       │
+          ▼                                       ▼
+   __name__ == "__main__"                  __name__ == "report"
+          │                                       │
+          ▼                                       ▼
+   the if-block RUNS                       the if-block is SKIPPED
+   (demo code executes)                    (only the functions are loaded)
+</code></pre></div>
+
+<p><strong>Analogy:</strong> think of a chef who also writes cookbooks. When the chef is in their <strong>own restaurant</strong> (the file is run directly), they cook full meals for guests. When someone just <strong>borrows their cookbook</strong> (the file is imported), nobody wants the chef to start cooking in their kitchen. They only want the recipes.</p>
+<p>So by checking <code>__name__</code>, you can mark a block of code that only runs when the file is run as a program:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">notebook cell</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="o">%%</span><span class="n">writefile</span> <span class="n">module_demo</span><span class="o">/</span><span class="n">report</span><span class="o">.</span><span class="n">py</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">summarise</span><span class="p">(</span><span class="n">titles</span><span class="p">):</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">titles</span><span class="p">)</span><span class="si">}</span><span class="s2"> titles, longest is '</span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">titles</span><span class="p">,</span><span class="w"> </span><span class="n">key</span><span class="o">=</span><span class="nb">len</span><span class="p">)</span><span class="si">}</span><span class="s2">'"</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="c1"># Only runs when you execute:  python3 report.py</span>
+    <span class="c1"># Skipped entirely when another file does:  import report</span>
+    <span class="n">demo_titles</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"Stranger Things"</span><span class="p">,</span> <span class="s2">"Wednesday"</span><span class="p">,</span> <span class="s2">"The Crown"</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">summarise</span><span class="p">(</span><span class="n">demo_titles</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Writing module_demo/report.py
+</code></pre></div>
+
+<p>Import it, and the code inside the <code>if</code> block doesn't run. We only get what we asked for:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">report</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">report</span><span class="o">.</span><span class="n">summarise</span><span class="p">([</span><span class="s2">"Dune"</span><span class="p">,</span> <span class="s2">"Arrival"</span><span class="p">]))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>2 titles, longest is 'Arrival'
+</code></pre></div>
+
+<p>Now let's run the same file as a script.</p>
+<p>The <code>!</code> at the start of the next cell tells Jupyter to send the rest of the line to your computer's <strong>terminal</strong> instead of to Python. (The terminal is the window where you type commands; Part 6 explains it properly.) So <code>!python3 module_demo/report.py</code> does exactly what typing <code>python3 module_demo/report.py</code> into a terminal does: it starts a brand-new Python and runs that file as the main program.</p>
+<blockquote>
+<p><strong>On Windows</strong>, the command is usually <code>python</code> (or <code>py</code>) instead of <code>python3</code>. If the cell below says <code>python3</code> wasn't found, change it to <code>!python module_demo/report.py</code>.</p>
+</blockquote>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">notebook cell</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="err">!</span><span class="n">python3</span> <span class="n">module_demo</span><span class="o">/</span><span class="n">report</span><span class="o">.</span><span class="n">py</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>3 titles, longest is 'Stranger Things'
+</code></pre></div>
+
+<p>It's the same file, but it behaves differently depending on how you use it. When imported, it quietly offers its <code>summarise</code> function. When run directly, it also runs its little demo. That's why you'll see <code>if __name__ == "__main__":</code> at the bottom of so many Python files.</p>
+<p>A simple rule to follow: <strong>put your functions and classes at the top level, and put anything that actually <em>does</em> something inside the <code>if</code> block.</strong></p>
+<h3 id="the-main-function-pattern">The <code>main()</code> Function Pattern</h3>
+<p>When files get bigger, people often move the code from inside the <code>if</code> block into a function called <code>main()</code>. Then the bottom of the file is just two lines:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="o">...</span>                      <span class="c1"># everything the script does when it is run</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</code></pre></div>
+
+<p>It works exactly the same way. It just keeps the bottom of the file tidy, and it gives the "run me" code a clear name. The project at the end of this guide uses this pattern.</p>
+<hr />
+<h2 id="part-4-packages-folders-of-modules"><span class="h-icon"><svg class="icon"><use href="#icon-package"></use></svg></span>Part 4: Packages, Folders of Modules</h2>
+<p>One file is a module. <strong>A folder of modules is a package.</strong></p>
+<p>Say your project has fifteen helper functions. Splitting them into <code>text_utils.py</code>, <code>date_utils.py</code> and <code>money_utils.py</code> helps, but now your project folder is getting crowded. A package puts related modules together under one name.</p>
+<p><strong>Analogy:</strong> if a module is a single recipe book, a package is a <strong>labelled shelf</strong> holding several related books. Instead of having all your books scattered on the floor, you put the "Italian cooking" books together on one shelf with a label.</p>
+<p>A folder becomes a package when it has a file called <code>__init__.py</code> inside it. The file can be completely empty. Just having it there marks the folder as a package.</p>
+<blockquote>
+<p>To be exact, Python 3.3 and newer will import a folder even if it has no <code>__init__.py</code>. It treats it as a <em>namespace package</em>, which is a feature meant for very large projects spread over several folders. So if you forget the file, you usually won't get an error. Add it anyway. It's what makes a folder a normal package, and it's where the package's own setup code goes. We'll use that in a minute.</p>
+</blockquote>
+<p>Here's the package we're about to build:</p>
+<div class="diagram-card"><pre><code>   module_demo/
+   └── netflix/              ← the package (a folder)
+       ├── __init__.py       ← marks the folder as a package
+       ├── catalog.py        ← a module: formats runtimes
+       └── ratings.py        ← a module: averages and labels scores
+</code></pre></div>
+
+<p>First, the folder:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">Path</span><span class="p">(</span><span class="s2">"module_demo/netflix"</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>   <span class="c1"># exist_ok: no error if the folder is already there</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"created module_demo/netflix/"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>created module_demo/netflix/
+</code></pre></div>
+
+<p>Then the <code>__init__.py</code> file that marks it as a package. For now it only contains comments:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">notebook cell</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="o">%%</span><span class="n">writefile</span> <span class="n">module_demo</span><span class="o">/</span><span class="n">netflix</span><span class="o">/</span><span class="fm">__init__</span><span class="o">.</span><span class="n">py</span>
+<span class="c1"># This file marks the folder as a package.</span>
+<span class="c1"># It can be empty. Code placed here runs when the package is imported.</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Writing module_demo/netflix/__init__.py
+</code></pre></div>
+
+<p>Now the first module inside the package. <code>divmod(minutes, 60)</code> divides by 60 and gives back two numbers at once: the whole hours, and the minutes left over. So <code>divmod(154, 60)</code> gives <code>(2, 34)</code>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">notebook cell</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="o">%%</span><span class="n">writefile</span> <span class="n">module_demo</span><span class="o">/</span><span class="n">netflix</span><span class="o">/</span><span class="n">catalog</span><span class="o">.</span><span class="n">py</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">format_runtime</span><span class="p">(</span><span class="n">minutes</span><span class="p">):</span>
+    <span class="n">hours</span><span class="p">,</span> <span class="n">mins</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">minutes</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">hours</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">mins</span><span class="si">}</span><span class="s2">m"</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">hours</span><span class="si">}</span><span class="s2">h </span><span class="si">{</span><span class="n">mins</span><span class="si">}</span><span class="s2">m"</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Writing module_demo/netflix/catalog.py
+</code></pre></div>
+
+<p>And the second module. <code>average()</code> returns <code>0.0</code> for an empty list (so we never divide by zero), and <code>label()</code> turns a number into a friendly description:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">notebook cell</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="o">%%</span><span class="n">writefile</span> <span class="n">module_demo</span><span class="o">/</span><span class="n">netflix</span><span class="o">/</span><span class="n">ratings</span><span class="o">.</span><span class="n">py</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">average</span><span class="p">(</span><span class="n">scores</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">scores</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+    <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">scores</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">label</span><span class="p">(</span><span class="n">score</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">score</span> <span class="o">&gt;=</span> <span class="mf">4.5</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">"Critically acclaimed"</span>
+    <span class="k">elif</span> <span class="n">score</span> <span class="o">&gt;=</span> <span class="mf">3.5</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">"Well received"</span>
+    <span class="k">return</span> <span class="s2">"Mixed reviews"</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Writing module_demo/netflix/ratings.py
+</code></pre></div>
+
+<p>Now you can import from the whole folder as one unit. Write the package name, then the modules you want from it:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">netflix</span><span class="w"> </span><span class="kn">import</span> <span class="n">catalog</span><span class="p">,</span> <span class="n">ratings</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">format_runtime</span><span class="p">(</span><span class="mi">154</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">format_runtime</span><span class="p">(</span><span class="mi">47</span><span class="p">))</span>
+
+<span class="n">scores</span> <span class="o">=</span> <span class="p">[</span><span class="mf">4.8</span><span class="p">,</span> <span class="mf">4.6</span><span class="p">,</span> <span class="mf">4.9</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ratings</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">scores</span><span class="p">),</span> <span class="s2">"-&gt;"</span><span class="p">,</span> <span class="n">ratings</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="n">ratings</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">scores</span><span class="p">)))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>2h 34m
+47m
+4.7 -&gt; Critically acclaimed
+</code></pre></div>
+
+<p>You can also go straight to one function. This is the style you'll see most often. The dot in <code>netflix.ratings</code> separates the package from the module inside it, a bit like <code>/</code> separates a folder from a file in a path:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">netflix.ratings</span><span class="w"> </span><span class="kn">import</span> <span class="n">label</span>
+
+<span class="n">label</span><span class="p">(</span><span class="mf">3.9</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>'Well received'
+</code></pre></div>
+
+<h3 id="what-goes-in-__init__py">What Goes in <code>__init__.py</code>?</h3>
+<p>Ours is (nearly) empty, and that's completely normal. But this file <strong>runs when the package is imported</strong>, so you can use it as a <strong>front door</strong> for the package.</p>
+<p>Instead of making people remember which module each function lives in, you import the useful functions into <code>__init__.py</code>, and then people can get them straight from the package.</p>
+<p><strong>Analogy:</strong> think of a big shop with many departments. You could tell customers "go to aisle 7, second shelf" for every product. Or you could put the most popular items right at the front entrance. <code>__init__.py</code> is that front entrance.</p>
+<p>That's exactly why <code>import pandas as pd</code> gives you <code>pd.DataFrame</code> directly, even though <code>DataFrame</code> is actually defined several files deep inside the pandas package.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">notebook cell</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="o">%%</span><span class="n">writefile</span> <span class="n">module_demo</span><span class="o">/</span><span class="n">netflix</span><span class="o">/</span><span class="fm">__init__</span><span class="o">.</span><span class="n">py</span>
+<span class="c1"># Pull the useful names up to the package level, so users can write</span>
+<span class="c1">#     from netflix import average</span>
+<span class="c1"># instead of having to know that average() lives in netflix/ratings.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">netflix.ratings</span><span class="w"> </span><span class="kn">import</span> <span class="n">average</span><span class="p">,</span> <span class="n">label</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">netflix.catalog</span><span class="w"> </span><span class="kn">import</span> <span class="n">format_runtime</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Overwriting module_demo/netflix/__init__.py
+</code></pre></div>
+
+<p>To see the change, we have to run this in a <strong>fresh Python process</strong>. This notebook already imported <code>netflix</code>, and as we saw earlier, Python saves modules and won't run the file again.</p>
+<p>This new script doesn't need a <code>sys.path</code> line, because it lives inside <code>module_demo/</code>, right next to the package it imports:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">notebook cell</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="o">%%</span><span class="n">writefile</span> <span class="n">module_demo</span><span class="o">/</span><span class="n">front_door</span><span class="o">.</span><span class="n">py</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">netflix</span>          <span class="c1"># not netflix.ratings -- the package hands us the names directly</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">netflix</span><span class="o">.</span><span class="n">format_runtime</span><span class="p">(</span><span class="mi">96</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">netflix</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="mf">4.7</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Writing module_demo/front_door.py
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">notebook cell</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="err">!</span><span class="n">python3</span> <span class="n">module_demo</span><span class="o">/</span><span class="n">front_door</span><span class="o">.</span><span class="n">py</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>1h 36m
+Critically acclaimed
+</code></pre></div>
+
+<p>Same functions, shorter import. Now the package has one simple front door, and you can move the files behind it around without breaking anyone's code. That's the main reason big libraries do this.</p>
+<h3 id="the-new-words-in-one-place">The New Words, in One Place</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Term</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Module</td>
+<td>A single <code>.py</code> file</td>
+</tr>
+<tr>
+<td>Package</td>
+<td>A folder of modules, marked by <code>__init__.py</code></td>
+</tr>
+<tr>
+<td>Library</td>
+<td>An everyday word for a package (or group of packages) you install and use</td>
+</tr>
+<tr>
+<td>Standard library</td>
+<td>The modules and packages that come with Python itself</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="part-5-the-standard-library-batteries-included"><span class="h-icon"><svg class="icon"><use href="#icon-battery"></use></svg></span>Part 5: The Standard Library, Batteries Included</h2>
+<p>For years, Python's slogan was <em>"batteries included"</em>. Like a new toy that comes with batteries in the box, Python comes with a big collection of useful modules. So even a fresh install can read CSV files, work with dates, do maths, and manage files and folders, without installing anything else.</p>
+<p>You've already used more than a dozen of these modules. Here's a new one, <code>random</code>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+
+<span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>                     <span class="c1"># fixes the "randomness" so results repeat</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="s2">"Netflix"</span><span class="p">,</span> <span class="s2">"Spotify"</span><span class="p">,</span> <span class="s2">"Amazon"</span><span class="p">]))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>82
+Netflix
+</code></pre></div>
+
+<h3 id="why-randomseed-matters">Why <code>random.seed()</code> Matters</h3>
+<p>Random numbers on a computer aren't truly random. They come from a formula that starts from some value, called the <strong>seed</strong>. Setting the seed fixes that starting value, so you get the <strong>same sequence of "random" numbers every time</strong> you run the code.</p>
+<p><strong>Analogy:</strong> it's like shuffling a deck of cards in exactly the same way every time. The order looks random, but if you start from the same position and shuffle the same way, you always get the same order.</p>
+<p>This is more useful than it sounds. It's how machine learning experiments are made repeatable, so another person can run your code and get exactly your results. It's also why you'll see <code>random_state=42</code> all over scikit-learn.</p>
+<h3 id="doing-maths-with-dates">Doing Maths with Dates</h3>
+<p>Next, <code>datetime</code>. You may have only used it to stamp the current time, but it can also do maths with dates. Subtracting one date from another gives you the gap between them:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+
+<span class="n">release</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+<span class="n">report_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>   <span class="c1"># a fixed date, so this cell prints the same thing every time</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Released:"</span><span class="p">,</span> <span class="n">release</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"</span><span class="si">%d</span><span class="s2"> %B %Y"</span><span class="p">))</span>   <span class="c1"># %d = day, %B = month name, %Y = year</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Days since release:"</span><span class="p">,</span> <span class="p">(</span><span class="n">report_date</span> <span class="o">-</span> <span class="n">release</span><span class="p">)</span><span class="o">.</span><span class="n">days</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Released: 15 March 2024
+Days since release: 78
+</code></pre></div>
+
+<p><code>strftime()</code> (short for "string format time") turns a date into text in whatever format you like. <code>%d</code> is the day, <code>%B</code> is the full month name, and <code>%Y</code> is the four-digit year. And <code>(report_date - release).days</code> gives the number of days between the two dates.</p>
+<h3 id="a-rough-map-of-the-standard-library">A Rough Map of the Standard Library</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Need</th>
+<th>Modules</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Files and paths</td>
+<td><code>os</code>, <code>pathlib</code>, <code>shutil</code>, <code>glob</code></td>
+</tr>
+<tr>
+<td>Data formats</td>
+<td><code>csv</code>, <code>json</code>, <code>pickle</code></td>
+</tr>
+<tr>
+<td>Text</td>
+<td><code>re</code>, <code>string</code>, <code>textwrap</code></td>
+</tr>
+<tr>
+<td>Dates and time</td>
+<td><code>datetime</code>, <code>time</code>, <code>calendar</code></td>
+</tr>
+<tr>
+<td>Maths and numbers</td>
+<td><code>math</code>, <code>statistics</code>, <code>random</code>, <code>decimal</code></td>
+</tr>
+<tr>
+<td>Data structures</td>
+<td><code>collections</code>, <code>itertools</code>, <code>functools</code></td>
+</tr>
+<tr>
+<td>System</td>
+<td><code>sys</code>, <code>subprocess</code>, <code>argparse</code></td>
+</tr>
+<tr>
+<td>Internet</td>
+<td><code>urllib</code>, <code>http</code>, <code>socket</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Some of these get their own proper coverage later in the course: <code>re</code> in chapter 16, and <code>collections</code>, <code>itertools</code>, <code>functools</code> and <code>datetime</code> in chapter 15.</p>
+<hr />
+<h2 id="part-6-third-party-packages-and-virtual-environments"><span class="h-icon"><svg class="icon"><use href="#icon-venv"></use></svg></span>Part 6: Third-Party Packages and Virtual Environments</h2>
+<p>The standard library is big, but it doesn't have everything. There's no <code>pandas</code>, no <code>requests</code> and no <code>scikit-learn</code> in it. Those are <strong>third-party packages</strong>: code written by other people and shared on the <strong>Python Package Index</strong>, or <strong>PyPI</strong> (you say it "pie-pea-eye"), at <a href="https://pypi.org">pypi.org</a>. The tool that downloads and installs them is called <strong><code>pip</code></strong>, and it comes with Python.</p>
+<p><strong>Analogy:</strong> if the standard library is the set of tools that came with your house, PyPI is a huge <strong>free hardware store</strong> with hundreds of thousands of tools made by people all over the world. <code>pip</code> is the delivery van that brings the tools you order to your house.</p>
+<p>Once a third-party package is installed, you import it like anything else:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>                   <span class="c1"># no different from "import csv"</span>
+</code></pre></div>
+
+<p>Python doesn't care who wrote a module. The standard library, your own file, something you installed: it's the same <code>import</code>, with the same rules.</p>
+<p>What causes trouble is <em>where</em> an installed package ends up. That's what the rest of this part is about.</p>
+<h3 id="why-every-project-gets-its-own-environment">Why Every Project Gets Its Own Environment</h3>
+<p>Say you build a project in March using version 2.28 of <code>requests</code>. In June you start a new project that needs version 2.31. If both projects use the same Python installation, then upgrading for the June project means the March project is now running on a version you never tested it with. Now imagine that with twenty packages and several projects. Things start breaking each other.</p>
+<p>A <strong>virtual environment</strong> is a private set of packages for one project, kept apart from everything else. Each project gets its own folder of packages, so nothing leaks from one project into another.</p>
+<p><strong>Analogy:</strong> imagine several chefs sharing <strong>one kitchen and one spice rack</strong>. One chef swaps the salt for a new brand, and suddenly another chef's famous dish tastes wrong. Now give every chef <strong>their own small kitchen</strong> with their own spice rack. Each chef can change anything they like, and nobody else is affected. Each small kitchen is a virtual environment.</p>
+<div class="diagram-card"><pre><code>   WITHOUT virtual environments            WITH virtual environments
+
+   ┌───────────────────────────┐           project_march/        project_june/
+   │   one shared Python       │           ┌──────────────┐      ┌──────────────┐
+   │   requests 2.31  ◄── June │           │ .venv/       │      │ .venv/       │
+   │                   upgrade │           │ requests 2.28│      │ requests 2.31│
+   │   (March project now      │           └──────────────┘      └──────────────┘
+   │    runs on an untested    │             each project has its own packages,
+   │    version!)              │             so neither can break the other
+   └───────────────────────────┘
+</code></pre></div>
+
+<p>On a lot of systems, this isn't even optional anymore. If you installed Python with Homebrew on macOS, or you're on a recent version of Ubuntu or Debian, a plain <code>pip install</code> outside a virtual environment gets refused with an <code>externally-managed-environment</code> error. That's there to stop projects from overwriting each other, and to protect the operating system's own tools, some of which are written in Python.</p>
+<p>So always do it in this order: <strong>first create the environment, then install packages into it.</strong></p>
+<h3 id="a-quick-introduction-to-the-terminal">A Quick Introduction to the Terminal</h3>
+<p>You create environments in the <strong>terminal</strong>. It's a window where you type commands for your computer instead of clicking on things. All the commands in the rest of this part go there, not in a notebook cell or a <code>.py</code> file.</p>
+<p><strong>How to open one:</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>On</th>
+<th>Do this</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>macOS</td>
+<td>Press Cmd+Space, type <em>Terminal</em>, press Enter</td>
+</tr>
+<tr>
+<td>Windows</td>
+<td>Open <strong>PowerShell</strong> from the Start menu</td>
+</tr>
+<tr>
+<td>Linux</td>
+<td>Open <strong>Terminal</strong> from your applications menu</td>
+</tr>
+<tr>
+<td>VS Code</td>
+<td>Choose <strong>Terminal → New Terminal</strong>; it opens in your project folder</td>
+</tr>
+</tbody>
+</table></div>
+<p>A terminal is always "in" one folder at a time. That folder is called the <strong>working directory</strong>, and your commands act on it. Before doing anything else, use <code>cd</code> (short for <em>change directory</em>) to go into your project folder:</p>
+<div class="code-card term"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">terminal</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">cd</span><span class="w"> </span>path/to/Python-Programming-Code<span class="w">      </span><span class="c1"># go to the project folder</span>
+<span class="nb">pwd</span><span class="w">                                     </span><span class="c1"># print the folder you are in now</span>
+</code></pre></div>
+
+<p>The text before your cursor, something like <code>~/Python-Programming-Code $</code>, is called the <strong>prompt</strong>. It's just the terminal telling you it's ready for a command. You don't type it yourself.</p>
+<blockquote>
+<p><strong><code>python3</code> or <code>python</code>?</strong> On macOS and Linux, the command is <code>python3</code>. On Windows it's usually <code>python</code> or <code>py</code>. Wherever this guide says <code>python3</code>, use the one that works on your computer.</p>
+</blockquote>
+<h3 id="creating-and-using-a-virtual-environment">Creating and Using a Virtual Environment</h3>
+<p>Here is the whole life cycle of an environment, in four steps:</p>
+<div class="code-card term"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">terminal</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="c1"># 1. Create it, inside your project folder (this makes a folder called .venv)</span>
+python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+
+<span class="c1"># 2. Activate it</span>
+<span class="nb">source</span><span class="w"> </span>.venv/bin/activate<span class="w">          </span><span class="c1"># macOS / Linux</span>
+.venv<span class="se">\S</span>cripts<span class="se">\a</span>ctivate<span class="w">             </span><span class="c1"># Windows</span>
+
+<span class="c1"># 3. Your prompt now starts with (.venv): installs go into .venv/, and only there</span>
+python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>requests
+
+<span class="c1"># 4. When you are done</span>
+deactivate
+</code></pre></div>
+
+<p>Let's go through it slowly:</p>
+<ol>
+<li><strong>Create.</strong> <code>python3 -m venv .venv</code> makes a new folder called <code>.venv</code> inside your project. It contains its own <code>python3</code> command (on macOS and Linux this is a shortcut, or link, to your main Python program; on Windows it's a small copy) and a private folder for packages, which already has <code>pip</code> installed in it. The dot at the start of <code>.venv</code> is just a convention that hides the folder in file browsers on macOS and Linux.</li>
+<li><strong>Activate.</strong> Activating tells <em>this terminal window</em> to use the environment's Python and <code>pip</code>. You'll know it worked because your prompt changes to start with <code>(.venv)</code>.</li>
+<li><strong>Install.</strong> Anything you install now goes into <code>.venv/</code>, and only there.</li>
+<li><strong>Deactivate.</strong> <code>deactivate</code> switches the terminal back to normal. Nothing is deleted; you can activate it again later.</li>
+</ol>
+<p><strong>What does the <code>-m</code> mean?</strong> The <code>-m</code> in <code>python3 -m venv</code> and <code>python3 -m pip</code> means <em>"run the module called..."</em>. It tells <strong>this exact Python</strong> to run its own <code>venv</code> or <code>pip</code> module.</p>
+<p>This matters because a plain <code>pip</code> command might belong to a <em>different</em> Python than the one you meant (and on some Macs, plain <code>pip</code> doesn't exist at all). That's the classic way people end up installing a package somewhere their code can't see it. <code>python3 -m pip</code> always installs for the Python you typed. Once an environment is active, plain <code>pip install ...</code> also points to the right place, and most tutorials use it.</p>
+<p>While the environment is active, <code>python3</code> means the environment's own Python. It can see the standard library and whatever you installed into <code>.venv/</code>, and nothing installed anywhere else. So nothing you do here affects your other projects.</p>
+<blockquote>
+<p><strong>On Windows PowerShell</strong>, activating might fail with an error about <em>execution policies</em>. Run <code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code> once, type <code>Y</code> when it asks, and then activate again.</p>
+</blockquote>
+<h3 id="the-pip-commands-youll-use-most">The <code>pip</code> Commands You'll Use Most</h3>
+<p>All of these are run with the environment active:</p>
+<div class="code-card term"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">terminal</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code>python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>requests<span class="w">              </span><span class="c1"># install the latest version</span>
+python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="nv">requests</span><span class="o">==</span><span class="m">2</span>.31.0<span class="w">      </span><span class="c1"># install one exact version</span>
+python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>requests<span class="w">    </span><span class="c1"># upgrade to the newest</span>
+python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>uninstall<span class="w"> </span>requests<span class="w">            </span><span class="c1"># remove it</span>
+python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>list<span class="w">                          </span><span class="c1"># everything installed in this environment</span>
+python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>show<span class="w"> </span>requests<span class="w">                 </span><span class="c1"># details about one package</span>
+</code></pre></div>
+
+<h3 id="your-notebook-and-your-environment">Your Notebook and Your Environment</h3>
+<p>This one trips up almost everyone. When you activate <code>.venv</code> in a terminal, it changes what <em>that terminal</em> runs. It does <strong>not</strong> change the Python behind a notebook that's already open. So you can install a package in the terminal, import it in the notebook, and get <code>ModuleNotFoundError</code> for a package you installed a minute ago.</p>
+<p><strong>Analogy:</strong> it's like stocking a new spice in the kitchen next door, then being surprised you can't find it in your own kitchen.</p>
+<p>There are two ways to keep them in sync:</p>
+<ul>
+<li><strong>Start Jupyter from inside the environment.</strong> With <code>.venv</code> active, run <code>python3 -m pip install jupyterlab</code>, then <code>jupyter lab</code>. Any notebook you open this way runs on the environment's Python.</li>
+<li><strong>In VS Code</strong>, click the kernel name in the top-right corner of the notebook and pick the interpreter inside <code>.venv</code>.</li>
+</ul>
+<p>If you want to install something from inside a notebook, run <code>%pip install requests</code> in a cell. Unlike <code>!pip</code>, <code>%pip</code> always installs into the Python that the notebook is running on.</p>
+<p>If you're ever unsure which Python you're using, ask Python itself:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">)</span>                                            <span class="c1"># the Python program running this notebook</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Inside a virtual environment:"</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">prefix</span> <span class="o">!=</span> <span class="n">sys</span><span class="o">.</span><span class="n">base_prefix</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>/opt/anaconda3/bin/python
+Inside a virtual environment: False
+</code></pre></div>
+
+<p>Your output will be different from the one shown here, because this one came from the author's computer.</p>
+<ul>
+<li>The <strong>first line</strong> is the full path to the Python program running your code. If it points inside your project's <code>.venv</code> folder, your notebook and your environment match.</li>
+<li>The <strong>second line</strong> compares where this Python keeps its packages (<code>sys.prefix</code>) with where the original Python installation keeps them (<code>sys.base_prefix</code>). They're only different when you're inside a virtual environment.</li>
+</ul>
+<p>(Conda environments, which come up below, are kept apart too, but they still print <code>False</code> here, because conda sets up its environments in a different way.)</p>
+<h3 id="sharing-an-environment-requirementstxt">Sharing an Environment: <code>requirements.txt</code></h3>
+<p>An environment isn't much use if nobody else can rebuild it. You can't just email someone your <code>.venv</code> folder (more on why in a moment). Instead, the usual fix is a plain text file called <code>requirements.txt</code> that lists what the project needs.</p>
+<p><strong>Analogy:</strong> instead of mailing someone your whole kitchen, you send them a <strong>shopping list</strong>. With the list, they can stock their own kitchen exactly like yours.</p>
+<p>You can make one in two ways.</p>
+<p><strong>1. Write it by hand</strong>, listing only the packages your code imports. That's what the course repository does. Here are the packages that chapters 17 to 19 need:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"requirements.txt"</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">line</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"#"</span><span class="p">):</span>      <span class="c1"># skip blank lines and comments</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>requests&gt;=2.31
+beautifulsoup4&gt;=4.12
+pytest&gt;=8.0
+mypy&gt;=1.8
+</code></pre></div>
+
+<p>The loop reads the file line by line and skips blank lines and comments (lines starting with <code>#</code>). In these lines, <code>&gt;=</code> means <em>"this version or newer"</em>. Using <code>==</code> instead would lock the package to one exact version.</p>
+<p><strong>2. Save a list of everything that's installed:</strong></p>
+<div class="code-card term"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">terminal</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code>python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>freeze<span class="w"> </span>&gt;<span class="w"> </span>requirements.txt
+</code></pre></div>
+
+<p><code>pip freeze</code> prints every package in the environment with its exact version. The <code>&gt;</code> is the terminal's way of saying <em>"put the output in this file instead of showing it on screen"</em>.</p>
+<p>You'll get more lines than you expect, because packages bring their own <strong>dependencies</strong> (other packages they need) along with them. If you install just <code>requests</code> and <code>beautifulsoup4</code>, you get something like:</p>
+<div class="diagram-card textfile"><pre><code>beautifulsoup4==4.12.3
+certifi==2024.2.2
+charset-normalizer==3.3.2
+idna==3.7
+requests==2.31.0
+soupsieve==2.5
+urllib3==2.2.1
+</code></pre></div>
+
+<p>A hand-written file is easier to read, and a frozen file rebuilds the environment exactly. You'll see both in real projects.</p>
+<p><strong>For someone else (or you, later) to rebuild the environment:</strong></p>
+<div class="code-card term"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">terminal</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+<span class="nb">source</span><span class="w"> </span>.venv/bin/activate<span class="w">                  </span><span class="c1"># Windows: .venv\Scripts\activate</span>
+python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+</code></pre></div>
+
+<p>Those three commands give them the same packages the project was built with. The <code>-r</code> flag tells pip to read the package list from a file.</p>
+<blockquote>
+<p><strong>For this course:</strong> chapters 12 to 16 don't need anything installed. Chapter 17 is the first one that needs one of the packages above, and it walks you through this setup again when you get there. If you'd like to get it done now, open a terminal in the folder that has the course notebooks, run those three commands, then run <code>python3 -m pip install jupyterlab</code>, and open the course again with <code>jupyter lab</code>.</p>
+</blockquote>
+<h3 id="two-rules-to-follow-from-day-one">Two Rules to Follow from Day One</h3>
+<ol>
+<li><strong>Share <code>requirements.txt</code>, but never <code>.venv/</code>.</strong> The file is just a few lines. The folder has thousands of files, is tied to your operating system, and you can rebuild it from the file any time. Most programmers keep their projects in <strong>git</strong>, a tool that keeps a history of a folder and can upload it to sites like GitHub. Saving a version in git is called a <strong>commit</strong>. A file called <code>.gitignore</code> lists what git should skip, and <code>.venv/</code> and <code>__pycache__/</code> should always be in it.</li>
+<li><strong>Use one environment per project.</strong> They're cheap to make, so delete them and rebuild them whenever you like. That's the whole point.</li>
+</ol>
+<blockquote>
+<p>You might also come across <strong>conda</strong>. It does the same job and is popular in data science, because it can also install tools that aren't written in Python. The idea is the same: separate environments, one per project.</p>
+</blockquote>
+<hr />
+<h2 id="part-7-when-an-import-fails"><span class="h-icon"><svg class="icon"><use href="#icon-error"></use></svg></span>Part 7: When an Import Fails</h2>
+<p>Most import problems come down to one of three errors, and Python tells you which one it is, as long as you read the message carefully.</p>
+<div class="diagram-card"><pre><code>   Your import failed. Which error did you get?
+   │
+   ├── ModuleNotFoundError: No module named 'x'
+   │       └── Python can't find the module at all
+   │           → typo? not installed? installed into a different Python?
+   │
+   ├── ImportError: cannot import name 'y' from 'x'
+   │       └── the module exists, but 'y' isn't inside it
+   │           → check the real name with dir(x) or help(x)
+   │
+   └── AttributeError: module 'x' has no attribute 'z'
+           └── (when you're SURE x has z) one of YOUR files is named x.py
+               → rename your file
+</code></pre></div>
+
+<h3 id="error-1-modulenotfounderror">Error 1: <code>ModuleNotFoundError</code></h3>
+<p>This means Python can't find the module at all.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">panads</span>
+<span class="k">except</span> <span class="ne">ModuleNotFoundError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="s2">"-&gt;"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>ModuleNotFoundError -&gt; No module named 'panads'
+</code></pre></div>
+
+<p>This usually means one of three things:</p>
+<ol>
+<li><strong>There's a typo in the name</strong>, like <code>panads</code> instead of <code>pandas</code> above.</li>
+<li><strong>It isn't installed</strong>, so you need <code>python3 -m pip install &lt;name&gt;</code>, or <code>%pip install &lt;name&gt;</code> in a notebook.</li>
+<li><strong>It's installed somewhere else.</strong> Most often it went into a different Python or environment from the one running your code. <code>sys.executable</code>, from Part 6, tells you which Python that is.</li>
+</ol>
+<h3 id="error-2-importerror">Error 2: <code>ImportError</code></h3>
+<p>This means Python <strong>found</strong> the module, but the name you asked for isn't in it.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">square_root</span>      <span class="c1"># math has sqrt, not square_root</span>
+<span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>cannot import name 'square_root' from 'math' (/opt/anaconda3/lib/python3.12/lib-dynload/math.cpython-312-darwin.so)
+</code></pre></div>
+
+<p>Python found <code>math</code>, and it even tells you which file it loaded (the part in brackets will look different on your computer). But there's nothing in it called <code>square_root</code>. If you check with <code>dir(math)</code> or <code>help(math)</code>, you'll find the real name is <code>sqrt</code>.</p>
+<h3 id="these-two-errors-are-related">These Two Errors Are Related</h3>
+<p><code>ModuleNotFoundError</code> is a more specific kind of <code>ImportError</code>, in the same way that <code>ZeroDivisionError</code> is a kind of <code>ArithmeticError</code>. In other words, <code>ModuleNotFoundError</code> is a <strong>child</strong> class of <code>ImportError</code>. So <code>except ImportError</code> catches a missing module too:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">panads</span>
+<span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>                                  <span class="c1"># the parent class...</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Caught as ImportError:"</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>    <span class="c1"># ...catches the child</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Caught as ImportError: ModuleNotFoundError
+</code></pre></div>
+
+<div class="diagram-card"><pre><code>   ImportError                  ← "something went wrong while importing"
+   └── ModuleNotFoundError      ← "...specifically, the module wasn't found"
+</code></pre></div>
+
+<h3 id="making-an-extra-package-optional">Making an Extra Package Optional</h3>
+<p>A failed import is just an exception, so you can catch it like any other exception. Libraries use this trick to offer extra features that only switch on if you have another package installed:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">fancy_plotting_library</span>   <span class="c1"># a made-up name: no package by that name exists</span>
+    <span class="n">HAS_PLOTTING</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">HAS_PLOTTING</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="k">if</span> <span class="n">HAS_PLOTTING</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Charts enabled."</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Charts disabled. Install with: python3 -m pip install fancy_plotting_library"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Charts disabled. Install with: python3 -m pip install fancy_plotting_library
+</code></pre></div>
+
+<p>The program doesn't crash. It just turns off the charts feature and tells the user how to turn it on. Many real libraries work this way: they run fine with the basics, and unlock extras when an optional package is present.</p>
+<h3 id="error-3-one-of-your-own-files-is-hiding-a-real-module">Error 3: One of Your Own Files Is Hiding a Real Module</h3>
+<p>Remember, Python looks in your script's own folder <strong>first</strong>. So if you save a file called <code>random.py</code>, every <code>import random</code> in that folder finds <strong>your</strong> file instead of the real one from the standard library. Beginners run into this all the time, and the error you get never mentions your file by default.</p>
+<p><strong>Analogy:</strong> imagine you put a homemade jar labelled "Salt" on the front of your shelf, but it actually contains sugar. Every recipe that reaches for "Salt" grabs your jar first, because it's the closest one, and the dish comes out wrong. The recipe didn't fail because salt doesn't exist; it failed because the wrong jar had the right label.</p>
+<p>Let's cause this bug on purpose, in its own folder:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">Path</span><span class="p">(</span><span class="s2">"module_demo/shadow"</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"created module_demo/shadow/"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>created module_demo/shadow/
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">notebook cell</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="o">%%</span><span class="n">writefile</span> <span class="n">module_demo</span><span class="o">/</span><span class="n">shadow</span><span class="o">/</span><span class="n">random</span><span class="o">.</span><span class="n">py</span>
+<span class="c1"># A practice file, innocently saved as random.py</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Running module_demo/shadow/random.py -- not Python's random module!"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Writing module_demo/shadow/random.py
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">notebook cell</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="o">%%</span><span class="n">writefile</span> <span class="n">module_demo</span><span class="o">/</span><span class="n">shadow</span><span class="o">/</span><span class="n">dice</span><span class="o">.</span><span class="n">py</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>    <span class="c1"># meant: Python's random module. Gets: random.py in this folder.</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>      <span class="c1"># caught only so the message prints cleanly</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"AttributeError:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Writing module_demo/shadow/dice.py
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">notebook cell</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="err">!</span><span class="n">python3</span> <span class="n">module_demo</span><span class="o">/</span><span class="n">shadow</span><span class="o">/</span><span class="n">dice</span><span class="o">.</span><span class="n">py</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Running module_demo/shadow/random.py -- not Python's random module!
+AttributeError: module 'random' has no attribute 'randint'
+</code></pre></div>
+
+<p>The first line of the output shows that Python ran <em>our</em> <code>random.py</code>, and of course our file has no <code>randint</code>. The error itself doesn't mention the file name at all, and that's why this bug is so confusing the first time you see it.</p>
+<p>Python 3.13 and newer are kinder here. They add a hint to the end of the same error message, telling you exactly which file to rename. On those versions, the second line looks like this:</p>
+<div class="diagram-card textfile"><pre><code>AttributeError: module 'random' has no attribute 'randint' (consider renaming '.../module_demo/shadow/random.py' since it has the same name as the standard library module named 'random' and prevents importing that standard library module)
+</code></pre></div>
+
+<p>The fix is easy: <strong>don't name your own files after a module you use</strong>, like <code>random.py</code>, <code>csv.py</code>, <code>math.py</code>, <code>requests.py</code> or <code>pandas.py</code>. Rename the file (for example, to <code>random_practice.py</code>), and the real module works again.</p>
+<hr />
+<h2 id="part-8-how-a-real-project-is-laid-out"><span class="h-icon"><svg class="icon"><use href="#icon-project"></use></svg></span>Part 8: How a Real Project Is Laid Out</h2>
+<p>Put everything from this guide together, and a small, well-organised Python project looks roughly like this:</p>
+<div class="diagram-card"><pre><code>netflix_analysis/
+├── .venv/                  &lt;- the virtual environment (never committed)
+├── .gitignore              &lt;- lists .venv/, __pycache__/, data files
+├── requirements.txt        &lt;- the packages this project needs
+├── README.md               &lt;- what this project is and how to run it
+├── main.py                 &lt;- the entry point you actually run
+├── data/
+│   ├── raw/                &lt;- data as downloaded, never edited
+│   └── processed/          &lt;- cleaned data your code produced
+└── netflix/                &lt;- your own package
+    ├── __init__.py
+    ├── catalog.py
+    └── ratings.py
+</code></pre></div>
+
+<p>Python doesn't force any of this on you. These are habits that most people follow, and each one has a good reason:</p>
+<ul>
+<li><strong><code>main.py</code> is the entry point.</strong> It's the one file you actually run. It imports from <code>netflix/</code> and does the actual work, inside <code>if __name__ == "__main__":</code>.</li>
+<li><strong>Nobody edits the files in <code>raw/</code>.</strong> If your cleaning code has a bug, you want to be able to start over from the original download. Treat raw data like the original copy of an important document: you make copies, you never write on the original.</li>
+<li><strong>Your own package sits next to <code>main.py</code></strong>, so importing it doesn't need any <code>sys.path</code> tricks. Python searches the script's own folder first, remember?</li>
+<li><strong><code>requirements.txt</code> and <code>README.md</code></strong> let anyone (including future you) set up and understand the project quickly.</li>
+</ul>
+<p>You don't need any of this for a ten-line script. But once a project lasts longer than the afternoon you wrote it in, you'll want it.</p>
+<hr />
+<h2 id="real-world-example-splitting-a-script-into-a-project"><span class="h-icon"><svg class="icon"><use href="#icon-refactor"></use></svg></span>Real-World Example: Splitting a Script into a Project</h2>
+<p>This is the change this whole guide has been building up to.</p>
+<p>Here's the kind of script everyone writes first. It's one file that holds the data, cleans up the titles, does the maths, formats the runtimes and prints a report, all mixed together in one loop. It works, but you can't reuse any of it anywhere else, and you can't check any piece of it on its own:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">notebook cell</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="o">%%</span><span class="n">writefile</span> <span class="n">module_demo</span><span class="o">/</span><span class="n">messy_report</span><span class="o">.</span><span class="n">py</span>
+<span class="c1"># Everything in one file: data, cleaning, maths, formatting and printing.</span>
+<span class="n">SHOWS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"  stranger   THINGS "</span><span class="p">,</span> <span class="s2">"runtime"</span><span class="p">:</span> <span class="mi">51</span><span class="p">,</span> <span class="s2">"scores"</span><span class="p">:</span> <span class="p">[</span><span class="mf">4.8</span><span class="p">,</span> <span class="mf">4.9</span><span class="p">,</span> <span class="mf">4.7</span><span class="p">]},</span>
+    <span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"the   crown"</span><span class="p">,</span> <span class="s2">"runtime"</span><span class="p">:</span> <span class="mi">58</span><span class="p">,</span> <span class="s2">"scores"</span><span class="p">:</span> <span class="p">[</span><span class="mf">4.2</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">4.3</span><span class="p">]},</span>
+    <span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"  WEDNESDAY"</span><span class="p">,</span> <span class="s2">"runtime"</span><span class="p">:</span> <span class="mi">47</span><span class="p">,</span> <span class="s2">"scores"</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.4</span><span class="p">,</span> <span class="mf">3.6</span><span class="p">,</span> <span class="mf">3.2</span><span class="p">]},</span>
+<span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"NETFLIX CATALOGUE REPORT"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"-"</span> <span class="o">*</span> <span class="mi">58</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">show</span> <span class="ow">in</span> <span class="n">SHOWS</span><span class="p">:</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">show</span><span class="p">[</span><span class="s2">"title"</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">())</span><span class="o">.</span><span class="n">title</span><span class="p">()</span>
+    <span class="n">score</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">show</span><span class="p">[</span><span class="s2">"scores"</span><span class="p">])</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">show</span><span class="p">[</span><span class="s2">"scores"</span><span class="p">]),</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">hours</span><span class="p">,</span> <span class="n">mins</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">show</span><span class="p">[</span><span class="s2">"runtime"</span><span class="p">],</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">hours</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">runtime</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">mins</span><span class="si">}</span><span class="s2">m"</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">runtime</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">hours</span><span class="si">}</span><span class="s2">h </span><span class="si">{</span><span class="n">mins</span><span class="si">}</span><span class="s2">m"</span>
+
+    <span class="k">if</span> <span class="n">score</span> <span class="o">&gt;=</span> <span class="mf">4.5</span><span class="p">:</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="s2">"Critically acclaimed"</span>
+    <span class="k">elif</span> <span class="n">score</span> <span class="o">&gt;=</span> <span class="mf">3.5</span><span class="p">:</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="s2">"Well received"</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="s2">"Mixed reviews"</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">title</span><span class="si">:</span><span class="s2">&lt;20</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">runtime</span><span class="si">:</span><span class="s2">&gt;6</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Writing module_demo/messy_report.py
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">notebook cell</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="err">!</span><span class="n">python3</span> <span class="n">module_demo</span><span class="o">/</span><span class="n">messy_report</span><span class="o">.</span><span class="n">py</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>NETFLIX CATALOGUE REPORT
+----------------------------------------------------------
+Stranger Things         51m  4.80  Critically acclaimed
+The Crown               58m  4.17  Well received
+Wednesday               47m  3.40  Mixed reviews
+</code></pre></div>
+
+<p>It works fine. But notice how the cleaning, the maths, the formatting and the labelling are all tangled together inside one loop. If another project needed just the runtime formatting, you'd have to copy and paste it out of here.</p>
+<p>Now here's the same report, built from the module and the package we wrote in this guide. The main file now just connects the pieces:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">notebook cell</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="o">%%</span><span class="n">writefile</span> <span class="n">module_demo</span><span class="o">/</span><span class="n">main</span><span class="o">.</span><span class="n">py</span>
+<span class="c1"># The entry point. Notice how little it does itself: it imports the real work.</span>
+<span class="c1"># No sys.path line needed here: main.py sits in the same folder as the modules</span>
+<span class="c1"># it imports, and a script's own folder is always searched first.</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">text_utils</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">netflix</span><span class="w"> </span><span class="kn">import</span> <span class="n">catalog</span><span class="p">,</span> <span class="n">ratings</span>
+
+<span class="n">SHOWS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"  stranger   THINGS "</span><span class="p">,</span> <span class="s2">"runtime"</span><span class="p">:</span> <span class="mi">51</span><span class="p">,</span> <span class="s2">"scores"</span><span class="p">:</span> <span class="p">[</span><span class="mf">4.8</span><span class="p">,</span> <span class="mf">4.9</span><span class="p">,</span> <span class="mf">4.7</span><span class="p">]},</span>
+    <span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"the   crown"</span><span class="p">,</span> <span class="s2">"runtime"</span><span class="p">:</span> <span class="mi">58</span><span class="p">,</span> <span class="s2">"scores"</span><span class="p">:</span> <span class="p">[</span><span class="mf">4.2</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">4.3</span><span class="p">]},</span>
+    <span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"  WEDNESDAY"</span><span class="p">,</span> <span class="s2">"runtime"</span><span class="p">:</span> <span class="mi">47</span><span class="p">,</span> <span class="s2">"scores"</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.4</span><span class="p">,</span> <span class="mf">3.6</span><span class="p">,</span> <span class="mf">3.2</span><span class="p">]},</span>
+<span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">build_report</span><span class="p">(</span><span class="n">shows</span><span class="p">):</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">show</span> <span class="ow">in</span> <span class="n">shows</span><span class="p">:</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="n">text_utils</span><span class="o">.</span><span class="n">clean_title</span><span class="p">(</span><span class="n">show</span><span class="p">[</span><span class="s2">"title"</span><span class="p">])</span>
+        <span class="n">score</span> <span class="o">=</span> <span class="n">ratings</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">show</span><span class="p">[</span><span class="s2">"scores"</span><span class="p">])</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">title</span><span class="si">:</span><span class="s2">&lt;20</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">catalog</span><span class="o">.</span><span class="n">format_runtime</span><span class="p">(</span><span class="n">show</span><span class="p">[</span><span class="s1">'runtime'</span><span class="p">])</span><span class="si">:</span><span class="s2">&gt;6</span><span class="si">}</span><span class="s2">  "</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">ratings</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="n">score</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">lines</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"NETFLIX CATALOGUE REPORT"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"-"</span> <span class="o">*</span> <span class="mi">58</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">build_report</span><span class="p">(</span><span class="n">SHOWS</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Writing module_demo/main.py
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">notebook cell</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="err">!</span><span class="n">python3</span> <span class="n">module_demo</span><span class="o">/</span><span class="n">main</span><span class="o">.</span><span class="n">py</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>NETFLIX CATALOGUE REPORT
+----------------------------------------------------------
+Stranger Things         51m  4.80  Critically acclaimed
+The Crown               58m  4.17  Well received
+Wednesday               47m  3.40  Mixed reviews
+</code></pre></div>
+
+<p>The output is exactly the same, down to the last character. What changed is how the code is organised. There are now four files, and each one has one clear job:</p>
+<div class="diagram-card"><pre><code>   main.py  (connects the pieces and prints the report)
+     │
+     ├── imports ──► text_utils.py          knows about text, nothing about Netflix
+     │                 └── clean_title()
+     │
+     └── imports ──► netflix/  (package)
+                       ├── catalog.py       formats runtimes
+                       │     └── format_runtime()
+                       └── ratings.py       scores things
+                             ├── average()
+                             └── label()
+</code></pre></div>
+
+<ul>
+<li><code>text_utils.py</code> knows about text, and nothing about Netflix.</li>
+<li><code>netflix/catalog.py</code> formats runtimes.</li>
+<li><code>netflix/ratings.py</code> scores things.</li>
+<li><code>main.py</code> connects them and prints the report.</li>
+</ul>
+<p>What you get out of this is code you can <strong>reuse</strong> and <strong>test</strong>. You can use <code>text_utils.clean_title</code> in any project you ever write, and you can check each piece on its own. That's exactly what chapter 19 does with real tests.</p>
+<p><strong>Analogy:</strong> the messy script is like a meal where everything was cooked in one pot. The organised project is like a kitchen with separate stations: one person chops, one person grills, one person plates. Each station can be improved, checked or reused on its own, and the final plate looks exactly the same.</p>
+<hr />
+<h2 id="quick-reference-summary"><span class="h-icon"><svg class="icon"><use href="#icon-table"></use></svg></span>Quick Reference Summary</h2>
+<p><strong>Importing</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Gets you</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>import math</code></td>
+<td>The module; use <code>math.sqrt()</code></td>
+</tr>
+<tr>
+<td><code>from math import sqrt</code></td>
+<td>Just that name; use <code>sqrt()</code></td>
+</tr>
+<tr>
+<td><code>import numpy as np</code></td>
+<td>The module under a shorter name</td>
+</tr>
+<tr>
+<td><code>from math import *</code></td>
+<td>Everything (<strong>avoid this</strong>)</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>The new words</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Module</td>
+<td>One <code>.py</code> file</td>
+</tr>
+<tr>
+<td>Package</td>
+<td>A folder of modules with an <code>__init__.py</code></td>
+</tr>
+<tr>
+<td>Standard library</td>
+<td>Modules that ship with Python</td>
+</tr>
+<tr>
+<td>PyPI</td>
+<td>The public index of third-party packages</td>
+</tr>
+<tr>
+<td>Virtual environment</td>
+<td>A private folder of packages for one project</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Virtual environments</strong> (in a terminal, inside the project folder)</p>
+<div class="code-card term"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">terminal</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv<span class="w">                         </span><span class="c1"># create</span>
+<span class="nb">source</span><span class="w"> </span>.venv/bin/activate<span class="w">                     </span><span class="c1"># activate (macOS/Linux)</span>
+.venv<span class="se">\S</span>cripts<span class="se">\a</span>ctivate<span class="w">                        </span><span class="c1"># activate (Windows)</span>
+python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt<span class="w">    </span><span class="c1"># restore from file</span>
+deactivate<span class="w">                                    </span><span class="c1"># leave</span>
+</code></pre></div>
+
+<p><strong><code>pip</code></strong> (with the environment active)</p>
+<div class="code-card term"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">terminal</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code>python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>&lt;package&gt;
+python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>&lt;package&gt;<span class="o">==</span>&lt;version&gt;
+python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>uninstall<span class="w"> </span>&lt;package&gt;
+python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>list
+python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>freeze<span class="w"> </span>&gt;<span class="w"> </span>requirements.txt
+</code></pre></div>
+
+<p>In a notebook, use <code>%pip install &lt;package&gt;</code>. To see which Python is running your code: <code>import sys; print(sys.executable)</code>.</p>
+<p><strong>When an import fails</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Error</th>
+<th>Usually means</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ModuleNotFoundError</code></td>
+<td>Typo, not installed, or installed into a different Python</td>
+</tr>
+<tr>
+<td><code>ImportError</code></td>
+<td>The module exists, but not the name you asked for</td>
+</tr>
+<tr>
+<td><code>AttributeError: module 'random' has no attribute ...</code></td>
+<td>One of your own files is named after the module</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>The pattern to remember</strong></p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="o">...</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</code></pre></div>
+
+<p>The code in <code>main()</code> runs when you run the file directly, and stays quiet when the file is imported.</p>
+
+      <div class="article-end">
+        <p><strong>A module is just a file, a package is just a folder, and <code>import</code> is just Python finding a file, running it once and saving the result.</strong> Everything else in this guide follows from those three ideas: why <code>import *</code> is risky, why <code>__name__ == "__main__"</code> exists, why your own <code>random.py</code> can break things, and why every project deserves its own virtual environment. Next up, in chapter 12, we look at iterators and generators: how a <code>for</code> loop really works, and how to handle data that's too big to fit in memory.</p>
+      </div>
+    </main>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="f-left">Python Programming Series &nbsp;/&nbsp; Article 11 of the course</div>
+  <div class="f-right"><a href="#top">Back to top ↑</a></div>
+</footer>
+<script>
+(function(){
+  var t=document.getElementById('navToggle'),s=document.getElementById('sidebar');
+  if(t&&s){t.addEventListener('click',function(){s.classList.toggle('open');var o=s.classList.contains('open');t.innerHTML=o?'<svg class="icon"><use href="#icon-close"></use></svg>':'<svg class="icon"><use href="#icon-menu"></use></svg>';});s.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){s.classList.remove('open');t.innerHTML='<svg class="icon"><use href="#icon-menu"></use></svg>';});});}
+  var tl=Array.prototype.slice.call(document.querySelectorAll('.toc a')),sc=tl.map(function(a){return document.getElementById(a.getAttribute('href').slice(1));}).filter(Boolean);
+  if('IntersectionObserver' in window&&sc.length){var bi={};tl.forEach(function(a){bi[a.getAttribute('href').slice(1)]=a;});var obs=new IntersectionObserver(function(es){es.forEach(function(e){var l=bi[e.target.id];if(!l)return;if(e.isIntersecting){tl.forEach(function(a){a.classList.remove('active');});l.classList.add('active');}});},{rootMargin:'-15% 0px -70% 0px',threshold:0});sc.forEach(function(s){obs.observe(s);});}
+  document.querySelectorAll('.code-card').forEach(function(c){var b=c.querySelector('.copy-btn'),e=c.querySelector('code');if(!b||!e)return;b.addEventListener('click',function(){var tx=e.innerText,done=function(){var o=b.innerHTML;b.innerHTML='<svg class="icon"><use href="#icon-check"></use></svg> Copied';setTimeout(function(){b.innerHTML=o;},1600);};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(tx).then(done,done);else{var ta=document.createElement('textarea');ta.value=tx;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(x){}document.body.removeChild(ta);done();}});});
+})();
+</script>
+</body>
+</html>

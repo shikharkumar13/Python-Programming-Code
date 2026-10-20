@@ -1,0 +1,1417 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Iterators and Generators · Python Programming Series</title>
+<meta name="description" content="A beginner-friendly guide to Python iterators and generators: how for loops work, yield, generator expressions, comprehensions, reading big files lazily, and paging through an API.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+
+:root{
+  --paper:#F3F8FC;--surface:#FFFFFF;--tint:#E8F2FB;
+  --ink:#0E2238;--ink-soft:#3D5570;--ink-faint:#7F95AB;
+  --violet:#0B6FCC;--violet-deep:#0A4F9E;--violet-soft:#E2EFFB;
+  --pink:#3FA34D;--pink-text:#0A7466;--pink-soft:#E0F5F2;
+  --mint:#0FA3A3;--mint-text:#08787A;--mint-soft:#DDF4F4;
+  --sun:#FFB627;--sun-soft:#FFF4D9;
+  --orange:#E89B00;--orange-text:#9A6400;--orange-soft:#FFF0D1;
+  --sky:#013243;--sky-text:#013243;--sky-soft:#E1ECF0;
+  --line:#D6E4F0;--line-strong:#B9CFE3;
+  --code-bg:#0B1E33;--code-head:#08172A;--code-line:#17304D;--out-bg:#071425;
+  --r-s:8px;--r-m:14px;--r-l:22px;
+  --font-d:'Bricolage Grotesque','Arial Rounded MT Bold',sans-serif;
+  --font-b:'Figtree',-apple-system,'Segoe UI',sans-serif;
+  --font-m:'JetBrains Mono','SFMono-Regular',Consolas,monospace;
+}
+*,*::before,*::after{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-b);font-size:17px;line-height:1.68;-webkit-font-smoothing:antialiased;}
+a{color:var(--violet-deep);text-decoration-color:rgba(11,111,204,.35);text-underline-offset:3px;text-decoration-thickness:2px;}
+a:hover{text-decoration-color:currentColor;}
+::selection{background:var(--pink);color:#fff;}
+:focus-visible{outline:3px solid var(--pink);outline-offset:2px;border-radius:4px;}
+.icon{width:1em;height:1em;display:inline-block;vertical-align:-.15em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+
+.shell{max-width:1300px;margin:0 auto;padding:0 clamp(16px,4vw,44px);}
+.topbar{display:none;position:sticky;top:0;z-index:40;align-items:center;justify-content:space-between;padding:12px clamp(16px,4vw,44px);background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-bottom:2px solid var(--violet-soft);}
+.topbar .brand{font-family:var(--font-d);font-weight:800;font-size:.98rem;color:var(--ink);}
+.topbar .brand span{color:var(--violet);}
+.topbar button{border:2px solid var(--violet-soft);background:var(--surface);border-radius:var(--r-s);width:40px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--violet);}
+
+/* ---------- Hero: the one loud moment ---------- */
+.hero{position:relative;margin:clamp(16px,2.5vw,28px) 0 clamp(36px,5vw,56px);padding:clamp(36px,5.5vw,68px) clamp(22px,4.5vw,60px);background:var(--violet);color:#fff;border-radius:var(--r-l);overflow:hidden;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:clamp(28px,4vw,56px);align-items:center;}
+.hero::before{content:"";position:absolute;width:420px;height:420px;border-radius:50%;background:var(--violet-deep);right:-120px;top:-160px;}
+.hero::after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;background:var(--pink);left:-70px;bottom:-90px;opacity:.9;}
+.hero-copy,.hero-art{position:relative;z-index:1;}
+.hero-eyebrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-weight:600;font-size:.95rem;color:rgba(255,255,255,.86);margin-bottom:20px;}
+.hero-eyebrow .badge{background:var(--sun);color:var(--ink);font-family:var(--font-d);font-weight:800;padding:4px 13px;border-radius:999px;font-size:.92rem;}
+h1.title{font-family:var(--font-d);font-weight:800;font-size:clamp(2.15rem,4.6vw,3.7rem);line-height:1.02;letter-spacing:-.025em;margin:0 0 20px;max-width:16ch;color:#fff;}
+.hero-sub{font-size:clamp(1rem,1.5vw,1.12rem);color:rgba(255,255,255,.9);max-width:58ch;margin:0 0 28px;}
+.hero-sub strong{color:#fff;font-weight:700;}
+.hero-chips{display:flex;flex-wrap:wrap;gap:10px;}
+.chip{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.13);border:1.5px solid rgba(255,255,255,.28);padding:7px 14px 7px 10px;border-radius:999px;font-size:.88rem;font-weight:600;color:#fff;}
+.chip .icon{width:1.15em;height:1.15em;}
+.chip:nth-child(1) .icon{color:var(--sun);}
+.chip:nth-child(2) .icon{color:#7FF0D2;}
+.chip:nth-child(3) .icon{color:#C5F27A;}
+.chip:nth-child(4) .icon{color:#9FD6FF;}
+
+.hero-art{display:flex;flex-direction:column;align-items:center;}
+.blueprint{width:min(250px,100%);border:2.5px dashed rgba(255,255,255,.75);border-radius:var(--r-m);padding:14px 16px 12px;font-family:var(--font-m);font-size:.8rem;color:#fff;background:rgba(255,255,255,.06);}
+.bp-title{font-weight:700;margin-bottom:8px;}
+.bp-title .kw{color:#C5F27A;}
+.bp-title .cn{color:var(--sun);}
+.bp-line{padding:2px 0 2px 14px;color:rgba(255,255,255,.82);}
+.bp-line.m{color:#7FF0D2;}
+.fan{width:min(330px,100%);height:44px;display:block;}
+.fan path{stroke:rgba(255,255,255,.7);stroke-width:2;fill:none;stroke-dasharray:4 4;vector-effect:non-scaling-stroke;}
+.objs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:min(360px,100%);}
+.obj{border-radius:12px;padding:10px 10px 9px;font-family:var(--font-m);font-size:.72rem;line-height:1.5;color:var(--ink);box-shadow:0 6px 0 rgba(14,34,56,.28);animation:stamp .5s cubic-bezier(.3,1.5,.6,1) both;}
+.obj b{display:block;font-family:var(--font-d);font-size:1rem;font-weight:800;margin-bottom:3px;}
+.obj span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.o1{background:var(--sun);transform:rotate(-4deg);animation-delay:.25s;}
+.o2{background:#7FF0D2;transform:rotate(2deg);animation-delay:.45s;}
+.o3{background:#C5F27A;transform:rotate(-1.5deg);animation-delay:.65s;}
+@keyframes stamp{from{opacity:0;translate:0 -26px;scale:.85;}to{opacity:1;translate:0 0;scale:1;}}
+.art-cap{margin:18px 0 0;font-family:var(--font-d);font-weight:700;font-size:.95rem;color:rgba(255,255,255,.9);}
+
+/* ---------- Layout + sidebar ---------- */
+.layout{display:grid;grid-template-columns:265px minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:start;padding-bottom:90px;}
+.sidebar{position:sticky;top:24px;max-height:calc(100vh - 48px);overflow-y:auto;padding:16px 10px 16px 0;}
+.sidebar::-webkit-scrollbar{width:5px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:3px;}
+.toc-label{font-family:var(--font-d);font-weight:800;font-size:1rem;color:var(--ink);margin:0 0 10px;padding-left:12px;}
+.toc{list-style:none;margin:0;padding:0;}
+.toc li{margin:0 0 2px;}
+.toc a{display:flex;align-items:center;gap:10px;padding:7px 12px;font-size:.88rem;font-weight:500;color:var(--ink-soft);text-decoration:none;border-radius:10px;transition:background .15s,color .15s;}
+.toc a .icon{width:1.05em;height:1.05em;flex:none;color:var(--violet);}
+.toc a:hover{background:var(--violet-soft);color:var(--ink);}
+.toc a.active{background:var(--violet);color:#fff;font-weight:600;}
+.toc a.active .icon{color:var(--sun);}
+
+/* ---------- Article ---------- */
+.article{min-width:0;padding-top:8px;max-width:820px;}
+.article h2{--acc:var(--violet);font-family:var(--font-d);font-weight:800;font-size:clamp(1.55rem,2.6vw,2rem);line-height:1.15;letter-spacing:-.015em;margin:64px 0 18px;scroll-margin-top:24px;display:flex;align-items:center;gap:14px;}
+.article h2:nth-of-type(5n+2){--acc:var(--pink);}
+.article h2:nth-of-type(5n+3){--acc:var(--mint);}
+.article h2:nth-of-type(5n+4){--acc:var(--orange);}
+.article h2:nth-of-type(5n+5){--acc:var(--sky);}
+.article>h2:first-of-type{margin-top:4px;}
+.article>hr:first-child{display:none;}
+.article h2 .h-icon{width:2.6rem;height:2.6rem;flex:none;display:grid;place-items:center;background:var(--acc);color:#fff;border-radius:12px;transform:rotate(-4deg);box-shadow:0 4px 0 rgba(14,34,56,.18);}
+.article h2 .h-icon .icon{width:1.35rem;height:1.35rem;stroke-width:2;}
+.article h3{font-family:var(--font-d);font-weight:700;font-size:1.2rem;margin:34px 0 10px;scroll-margin-top:24px;color:var(--ink);}
+.article p{margin:0 0 17px;}
+.article ul,.article ol{margin:0 0 20px;padding-left:1.35em;}
+.article li{margin-bottom:8px;padding-left:.2em;}
+.article ul li::marker{color:var(--pink);font-size:1.15em;}
+.article ol li::marker{color:var(--violet);font-family:var(--font-d);font-weight:800;}
+.article strong{font-weight:700;}
+.article hr{border:0;height:6px;width:110px;margin:52px auto;border-radius:6px;background:linear-gradient(90deg,var(--violet) 0 20%,var(--pink) 20% 40%,var(--mint) 40% 60%,var(--sun) 60% 80%,var(--sky) 80% 100%);}
+.article code{font-family:var(--font-m);font-size:.84em;background:var(--pink-soft);padding:.12em .4em;border-radius:6px;color:var(--pink-text);}
+.article blockquote{margin:22px 0;padding:16px 20px;border-left:5px solid var(--sun);background:var(--sun-soft);border-radius:0 var(--r-m) var(--r-m) 0;color:var(--ink);}
+.article blockquote p{margin:0;color:inherit;}
+
+.table-wrap{overflow-x:auto;margin:22px 0 28px;border-radius:var(--r-m);border:2px solid var(--violet-soft);background:var(--surface);}
+.article table{width:100%;border-collapse:collapse;font-size:.9rem;}
+.article thead th{background:var(--violet);color:#fff;font-family:var(--font-d);font-weight:700;text-align:left;padding:12px 16px;white-space:nowrap;font-size:.9rem;}
+.article tbody td{padding:11px 16px;border-bottom:1px solid var(--line);vertical-align:top;}
+.article tbody tr:last-child td{border-bottom:none;}
+.article tbody tr:nth-child(even){background:#F5F9FD;}
+.article tbody td code{white-space:nowrap;}
+
+/* ---------- Code ---------- */
+.code-card{margin:22px 0 26px;border-radius:var(--r-m);overflow:hidden;background:var(--code-bg);box-shadow:0 6px 0 var(--violet-soft);}
+.code-card .code-head{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:var(--code-head);border-bottom:1px solid var(--code-line);}
+.code-card .dots{display:flex;gap:6px;}
+.code-card .dots span{width:10px;height:10px;border-radius:50%;display:block;}
+.code-card .dots span:nth-child(1){background:var(--pink);}
+.code-card .dots span:nth-child(2){background:var(--sun);}
+.code-card .dots span:nth-child(3){background:var(--mint);}
+.code-card .lang{font-family:var(--font-m);font-size:.72rem;color:#7E9CC0;}
+.code-card .copy-btn{font-family:var(--font-b);font-weight:600;font-size:.76rem;color:#DCEBFA;background:rgba(255,255,255,.06);border:1px solid #23456B;border-radius:7px;padding:4px 10px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .15s,border-color .15s;}
+.code-card .copy-btn:hover{background:var(--violet);border-color:var(--violet);color:#fff;}
+.code-card .copy-btn .icon{width:.95em;height:.95em;}
+.code-card pre{margin:0;padding:16px 20px;overflow-x:auto;font-size:.85rem;line-height:1.6;}
+.code-card code{font-family:var(--font-m);font-size:1em;line-height:inherit;color:#E6F1FF;background:none;padding:0;border-radius:0;}
+.code-card .k,.code-card .kn,.code-card .kd,.code-card .kc,.code-card .ow{color:#5CC8FF;}
+.code-card .nb,.code-card .bp{color:#9FD6FF;}
+.code-card .nf,.code-card .fm{color:#A6E36B;}
+.code-card .s,.code-card .s1,.code-card .s2,.code-card .sa,.code-card .sd,.code-card .se{color:#FFD166;}
+.code-card .si{color:#6EE7D8;}
+.code-card .mi,.code-card .mf{color:#6EE7D8;}
+.code-card .o,.code-card .p{color:#9FB6CF;}
+.code-card .c,.code-card .c1,.code-card .cm{color:#6F8BA8;font-style:italic;}
+.code-card .n{color:#E6F1FF;}
+.code-card .nc,.code-card .ne{color:#FFB86B;font-weight:600;}
+
+.output-card{margin:-26px 0 26px;border-radius:0 0 var(--r-m) var(--r-m);overflow:hidden;background:var(--out-bg);border-top:2px dashed #23456B;box-shadow:0 6px 0 var(--violet-soft);position:relative;z-index:1;}
+.output-card::before{content:"Output";display:block;font-family:var(--font-b);font-weight:700;font-size:.74rem;color:#A6E36B;padding:9px 20px 0;}
+.output-card pre{margin:0;padding:4px 20px 16px;overflow-x:auto;font-size:.82rem;line-height:1.6;}
+.output-card code{font-family:var(--font-m);font-size:1em;line-height:inherit;color:#BFD6EE;background:none;padding:0;border-radius:0;}
+
+.diagram-card{margin:22px 0 26px;border-radius:var(--r-m);overflow:hidden;position:relative;border:2.5px dashed var(--line-strong);background:var(--surface);}
+.diagram-card::before{content:"diagram";position:absolute;top:10px;right:14px;font-family:var(--font-b);font-weight:700;font-size:.74rem;color:var(--violet);}
+.diagram-card pre{margin:0;padding:26px 22px 20px;overflow-x:auto;}
+.diagram-card pre{line-height:1.3;font-size:.84rem;}
+.diagram-card code{font-family:var(--font-m);font-size:1em;line-height:inherit;color:var(--violet-deep);font-weight:500;background:none;padding:0;white-space:pre;}
+
+.svg-diagram{margin:24px 0 28px;padding:22px 20px 18px;background:var(--surface);border:2px solid var(--violet-soft);border-radius:var(--r-m);}
+.svg-diagram{overflow-x:auto;}
+.svg-diagram svg{width:100%;min-width:560px;height:auto;display:block;}
+.svg-diagram .cap{font-size:.86rem;font-weight:500;color:var(--ink-faint);text-align:center;margin-top:12px;}
+
+.article-end{margin-top:56px;padding:30px 30px;border-radius:var(--r-l);background:var(--violet);color:#fff;position:relative;overflow:hidden;}
+.article-end::after{content:"";position:absolute;width:140px;height:140px;border-radius:50%;background:var(--sun);right:-50px;bottom:-60px;}
+.article-end p{margin:0;font-size:1.06rem;color:rgba(255,255,255,.92);position:relative;z-index:1;max-width:62ch;}
+.article-end p strong{color:#fff;}
+
+footer.site-footer{border-top:2px solid var(--violet-soft);margin-top:30px;padding:22px clamp(16px,4vw,44px) 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+footer.site-footer .f-left{font-size:.88rem;font-weight:500;color:var(--ink-faint);}
+footer.site-footer a{font-size:.9rem;font-weight:600;}
+
+@media(max-width:960px){
+  .topbar{display:flex;}
+  .layout{grid-template-columns:1fr;}
+  .article{max-width:none;}
+  .sidebar{position:fixed;inset:60px 0 0 0;z-index:35;background:var(--paper);padding:18px clamp(16px,4vw,44px) 24px;transform:translateX(-100%);transition:transform .2s;max-height:none;height:calc(100vh - 60px);}
+  .sidebar.open{transform:translateX(0);}
+  .hero{grid-template-columns:1fr;}
+}
+@media(max-width:520px){
+  .article h2 .h-icon{width:2.2rem;height:2.2rem;}
+  .obj{font-size:.66rem;padding:9px 8px;}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}.sidebar{transition:none;}.obj{animation:none;}}
+
+/* NumPy hero illustration */
+.cells{display:grid;grid-template-columns:repeat(4,1fr);border:2px solid rgba(255,255,255,.8);border-radius:8px;overflow:hidden;margin-top:4px;}
+.cells span{text-align:center;padding:7px 0;font-weight:700;color:#fff;}
+.cells span+span{border-left:2px solid rgba(255,255,255,.8);}
+.objs.four{grid-template-columns:repeat(4,1fr);width:min(380px,100%);gap:9px;}
+.objs.four .obj{text-align:center;padding:10px 4px 9px;}
+.o4{background:#9FD6FF;transform:rotate(3deg);animation-delay:.85s;}
+
+/* Article 11 extras */
+.cells.three{grid-template-columns:repeat(3,1fr);}
+.cells.three span{font-size:.72rem;padding:6px 0;}
+.objs .obj{min-width:0;}
+.obj.seq{text-align:center;padding:10px 6px 9px;}
+.obj.seq code{display:block;font-family:var(--font-m);font-size:.74rem;font-weight:700;margin:2px 0 4px;color:var(--ink);background:none;padding:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.obj.seq span{font-size:.68rem;white-space:normal;}
+.code-card.term .code-head{background:#06121F;}
+.code-card .lang{text-transform:none;}
+.diagram-card.textfile::before{content:"text";}
+@media(max-width:520px){.obj.seq code{font-size:.62rem;}}
+</style>
+</head>
+<body>
+<svg style="display:none" aria-hidden="true"><defs>
+<symbol id="icon-loop" viewBox="0 0 24 24"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></symbol>
+<symbol id="icon-book" viewBox="0 0 24 24"><path d="M4 4h7a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H4z"/><path d="M20 4h-3v9l-1.5-1.2L14 13"/><path d="M14 7a3 3 0 0 1 3-3"/></symbol>
+<symbol id="icon-gearclass" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></symbol>
+<symbol id="icon-pause" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M10 8v8M14 8v8"/></symbol>
+<symbol id="icon-brackets" viewBox="0 0 24 24"><path d="M8 3H5v18h3M16 3h3v18h-3"/><path d="M10 12h4"/></symbol>
+<symbol id="icon-file" viewBox="0 0 24 24"><path d="M6 2h8l5 5v15H6z"/><path d="M14 2v5h5"/><path d="M9 12h6M9 15h6M9 18h4"/></symbol>
+<symbol id="icon-warn" viewBox="0 0 24 24"><path d="M12 3l10 18H2z"/><path d="M12 10v5"/><circle cx="12" cy="18" r=".8" fill="currentColor"/></symbol>
+<symbol id="icon-api" viewBox="0 0 24 24"><path d="M7 18a5 5 0 1 1 1-9.9A6 6 0 0 1 19 10a4 4 0 0 1-1 8z"/><path d="M10 14h4"/></symbol>
+<symbol id="icon-compare" viewBox="0 0 24 24"><rect x="2" y="5" width="8" height="14" rx="1.5"/><rect x="14" y="5" width="8" height="14" rx="1.5"/><path d="M5 9h2M5 12h2M5 15h2M17 12h2"/></symbol>
+<symbol id="icon-table" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="1.5"/><line x1="2" y1="9" x2="22" y2="9"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15.5" y1="3" x2="15.5" y2="21"/></symbol>
+<symbol id="icon-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="13" rx="1.6"/><path d="M5 16H4.5A1.5 1.5 0 0 1 3 14.5v-10A1.5 1.5 0 0 1 4.5 3h10A1.5 1.5 0 0 1 16 4.5V5"/></symbol>
+<symbol id="icon-check" viewBox="0 0 24 24"><path d="M4 12.5 L9.5 18 L20 5"/></symbol>
+<symbol id="icon-menu" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
+<symbol id="icon-close" viewBox="0 0 24 24"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></symbol>
+</defs></svg>
+
+
+<div class="topbar">
+  <span class="brand">§12 &nbsp;<span>Iterators &amp; Generators</span></span>
+  <button id="navToggle" aria-label="Toggle navigation">
+    <svg class="icon"><use href="#icon-menu"></use></svg>
+  </button>
+</div>
+
+<div class="shell" id="top">
+  <section class="hero">
+  <div class="hero-copy">
+    <div class="hero-eyebrow"><span class="badge">Article 12</span> Python Programming Series</div>
+    <h1 class="title">Iterators and Generators in Python: A Complete Beginner&#x27;s Guide</h1>
+    <p class="hero-sub">You have already used the idea behind this guide many times without noticing it. Every time you wrote <code>for item in my_list</code>, used <code>enumerate()</code> or <code>zip()</code>, or read a file one line at a time, Python was quietly using <strong>iterators</strong>. This guide finally opens the box and shows you how they work, in plain English, one small step at a time.</p>
+    <div class="hero-chips">
+      <div class="chip"><svg class="icon"><use href="#icon-loop"></use></svg> How a for loop really works</div>
+      <div class="chip"><svg class="icon"><use href="#icon-pause"></use></svg> yield: pause and resume</div>
+      <div class="chip"><svg class="icon"><use href="#icon-file"></use></svg> Read huge files line by line</div>
+      <div class="chip"><svg class="icon"><use href="#icon-api"></use></svg> Page through an API lazily</div>
+    </div>
+  </div>
+  <div class="hero-art" aria-hidden="true">
+    <div class="blueprint">
+      <div class="bp-title"><span class="kw">for</span> x <span class="kw">in</span> <span class="cn">data</span>:</div>
+      <div class="cells three"><span>iter()</span><span>next()</span><span>stop</span></div>
+    </div>
+    <svg class="fan" viewBox="0 0 330 44" preserveAspectRatio="none"><path d="M165 0 C165 24 55 18 55 44"/><path d="M165 0 L165 44"/><path d="M165 0 C165 24 275 18 275 44"/></svg>
+    <div class="objs">
+      <div class="obj seq o1"><b>iterable</b><code>[1, 2, 3]</code><span>the book</span></div>
+      <div class="obj seq o2"><b>iterator</b><code>iter(x)</code><span>the bookmark</span></div>
+      <div class="obj seq o3"><b>generator</b><code>yield</code><span>pause &amp; resume</span></div>
+    </div>
+    <p class="art-cap">What a for loop is made of</p>
+  </div>
+</section>
+
+  <div class="layout">
+    <nav class="sidebar" id="sidebar">
+      <div class="toc-label">On this page</div>
+      <ul class="toc">
+<li><a href="#part-1-what-a-for-loop-really-does"><svg class="icon"><use href="#icon-loop"></use></svg><span>Part 1: What a for Loop Really Does</span></a></li>
+<li><a href="#iterable-vs-iterator"><svg class="icon"><use href="#icon-book"></use></svg><span>Iterable vs Iterator</span></a></li>
+<li><a href="#part-2-writing-your-own-iterator"><svg class="icon"><use href="#icon-gearclass"></use></svg><span>Part 2: Writing Your Own Iterator</span></a></li>
+<li><a href="#part-3-generators-the-same-thing-with-much-less-code"><svg class="icon"><use href="#icon-pause"></use></svg><span>Part 3: Generators, the Same Thing with Much Less Code</span></a></li>
+<li><a href="#part-4-generator-expressions"><svg class="icon"><use href="#icon-brackets"></use></svg><span>Part 4: Generator Expressions</span></a></li>
+<li><a href="#part-5-reading-big-files-a-little-at-a-time"><svg class="icon"><use href="#icon-file"></use></svg><span>Part 5: Reading Big Files a Little at a Time</span></a></li>
+<li><a href="#part-6-when-a-generator-is-the-wrong-choice"><svg class="icon"><use href="#icon-warn"></use></svg><span>Part 6: When a Generator Is the Wrong Choice</span></a></li>
+<li><a href="#real-world-example-going-through-an-api-page-by-page"><svg class="icon"><use href="#icon-api"></use></svg><span>Real-World Example: Going Through an API Page by Page</span></a></li>
+<li><a href="#quick-reference-summary"><svg class="icon"><use href="#icon-table"></use></svg><span>Quick Reference Summary</span></a></li>
+      </ul>
+    </nav>
+
+    <main class="article">
+<p>There's also a very practical reason to learn this. Once you understand iterators and generators, you can work with data that is <strong>bigger than your computer's memory</strong>. That happens all the time in data science: log files with millions of rows, datasets that don't fit in RAM, websites that hand you results one page at a time. So it's worth understanding this before you touch a real dataset.</p>
+<p>Here is what we will cover:</p>
+<ol>
+<li>What a <code>for</code> loop really does, step by step, and the difference between an <em>iterable</em> and an <em>iterator</em></li>
+<li>Writing your own iterator with <code>__iter__</code> and <code>__next__</code></li>
+<li>Generators: the same thing with much less code</li>
+<li>Generator expressions, and the other kinds of comprehension</li>
+<li>Reading big files a little at a time</li>
+<li>When a generator is the wrong choice</li>
+<li>A real-world example: going through an API's results page by page</li>
+</ol>
+<hr />
+<h2 id="part-1-what-a-for-loop-really-does"><span class="h-icon"><svg class="icon"><use href="#icon-loop"></use></svg></span>Part 1: What a <code>for</code> Loop Really Does</h2>
+<p>Let's start with something you've written a hundred times:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">shows</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"Stranger Things"</span><span class="p">,</span> <span class="s2">"Dark"</span><span class="p">,</span> <span class="s2">"Wednesday"</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">show</span> <span class="ow">in</span> <span class="n">shows</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">show</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Stranger Things
+Dark
+Wednesday
+</code></pre></div>
+
+<p>It looks simple. But what is Python actually doing here? It is <strong>not</strong> looking inside the list by itself, and the <code>for</code> loop is <strong>not</strong> keeping its own counter like <code>0, 1, 2</code>. Instead, it follows three steps:</p>
+<ol>
+<li>It asks the list for an <strong>iterator</strong>. An iterator is a small helper object whose only job is to walk through the list and remember where it is.</li>
+<li>It asks that iterator for the <strong>next item</strong>, again and again.</li>
+<li>It <strong>stops</strong> when the iterator says there's nothing left.</li>
+</ol>
+<p><strong>Analogy:</strong> think of a book and a <strong>bookmark</strong>. The book (the list) holds all the pages. The bookmark (the iterator) doesn't hold any pages itself; it just remembers where you are. Every time you want to read on, you look at the bookmark, read the next page, and move the bookmark forward. When the bookmark reaches the back cover, you're done.</p>
+<div class="diagram-card"><pre><code>   shows = ["Stranger Things", "Dark", "Wednesday"]       ← the iterable (the book)
+
+   it = iter(shows)                                        ← the iterator (the bookmark)
+         │
+         ▼
+   next(it) ──► "Stranger Things"     bookmark moves forward
+   next(it) ──► "Dark"                bookmark moves forward
+   next(it) ──► "Wednesday"           bookmark moves forward
+   next(it) ──► StopIteration!        bookmark is at the back cover: "I'm done"
+</code></pre></div>
+
+<p>You can do all three steps yourself, by hand. The built-in function <code>iter()</code> does step 1, and <code>next()</code> does step 2:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">it</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">shows</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Stranger Things
+Dark
+Wednesday
+</code></pre></div>
+
+<p>Three items, three calls to <code>next()</code>, three answers. So what happens if we call it a fourth time, when there's nothing left?</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">try</span><span class="p">:</span>
+    <span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"StopIteration: the iterator is exhausted"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>StopIteration: the iterator is exhausted
+</code></pre></div>
+
+<p>That's the whole trick. An iterator says "I'm finished" by <strong>raising an exception</strong> called <code>StopIteration</code>. It's not an error in the scary sense. It's just the iterator's polite way of saying "there's nothing more to give you".</p>
+<p><strong>Analogy:</strong> think of a vending machine for a single snack column. Each time you press the button (<code>next()</code>), one snack drops out. When the column is empty, a small "SOLD OUT" light turns on. <code>StopIteration</code> is that light.</p>
+<h3 id="a-for-loop-is-just-this-pattern-done-for-you">A <code>for</code> Loop Is Just This Pattern, Done for You</h3>
+<p>A <code>for</code> loop is exactly the same pattern, with the exception handling written for you. These two cells do the same thing:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="c1"># The for loop you write</span>
+<span class="k">for</span> <span class="n">show</span> <span class="ow">in</span> <span class="n">shows</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">show</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Stranger Things
+Dark
+Wednesday
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="c1"># What Python effectively runs</span>
+<span class="n">it</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">shows</span><span class="p">)</span>
+<span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">show</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+        <span class="k">break</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">show</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Stranger Things
+Dark
+Wednesday
+</code></pre></div>
+
+<p>Read the second version slowly, line by line:</p>
+<ul>
+<li><code>it = iter(shows)</code> gets the iterator (the bookmark).</li>
+<li><code>while True:</code> keeps going forever, until something breaks out.</li>
+<li><code>show = next(it)</code> asks for the next item.</li>
+<li><code>except StopIteration: break</code> means "when the iterator says it's done, leave the loop".</li>
+<li><code>print(show)</code> is the body of your loop.</li>
+</ul>
+<p>Nobody actually writes the second version in real code. But knowing that this is what happens behind the scenes explains a lot of behaviour that would otherwise seem random, including a couple of bugs you'll meet later in this guide.</p>
+<h3 id="almost-everything-is-iterable">Almost Everything Is Iterable</h3>
+<p>Anything you can put after <code>in</code> in a <code>for</code> loop is called <strong>iterable</strong>. That's a lot more than just lists:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="s2">"Dark"</span><span class="p">)))</span>                       <span class="c1"># strings, character by character</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">iter</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))))</span>                    <span class="c1"># tuples</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">iter</span><span class="p">({</span><span class="s2">"a"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">:</span> <span class="mi">2</span><span class="p">})))</span>             <span class="c1"># dicts -&gt; the keys</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">iter</span><span class="p">({</span><span class="s2">"x"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">})))</span>                 <span class="c1"># sets -- sorted, because a set has no fixed order</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">))))</span>                     <span class="c1"># range objects</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>['D', 'a', 'r', 'k']
+[1, 2, 3]
+['a', 'b']
+['x', 'y']
+[0, 1, 2, 3]
+</code></pre></div>
+
+<p>Notice two small details:</p>
+<ul>
+<li>Looping over a <strong>dictionary</strong> gives you its <strong>keys</strong>, not its values.</li>
+<li>A <strong>set</strong> has no fixed order, so the example uses <code>sorted()</code> to make the output the same every time.</li>
+</ul>
+<h3 id="range-doesnt-build-a-list"><code>range</code> Doesn't Build a List</h3>
+<p><code>range</code> is worth a closer look, because it surprises people. <code>range(1_000_000)</code> does <strong>not</strong> build a list of a million numbers.</p>
+<p>(The underscores in <code>1_000_000</code> are only there to make the number easier to read, like the commas in 1,000,000. Python ignores them, so <code>1_000_000</code> and <code>1000000</code> are exactly the same number.)</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">r</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1_000_000</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>                    <span class="c1"># it prints as a range, not as [0, 1, 2, ...]</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">r</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">500</span><span class="p">])</span>               <span class="c1"># you can still index it</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">r</span><span class="p">))</span>               <span class="c1"># and consume it -- the numbers are produced on demand</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>range(0, 1000000)
+&lt;class 'range'&gt;
+500
+499999500000
+</code></pre></div>
+
+<p>A <code>range</code> only stores <strong>three numbers</strong>: where to start, where to stop, and the step size. It works out each value only when you ask for it. Even <code>r[500]</code> is calculated on the spot (start + 500 × step), not looked up in a stored list.</p>
+<p><strong>Analogy:</strong> a <code>range</code> is like a <strong>recipe</strong> for numbers, not a box of numbers. A recipe for 1,000 cookies is one small card, not 1,000 cookies. You bake each cookie only when someone wants one.</p>
+<p>That idea, <strong>making values when you need them instead of storing them all in advance</strong>, is what this whole guide is about. You've been using <code>range</code> for a long time without noticing that it works like this.</p>
+<p><code>enumerate()</code> and <code>zip()</code> work the same way. They don't build a list; they hand out values as you ask for them:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">e</span> <span class="o">=</span> <span class="nb">enumerate</span><span class="p">([</span><span class="s2">"a"</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>              <span class="c1"># not a list</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>              <span class="c1"># it only becomes one when you ask</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>&lt;class 'enumerate'&gt;
+[(0, 'a'), (1, 'b')]
+</code></pre></div>
+
+<hr />
+<h2 id="iterable-vs-iterator"><span class="h-icon"><svg class="icon"><use href="#icon-book"></use></svg></span>Iterable vs Iterator</h2>
+<p>These two words sound almost the same, which makes them confusing. But they mean different things:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>Iterable</th>
+<th>Iterator</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>What it is</td>
+<td>Something you <em>can</em> loop over</td>
+<td>The thing that <em>does</em> the looping</td>
+</tr>
+<tr>
+<td>Special method</td>
+<td><code>__iter__</code></td>
+<td><code>__next__</code> (and <code>__iter__</code>)</td>
+</tr>
+<tr>
+<td>Examples</td>
+<td>list, string, dict, set, <code>range</code></td>
+<td>what <code>iter(my_list)</code> gives you, an open file</td>
+</tr>
+<tr>
+<td>Can you reuse it?</td>
+<td><strong>Yes</strong>, loop over it as often as you like</td>
+<td><strong>No</strong>, once it's used up, it's done</td>
+</tr>
+</tbody>
+</table></div>
+<p>Going back to the analogy: the <strong>book</strong> is the iterable. You can read it as many times as you like. The <strong>bookmark</strong> is the iterator. It only moves forward, and once it reaches the end, it stays at the end.</p>
+<p>Notice that an <strong>open file</strong> is in the iterator column. Loop over a file object once, and a second loop over the same file object finds nothing left, because the "bookmark" is already at the end of the file.</p>
+<p>That last row of the table is the one that causes bugs. You can loop over a list again and again:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">numbers</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">numbers</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">numbers</span><span class="p">))</span>         <span class="c1"># same answer, the list is unchanged</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>6
+6
+</code></pre></div>
+
+<p>An iterator can't do that. It has no way to go back to the start:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">it</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">numbers</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">it</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">it</span><span class="p">))</span>              <span class="c1"># already exhausted -- there is nothing left to add</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>6
+0
+</code></pre></div>
+
+<p>You got <strong>0, not 6</strong>. There was no error and no warning. The second <code>sum()</code> simply found an empty iterator and added up nothing.</p>
+<p><strong>Analogy:</strong> an iterator is like a <strong>one-time-use train ticket</strong>. Once it has been punched for a journey, showing it again won't get you anywhere. The ticket still exists, but it's used up.</p>
+<p>Remember this one. It's the most common bug with iterators and generators, and you'll see it again later in a more realistic form.</p>
+<h3 id="iter-on-a-list-vs-iter-on-an-iterator"><code>iter()</code> on a List vs <code>iter()</code> on an Iterator</h3>
+<p>One more difference worth seeing for yourself. Calling <code>iter()</code> on a <strong>list</strong> makes a <em>new</em> iterator every time (a fresh bookmark at page one). But calling <code>iter()</code> on an <strong>iterator</strong> just gives you the same object back:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">numbers</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">numbers</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">iter</span><span class="p">(</span><span class="n">numbers</span><span class="p">))</span>     <span class="c1"># two separate iterators over one list</span>
+
+<span class="n">it</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">numbers</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">it</span><span class="p">)</span> <span class="ow">is</span> <span class="n">it</span><span class="p">)</span>                     <span class="c1"># an iterator is its own iterator</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>False
+True
+</code></pre></div>
+
+<ul>
+<li>The first line is <code>False</code> because each <code>iter(numbers)</code> call creates a separate, brand-new iterator. (<code>is</code> checks whether two things are the very same object.)</li>
+<li>The second line is <code>True</code> because an iterator's <code>__iter__</code> simply returns itself.</li>
+</ul>
+<p>That second line is why you can hand an iterator straight to a <code>for</code> loop. The loop always calls <code>iter()</code> on whatever you give it, and an iterator basically answers "that's already me, go ahead".</p>
+<hr />
+<h2 id="part-2-writing-your-own-iterator"><span class="h-icon"><svg class="icon"><use href="#icon-gearclass"></use></svg></span>Part 2: Writing Your Own Iterator</h2>
+<p>To make your own class work in a <code>for</code> loop, you give it the two methods that a <code>for</code> loop calls behind the scenes:</p>
+<ul>
+<li><code>__iter__</code>, which returns the iterator, and</li>
+<li><code>__next__</code>, which gives back the next value, or raises <code>StopIteration</code> when there's nothing left.</li>
+</ul>
+<p>These are <strong>dunder methods</strong> (short for "double underscore"), from the same family as <code>__init__</code> and <code>__str__</code> that you met with classes.</p>
+<p>Here's a countdown, written the long way:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">class</span><span class="w"> </span><span class="nc">Countdown</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">=</span> <span class="n">start</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>                     <span class="c1"># this object is its own iterator</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">StopIteration</span>         <span class="c1"># tell the loop we are done</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">value</span>
+</code></pre></div>
+
+<p>Let's walk through it:</p>
+<ul>
+<li><code>__init__</code> stores the starting number in <code>self.current</code>. This is the iterator's "bookmark": it remembers where we are.</li>
+<li><code>__iter__</code> returns <code>self</code>, meaning "this object is its own iterator".</li>
+<li><code>__next__</code> is called once per loop step. If <code>current</code> has reached 0, it raises <code>StopIteration</code> to end the loop. Otherwise it saves the current value, moves the bookmark down by one, and returns the saved value.</li>
+</ul>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">Countdown</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">" "</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>5 4 3 2 1 
+</code></pre></div>
+
+<p>(<code>end=" "</code> tells <code>print()</code> to put a space after each number instead of starting a new line, so they all come out on one line.)</p>
+<p>It works, and it works anywhere a <code>for</code> loop works, including <code>list()</code>, <code>sum()</code> and <code>max()</code>, because they all use the same two methods behind the scenes:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">Countdown</span><span class="p">(</span><span class="mi">4</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">Countdown</span><span class="p">(</span><span class="mi">4</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">Countdown</span><span class="p">(</span><span class="mi">4</span><span class="p">)))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>[4, 3, 2, 1]
+10
+4
+</code></pre></div>
+
+<h3 id="a-more-realistic-iterator-results-split-into-pages">A More Realistic Iterator: Results Split into Pages</h3>
+<p>Here's something closer to real life: going through search results <strong>page by page</strong>, the way many websites and APIs make you do it. You get one page at a time, and you don't know in advance how many pages there are.</p>
+<p><strong>Analogy:</strong> think of Google search results. You see results 1 to 10 on page 1, then click "Next" to see page 2, and so on. You'd really like to just read through all results in one smooth list, without thinking about pages.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">class</span><span class="w"> </span><span class="nc">SearchResults</span><span class="p">:</span>
+    <span class="c1"># Walks every result across every page, fetching one page at a time.</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pages</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pages</span> <span class="o">=</span> <span class="n">pages</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">page_index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item_index</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">page_index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pages</span><span class="p">):</span>
+            <span class="n">page</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pages</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">page_index</span><span class="p">]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">item_index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">page</span><span class="p">):</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">page</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">item_index</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">item_index</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">return</span> <span class="n">item</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">page_index</span> <span class="o">+=</span> <span class="mi">1</span>        <span class="c1"># this page is done, move to the next</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item_index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">raise</span> <span class="ne">StopIteration</span>
+</code></pre></div>
+
+<p>This iterator has to remember <strong>two</strong> positions at once: which page it's on (<code>page_index</code>) and which item on that page it's on (<code>item_index</code>). In <code>__next__</code>:</p>
+<ul>
+<li>If there's still an item left on the current page, it returns that item and moves <code>item_index</code> forward.</li>
+<li>If the current page is finished, it moves to the next page and resets <code>item_index</code> to 0.</li>
+<li>If there are no pages left at all, it raises <code>StopIteration</code>.</li>
+</ul>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">pages</span> <span class="o">=</span> <span class="p">[[</span><span class="s2">"Dune"</span><span class="p">,</span> <span class="s2">"Arrival"</span><span class="p">],</span> <span class="p">[</span><span class="s2">"Sicario"</span><span class="p">],</span> <span class="p">[</span><span class="s2">"Blade Runner 2049"</span><span class="p">,</span> <span class="s2">"Prisoners"</span><span class="p">]]</span>
+
+<span class="k">for</span> <span class="n">title</span> <span class="ow">in</span> <span class="n">SearchResults</span><span class="p">(</span><span class="n">pages</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Dune
+Arrival
+Sicario
+Blade Runner 2049
+Prisoners
+</code></pre></div>
+
+<p>That's more than fifteen lines of bookkeeping (two index variables, a <code>while</code> loop and a hand-written <code>StopIteration</code>) just to say something simple: <em>give me each item from each page, one after another</em>.</p>
+<p>That's a lot of code for a simple idea, and it's exactly the problem generators solve.</p>
+<hr />
+<h2 id="part-3-generators-the-same-thing-with-much-less-code"><span class="h-icon"><svg class="icon"><use href="#icon-pause"></use></svg></span>Part 3: Generators, the Same Thing with Much Less Code</h2>
+<p>A <strong>generator function</strong> is a function that hands back a <strong>series of values, one at a time</strong>, instead of returning just one value. You write it like a normal function, with one change: you use <strong><code>yield</code></strong> instead of <code>return</code>.</p>
+<p>Here's the whole <code>SearchResults</code> class from above, rewritten as a generator function:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">search_results</span><span class="p">(</span><span class="n">pages</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">page</span> <span class="ow">in</span> <span class="n">pages</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">page</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">item</span>
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">for</span> <span class="n">title</span> <span class="ow">in</span> <span class="n">search_results</span><span class="p">(</span><span class="n">pages</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Dune
+Arrival
+Sicario
+Blade Runner 2049
+Prisoners
+</code></pre></div>
+
+<p>Four lines instead of more than fifteen. No index variables, no hand-written <code>StopIteration</code>, and the code now reads just like the sentence we used to describe it: <em>for each page, for each item in the page, hand over the item</em>.</p>
+<h3 id="yield-from-passing-along-everything"><code>yield from</code>: Passing Along Everything</h3>
+<p>That inner loop, <em>"yield every item from this thing"</em>, is so common that Python has a shortcut for it, <strong><code>yield from</code></strong>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">search_results</span><span class="p">(</span><span class="n">pages</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">page</span> <span class="ow">in</span> <span class="n">pages</span><span class="p">:</span>
+        <span class="k">yield from</span> <span class="n">page</span>         <span class="c1"># hand over every item in page, one at a time</span>
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">search_results</span><span class="p">(</span><span class="n">pages</span><span class="p">)))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>['Dune', 'Arrival', 'Sicario', 'Blade Runner 2049', 'Prisoners']
+</code></pre></div>
+
+<p><code>yield from page</code> does exactly what the inner <code>for</code> loop did. Use it whenever a generator just needs to pass along everything from something else.</p>
+<h3 id="what-do-you-get-when-you-call-a-generator-function">What Do You Get When You Call a Generator Function?</h3>
+<p>Notice that we never wrote <code>__iter__</code> or <code>__next__</code>. Python builds the iterator for you. When you call a function that contains <code>yield</code>, you don't get a normal result back. You get a <strong>generator object</strong>, and <strong>none of the function's code has run yet</strong> (you'll see that for yourself in a moment):</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">gen</span> <span class="o">=</span> <span class="n">search_results</span><span class="p">(</span><span class="n">pages</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">gen</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>&lt;class 'generator'&gt;
+</code></pre></div>
+
+<p>If you print the generator itself, you get something like <code>&lt;generator object search_results at 0x7f9c1a2b3c40&gt;</code>. That hex number is just where it happens to sit in memory, so it changes every time you run it. It tells you nothing about the values, because right now there aren't any values yet.</p>
+<p>From here on, "generator" means that generator object: the thing you get back when you call a generator function. A generator is a kind of <strong>iterator</strong>, so everything from Part 1 applies to it: <code>next()</code> works on it, <code>for</code> loops work on it, and it gets used up after one pass.</p>
+<h3 id="what-yield-does-pause-not-stop">What <code>yield</code> Does: Pause, Not Stop</h3>
+<p><code>return</code> ends a function for good. <strong><code>yield</code> only pauses it.</strong> It hands a value back and keeps all the local variables exactly as they were, so the function can carry on from exactly where it stopped.</p>
+<p><strong>Analogy:</strong> think of watching a show on Netflix. <code>return</code> is like the <strong>end credits</strong>: the show is over. <code>yield</code> is like pressing <strong>pause</strong>: the picture freezes on the exact second you stopped, and when you press play again, it continues from that same second, not from the beginning.</p>
+<p>The easiest way to see this is to put some <code>print</code> lines around the <code>yield</code>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">countdown</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"    [starting at </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">]"</span><span class="p">)</span>
+    <span class="k">while</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"    [about to yield </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">]"</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">n</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"    [resumed, now decrementing]"</span><span class="p">)</span>
+        <span class="n">n</span> <span class="o">-=</span> <span class="mi">1</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"    [function finished]"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">gen</span> <span class="o">=</span> <span class="n">countdown</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"generator created -- notice nothing above has run yet"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>generator created -- notice nothing above has run yet
+</code></pre></div>
+
+<p>The function hasn't started yet. Not even the first <code>print</code> ran. Now ask for one value:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="s2">"first value:"</span><span class="p">,</span> <span class="nb">next</span><span class="p">(</span><span class="n">gen</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>    [starting at 3]
+    [about to yield 3]
+first value: 3
+</code></pre></div>
+
+<p>It ran up to the first <code>yield</code> and <strong>stopped there</strong>. The function is paused in the middle of its loop, with <code>n</code> still equal to 3, waiting for you.</p>
+<p>Ask for another value and it carries on from the line <strong>right after</strong> the <code>yield</code>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="s2">"second value:"</span><span class="p">,</span> <span class="nb">next</span><span class="p">(</span><span class="n">gen</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>    [resumed, now decrementing]
+    [about to yield 2]
+second value: 2
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="s2">"third value:"</span><span class="p">,</span> <span class="nb">next</span><span class="p">(</span><span class="n">gen</span><span class="p">))</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="nb">next</span><span class="p">(</span><span class="n">gen</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"StopIteration -- the function ran off the end"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>    [resumed, now decrementing]
+    [about to yield 1]
+third value: 1
+    [resumed, now decrementing]
+    [function finished]
+StopIteration -- the function ran off the end
+</code></pre></div>
+
+<p>Here's the whole story as a timeline:</p>
+<div class="diagram-card"><pre><code>   your code                   inside countdown(3)
+   ─────────                   ───────────────────
+   gen = countdown(3)          (nothing runs yet)
+
+   next(gen) ───────────────►  [starting at 3]
+                               [about to yield 3]
+             ◄──── 3 ───────── yield 3        ⏸ paused, n = 3
+
+   next(gen) ───────────────►  [resumed, now decrementing]   ▶ continues
+                               [about to yield 2]
+             ◄──── 2 ───────── yield 2        ⏸ paused, n = 2
+
+   next(gen) ───────────────►  [resumed ...]  [about to yield 1]
+             ◄──── 1 ───────── yield 1        ⏸ paused, n = 1
+
+   next(gen) ───────────────►  [resumed ...]  [function finished]
+             ◄── StopIteration (the function ran off the end)
+</code></pre></div>
+
+<p>So a generator is a function that can be <strong>paused and resumed</strong>, and when the function finally ends, Python raises <code>StopIteration</code> for you. That's really all there is to it.</p>
+<h3 id="what-about-return-in-a-generator">What About <code>return</code> in a Generator?</h3>
+<p>Earlier we said a generator uses <code>yield</code> <em>instead of</em> <code>return</code>. That's not quite the full story. A generator can still contain a <code>return</code>, and there it simply means <strong>stop now</strong>. Unlike in a normal function, it doesn't hand a value to your <code>for</code> loop.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">countdown_to_zero</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>              <span class="c1"># ends the generator here; produces no value</span>
+        <span class="k">yield</span> <span class="n">n</span>
+        <span class="n">n</span> <span class="o">-=</span> <span class="mi">1</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">countdown_to_zero</span><span class="p">(</span><span class="mi">3</span><span class="p">)))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>[3, 2, 1]
+</code></pre></div>
+
+<p>When <code>n</code> reaches 0, <code>return</code> ends the generator, so the <code>for</code> loop inside <code>list()</code> sees <code>StopIteration</code> and finishes. So the rule is: <strong><code>yield</code> gives a value, and <code>return</code> ends the generator.</strong> You'll see <code>return</code> used as an early exit like this in the API example at the end of this guide.</p>
+<h3 id="getting-a-value-without-the-exception">Getting a Value Without the Exception</h3>
+<p>Wrapping every <code>next()</code> in <code>try</code>/<code>except</code> gets messy when all you want is "the next value, or something else if there isn't one". <code>next()</code> takes an optional <strong>second argument</strong> for exactly this: a default value to return when the iterator is empty.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">gen</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">gen</span><span class="p">,</span> <span class="s2">"nothing left"</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">gen</span><span class="p">,</span> <span class="s2">"nothing left"</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">gen</span><span class="p">,</span> <span class="s2">"nothing left"</span><span class="p">))</span>    <span class="c1"># exhausted -- returns the default instead of raising</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>10
+20
+nothing left
+</code></pre></div>
+
+<h3 id="generators-are-lazy">Generators Are Lazy</h3>
+<p>A generator only runs its code <strong>when you ask for a value</strong>. Programmers call this being <strong>lazy</strong>, and here it's a good thing: it means no work gets done until it has to be.</p>
+<p><strong>Analogy:</strong> compare a <strong>buffet</strong> with a <strong>cook-to-order kitchen</strong>. A buffet (a list) cooks every dish in advance and lays it all out, whether anyone eats it or not. A cook-to-order kitchen (a generator) cooks each dish only when a customer orders it. Nothing is wasted, and the kitchen never runs out of table space.</p>
+<p>Because of this, a generator can describe a sequence that <strong>never ends</strong>, which you simply can't do with a list (a list that never ends would need infinite memory):</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">ticket_numbers</span><span class="p">(</span><span class="n">start</span><span class="p">):</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">start</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>                 <span class="c1"># no exit condition at all</span>
+        <span class="k">yield</span> <span class="n">n</span>
+        <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+</code></pre></div>
+
+<p>Think of the token machine at a bank or a hospital. It hands out ticket 1001, then 1002, then 1003, for as long as people keep arriving. It doesn't print every ticket for the whole year in the morning. It just prints the next one when someone presses the button.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">tickets</span> <span class="o">=</span> <span class="n">ticket_numbers</span><span class="p">(</span><span class="mi">1001</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tickets</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">" "</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">t</span> <span class="o">&gt;=</span> <span class="mi">1005</span><span class="p">:</span>
+        <span class="k">break</span>                   <span class="c1"># we decide when to stop, not the generator</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>1001 1002 1003 1004 1005 
+</code></pre></div>
+
+<p>That's a loop with no end, and it still doesn't freeze, because nothing gets worked out until you ask for it. <strong>We</strong> decide when to stop, using <code>break</code>. The <code>tickets</code> generator is still sitting there paused, ready to carry on from 1006 if we ask for more.</p>
+<p>Here's the practical difference between a list and a generator:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>List</th>
+<th>Generator</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>When values are worked out</td>
+<td>All at once, up front</td>
+<td>One at a time, when asked</td>
+</tr>
+<tr>
+<td>Memory used</td>
+<td>Grows with the number of items</td>
+<td>Stays about the same</td>
+</tr>
+<tr>
+<td>Can go on forever</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Can be reused</td>
+<td>Yes</td>
+<td>No, one pass only</td>
+</tr>
+<tr>
+<td>Supports <code>len()</code> and indexing</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="part-4-generator-expressions"><span class="h-icon"><svg class="icon"><use href="#icon-brackets"></use></svg></span>Part 4: Generator Expressions</h2>
+<p>You already know <strong>list comprehensions</strong>, the one-line way to build a list. There's a generator version too, and the only difference is the brackets: <strong>square brackets</strong> make a list, <strong>round brackets</strong> make a generator.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">squares_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">*</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>      <span class="c1"># square brackets -&gt; a list</span>
+<span class="n">squares_gen</span>  <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>      <span class="c1"># parentheses     -&gt; a generator</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">squares_list</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">squares_gen</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>[0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+&lt;class 'generator'&gt;
+</code></pre></div>
+
+<p>The list worked out all ten values straight away and stored them. The generator hasn't worked out <strong>any</strong> of them yet.</p>
+<p>With ten items, that doesn't matter. With millions of items, it really starts to:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="n">big_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">*</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1_000_000</span><span class="p">)]</span>
+<span class="n">big_gen</span>  <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1_000_000</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"list:     "</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">getsizeof</span><span class="p">(</span><span class="n">big_list</span><span class="p">)</span><span class="si">:</span><span class="s2">&gt;9,</span><span class="si">}</span><span class="s2"> bytes"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"generator:"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">getsizeof</span><span class="p">(</span><span class="n">big_gen</span><span class="p">)</span><span class="si">:</span><span class="s2">&gt;9,</span><span class="si">}</span><span class="s2"> bytes"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>list:      8,448,728 bytes
+generator:       200 bytes
+</code></pre></div>
+
+<p>The list holds a million numbers. The generator only holds the <strong>instructions</strong> for making them, so its size doesn't depend on how many there are. It would be about the same size for a billion.</p>
+<div class="diagram-card"><pre><code>   big_list  ███████████████████████████████████████████  8,448,728 bytes
+   big_gen   ▏                                                   200 bytes
+</code></pre></div>
+
+<p><strong>Analogy:</strong> filling a <strong>swimming pool</strong> versus having a <strong>tap</strong>. The list fills the whole pool before you can use any water. The generator is a tap: water comes out only when you turn it on, and the tap itself takes up almost no space.</p>
+<p>Two small notes: the exact byte counts depend on your Python version and your computer. And <code>sys.getsizeof</code> on a list only measures the list itself (the "shelf" of slots), not the numbers stored inside it. So the real difference is even bigger than this. The file example later in this guide measures both.</p>
+<p>Both of them still add up to the same total:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">big_list</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">big_gen</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>333332833333500000
+333332833333500000
+</code></pre></div>
+
+<p>Same answer. And you don't even need a variable for the generator. When a generator expression is the <strong>only</strong> thing you pass to a function, you can leave out its own round brackets:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1_000_000</span><span class="p">)))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>333332833333500000
+</code></pre></div>
+
+<p>That's why you'll see <code>sum(...)</code>, <code>max(...)</code>, <code>any(...)</code> and <code>all(...)</code> written this way all the time.</p>
+<p><strong>A simple way to choose:</strong></p>
+<ul>
+<li>If you need the values <strong>more than once</strong>, or need <code>len()</code> or indexing, use a <strong>list</strong>.</li>
+<li>If you're passing the values straight into <code>sum()</code>, <code>max()</code>, a <code>for</code> loop or another generator, use a <strong>generator</strong>.</li>
+<li>If the data is big enough that you'd notice the memory, use a <strong>generator</strong>.</li>
+</ul>
+<h3 id="the-comprehension-family">The Comprehension Family</h3>
+<p>While we're here: comprehensions come in four kinds, not just one. They're all written the same way; only the brackets change.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">titles</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"Stranger Things"</span><span class="p">,</span> <span class="s2">"The Crown"</span><span class="p">,</span> <span class="s2">"Wednesday"</span><span class="p">,</span> <span class="s2">"Dark"</span><span class="p">,</span> <span class="s2">"The Crown"</span><span class="p">]</span>
+
+<span class="n">as_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">titles</span><span class="p">]</span>                 <span class="c1"># [ ] -&gt; list, keeps duplicates</span>
+<span class="n">as_set</span>  <span class="o">=</span> <span class="p">{</span><span class="n">t</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">titles</span><span class="p">}</span>                 <span class="c1"># { } -&gt; set, drops duplicates</span>
+<span class="n">as_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">t</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">titles</span><span class="p">}</span>                 <span class="c1"># {k: v} -&gt; dict</span>
+<span class="n">as_gen</span>  <span class="o">=</span> <span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">titles</span><span class="p">)</span>                 <span class="c1"># ( ) -&gt; generator</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"list:"</span><span class="p">,</span> <span class="n">as_list</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"set: "</span><span class="p">,</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">as_set</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"dict:"</span><span class="p">,</span> <span class="n">as_dict</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"gen: "</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">as_gen</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>list: ['stranger things', 'the crown', 'wednesday', 'dark', 'the crown']
+set:  ['dark', 'stranger things', 'the crown', 'wednesday']
+dict: {'Stranger Things': 15, 'The Crown': 9, 'Wednesday': 9, 'Dark': 4}
+gen:  generator
+</code></pre></div>
+
+<p>Look at what each one did with the duplicate <code>"The Crown"</code>:</p>
+<ul>
+<li>The <strong>list</strong> kept both copies.</li>
+<li>The <strong>set</strong> dropped the duplicate, because a set only keeps unique values.</li>
+<li>The <strong>dict</strong> used each title as a key. A key can only appear once, so the second <code>"The Crown"</code> simply overwrote the first one (with the same value).</li>
+<li>The <strong>generator</strong> hasn't produced anything yet.</li>
+</ul>
+<p>After lists, the <strong>dict</strong> version is the one you'll use most. It looks like <code>{key: value for ...}</code>, and the <strong>colon</strong> inside the curly braces is what makes it a dict instead of a set:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">runtimes</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"Dune"</span><span class="p">:</span> <span class="mi">155</span><span class="p">,</span> <span class="s2">"Arrival"</span><span class="p">:</span> <span class="mi">116</span><span class="p">,</span> <span class="s2">"Sicario"</span><span class="p">:</span> <span class="mi">121</span><span class="p">,</span> <span class="s2">"Prisoners"</span><span class="p">:</span> <span class="mi">153</span><span class="p">}</span>
+
+<span class="c1"># Convert to hours, keeping only the long ones</span>
+<span class="n">long_films</span> <span class="o">=</span> <span class="p">{</span><span class="n">title</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">mins</span> <span class="o">/</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">title</span><span class="p">,</span> <span class="n">mins</span> <span class="ow">in</span> <span class="n">runtimes</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">mins</span> <span class="o">&gt;</span> <span class="mi">120</span><span class="p">}</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">long_films</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>{'Dune': 2.58, 'Sicario': 2.02, 'Prisoners': 2.55}
+</code></pre></div>
+
+<p>Reading it left to right: for each <code>title, mins</code> pair in the dictionary, <strong>if</strong> <code>mins</code> is more than 120, put <code>title</code> as the key and <code>mins / 60</code> (rounded to 2 decimals) as the value. <code>Arrival</code> (116 minutes) didn't pass the <code>if</code>, so it was left out.</p>
+<p>And the <strong>set</strong> version is an easy way to collect the unique values in one line:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">watch_log</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">"user"</span><span class="p">:</span> <span class="s2">"amit"</span><span class="p">,</span> <span class="s2">"genre"</span><span class="p">:</span> <span class="s2">"Sci-Fi"</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">"user"</span><span class="p">:</span> <span class="s2">"sara"</span><span class="p">,</span> <span class="s2">"genre"</span><span class="p">:</span> <span class="s2">"Drama"</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">"user"</span><span class="p">:</span> <span class="s2">"amit"</span><span class="p">,</span> <span class="s2">"genre"</span><span class="p">:</span> <span class="s2">"Sci-Fi"</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">"user"</span><span class="p">:</span> <span class="s2">"raj"</span><span class="p">,</span>  <span class="s2">"genre"</span><span class="p">:</span> <span class="s2">"Comedy"</span><span class="p">},</span>
+<span class="p">]</span>
+
+<span class="n">genres</span> <span class="o">=</span> <span class="p">{</span><span class="n">entry</span><span class="p">[</span><span class="s2">"genre"</span><span class="p">]</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">watch_log</span><span class="p">}</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">genres</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>['Comedy', 'Drama', 'Sci-Fi']
+</code></pre></div>
+
+<p>In short:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Brackets</th>
+<th>Produces</th>
+<th>Use when</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>[ ... ]</code></td>
+<td>list</td>
+<td>You need the values more than once</td>
+</tr>
+<tr>
+<td><code>{ ... }</code></td>
+<td>set</td>
+<td>You want unique values</td>
+</tr>
+<tr>
+<td><code>{k: v ...}</code></td>
+<td>dict</td>
+<td>You are building a lookup</td>
+</tr>
+<tr>
+<td><code>( ... )</code></td>
+<td>generator</td>
+<td>You will consume the values once</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="part-5-reading-big-files-a-little-at-a-time"><span class="h-icon"><svg class="icon"><use href="#icon-file"></use></svg></span>Part 5: Reading Big Files a Little at a Time</h2>
+<p>Now it gets practical. First we need a file big enough to show the difference, so this cell writes <strong>200,000 rows</strong> of made-up music streaming history, like a tiny version of the listening logs a music app keeps.</p>
+<p>(The <code>_</code> in <code>for _ in range(200_000)</code> is a normal variable name. Programmers use <code>_</code> when they need a loop variable but never use its value. It's a way of saying "I don't care about this one".)</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="n">demo</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"generators_demo"</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">demo</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">demo</span><span class="p">)</span>
+<span class="n">demo</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
+
+<span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+<span class="n">artists</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"Arijit Singh"</span><span class="p">,</span> <span class="s2">"Taylor Swift"</span><span class="p">,</span> <span class="s2">"The Weeknd"</span><span class="p">,</span> <span class="s2">"A.R. Rahman"</span><span class="p">,</span> <span class="s2">"Drake"</span><span class="p">]</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">demo</span> <span class="o">/</span> <span class="s2">"play_history.csv"</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">log</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"artist,ms_played</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">200_000</span><span class="p">):</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">artists</span><span class="p">)</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">5_000</span><span class="p">,</span><span class="w"> </span><span class="mi">240_000</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">log</span><span class="si">}</span><span class="s2"> created: </span><span class="si">{</span><span class="n">log</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">1_000_000</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MB, 200,000 rows"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>generators_demo/play_history.csv created: 3.5 MB, 200,000 rows
+</code></pre></div>
+
+<h3 id="the-way-that-uses-the-most-memory">The Way That Uses the Most Memory</h3>
+<p>The first approach is to read <strong>everything</strong> into memory first, and then work on it:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">log</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="nb">next</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>                             <span class="c1"># skip the header</span>
+    <span class="n">all_lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>           <span class="c1"># every remaining line, in memory, right now</span>
+
+<span class="n">total_bytes</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">getsizeof</span><span class="p">(</span><span class="n">all_lines</span><span class="p">)</span> <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">getsizeof</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">all_lines</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">all_lines</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> lines held in memory: ~</span><span class="si">{</span><span class="n">total_bytes</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">1_000_000</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> MB"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>200,000 lines held in memory: ~13.3 MB
+</code></pre></div>
+
+<p>That's almost <strong>four times</strong> the size of the 3.5 MB file. Why? Each line becomes its own Python string object, and every string carries some extra bookkeeping on top of its characters (its type, its length, and so on). So holding everything in memory costs more than the file itself. A 10 GB file read this way could need several times that much memory, which most laptops simply don't have.</p>
+<h3 id="the-lazy-way">The Lazy Way</h3>
+<p>A file object is <strong>already an iterator</strong> over its lines. So if you loop over it directly, Python reads <strong>one line at a time</strong> and never holds the whole file:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">log</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="nb">next</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>                             <span class="c1"># skip the header (a file supports next() because it is an iterator)</span>
+    <span class="n">line_count</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">f</span><span class="p">)</span>      <span class="c1"># count without storing anything</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"counted </span><span class="si">{</span><span class="n">line_count</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> lines, holding one at a time"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>counted 200,000 lines, holding one at a time
+</code></pre></div>
+
+<p><code>sum(1 for _ in f)</code> adds up a <code>1</code> for every line, without keeping any of the lines. Same count, and the memory you use doesn't depend on how big the file is. A 50 GB file would work exactly the same way; it would just take longer.</p>
+<p><strong>Analogy:</strong> reading the whole file at once is like photocopying an entire phone book before you look up a single name. Reading it line by line is like running your finger down the pages: you only ever look at one line at a time.</p>
+<h3 id="building-a-pipeline">Building a Pipeline</h3>
+<p>Generators get really useful when you <strong>chain them together</strong>. Each step takes an iterator in, and yields a new one out, so the full data never has to sit in memory at once. Rows flow through the steps one at a time.</p>
+<p><strong>Analogy:</strong> think of a factory <strong>assembly line</strong>. One worker unpacks a part, passes it to the next worker who cleans it, who passes it to the next worker who checks its quality. Each part moves down the line on its own. Nobody waits for all 200,000 parts to be unpacked before cleaning starts.</p>
+<div class="diagram-card"><pre><code>   play_history.csv
+        │  one line at a time
+        ▼
+   ┌─────────────┐    "Drake,183000"     ┌─────────────┐   ("Drake", 183000)   ┌──────────────────┐
+   │ read_rows   │ ────────────────────► │ parse       │ ───────────────────► │ long_plays       │ ──► only plays
+   │ skip header │                       │ split + int │                      │ keep ms &gt;= 180000│     of 3+ minutes
+   └─────────────┘                       └─────────────┘                      └──────────────────┘
+         only ONE row is inside the pipeline at any moment
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">read_rows</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="c1"># Stage 1: yield each line, skipping the header.</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="nb">next</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">parse</span><span class="p">(</span><span class="n">rows</span><span class="p">):</span>
+    <span class="c1"># Stage 2: turn each line into a (artist, ms) tuple.</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+        <span class="n">artist</span><span class="p">,</span> <span class="n">ms</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">","</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">artist</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">ms</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">long_plays</span><span class="p">(</span><span class="n">records</span><span class="p">,</span> <span class="n">minimum_ms</span><span class="p">):</span>
+    <span class="c1"># Stage 3: keep only the ones that played for a while.</span>
+    <span class="k">for</span> <span class="n">artist</span><span class="p">,</span> <span class="n">ms</span> <span class="ow">in</span> <span class="n">records</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ms</span> <span class="o">&gt;=</span> <span class="n">minimum_ms</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">artist</span><span class="p">,</span> <span class="n">ms</span>
+</code></pre></div>
+
+<p>Each function is small and does one job:</p>
+<ul>
+<li><code>read_rows</code> opens the file, skips the header line, and yields each line with the newline character removed.</li>
+<li><code>parse</code> splits each line at the comma and turns the milliseconds into an <code>int</code>.</li>
+<li><code>long_plays</code> only lets through plays of at least <code>minimum_ms</code> milliseconds.</li>
+</ul>
+<p>Connecting them reads like a description of the task, and still <strong>nothing has been worked out</strong>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">rows</span> <span class="o">=</span> <span class="n">read_rows</span><span class="p">(</span><span class="n">log</span><span class="p">)</span>
+<span class="n">records</span> <span class="o">=</span> <span class="n">parse</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+<span class="n">serious_listens</span> <span class="o">=</span> <span class="n">long_plays</span><span class="p">(</span><span class="n">records</span><span class="p">,</span> <span class="mi">180_000</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">serious_listens</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>   <span class="c1"># a generator -- the file has not been read yet</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>generator
+</code></pre></div>
+
+<p>At this point, the file hasn't even been opened. We've only connected the pipes; no water is flowing yet. The work only happens when something <strong>asks</strong> for the values:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
+
+<span class="n">totals</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">artist</span><span class="p">,</span> <span class="n">ms</span> <span class="ow">in</span> <span class="n">serious_listens</span><span class="p">:</span>
+    <span class="n">totals</span><span class="p">[</span><span class="n">artist</span><span class="p">]</span> <span class="o">+=</span> <span class="n">ms</span>
+
+<span class="k">for</span> <span class="n">artist</span><span class="p">,</span> <span class="n">ms</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">totals</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">pair</span><span class="p">:</span> <span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">artist</span><span class="si">:</span><span class="s2">&lt;15</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">ms</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">3_600_000</span><span class="si">:</span><span class="s2">&gt;6.1f</span><span class="si">}</span><span class="s2"> hours"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Arijit Singh     601.8 hours
+Taylor Swift     598.2 hours
+A.R. Rahman      596.8 hours
+The Weeknd       593.9 hours
+Drake            591.0 hours
+</code></pre></div>
+
+<p>Here's what happens in that loop:</p>
+<ul>
+<li><code>defaultdict(int)</code> is a dictionary that starts every new key at <code>0</code>, so <code>totals[artist] += ms</code> works even for an artist we haven't seen yet.</li>
+<li><code>sorted(..., key=lambda pair: pair[1], reverse=True)</code> sorts the artists by their total time, biggest first.</li>
+<li><code>ms / 3_600_000</code> turns milliseconds into hours (1 hour = 3,600,000 ms).</li>
+</ul>
+<p>That's two hundred thousand rows added up, with <strong>only one row in memory at a time</strong>. If the file had 200 million rows, the pipeline code wouldn't need to change at all. It would just take longer.</p>
+<p>Data-cleaning pipelines in the real world look exactly like this, which is why generators show up everywhere in data engineering.</p>
+<hr />
+<h2 id="part-6-when-a-generator-is-the-wrong-choice"><span class="h-icon"><svg class="icon"><use href="#icon-warn"></use></svg></span>Part 6: When a Generator Is the Wrong Choice</h2>
+<p>Generators aren't free. You give up three things in exchange for saving memory.</p>
+<h3 id="1-you-can-only-go-through-it-once">1. You Can Only Go Through It Once</h3>
+<p>This is the bug that catches everyone:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">scores</span> <span class="o">=</span> <span class="p">(</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="p">[</span><span class="mf">4.5</span><span class="p">,</span> <span class="mf">3.8</span><span class="p">,</span> <span class="mf">4.9</span><span class="p">,</span> <span class="mf">4.1</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"average:"</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"highest:"</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">"nothing left!"</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>average: 4.325
+highest: nothing left!
+</code></pre></div>
+
+<p><code>sum()</code> used up the whole generator. By the time <code>max()</code> runs, there's nothing left to look at. Without that <code>default=</code>, it would have raised a <code>ValueError</code> instead. (<code>default=</code> tells <code>max()</code> what to return if there's nothing to compare.)</p>
+<p>Notice something else too: the code divided by <code>4</code> by hand, because a generator can't tell you how many items it has. That's a hint that a list would have been a better fit here.</p>
+<p>If you need the values twice, <strong>turn them into a list first</strong>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">scores</span> <span class="o">=</span> <span class="p">(</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="p">[</span><span class="mf">4.5</span><span class="p">,</span> <span class="mf">3.8</span><span class="p">,</span> <span class="mf">4.9</span><span class="p">,</span> <span class="mf">4.1</span><span class="p">])</span>
+<span class="n">scores</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span>                  <span class="c1"># store the values once, then reuse them as often as you like</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"average:"</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">scores</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"highest:"</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">scores</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>average: 4.325
+highest: 4.9
+</code></pre></div>
+
+<h3 id="2-no-len-and-no-indexing">2. No <code>len()</code> and No Indexing</h3>
+<p>A generator doesn't know how many values it will make (it hasn't made them yet!), and it can't jump straight to the fifth one without making the first four:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">gen</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="nb">len</span><span class="p">(</span><span class="n">gen</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"len(gen) -&gt;"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">gen</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+<span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"gen[3]   -&gt;"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>len(gen) -&gt; object of type 'generator' has no len()
+gen[3]   -&gt; 'generator' object is not subscriptable
+</code></pre></div>
+
+<p><strong>Analogy:</strong> asking a generator for its length is like asking a storyteller "how many sentences are in the story you haven't told yet?" They can't know until they tell it.</p>
+<h3 id="3-debugging-is-harder">3. Debugging Is Harder</h3>
+<p>Printing a generator shows <code>&lt;generator object ...&gt;</code>, not what's inside it. And if you call <code>list()</code> on it to take a peek, you've just used it up, so the rest of your code will find it empty. Looking inside it changes it.</p>
+<h3 id="the-middle-ground-a-reusable-iterable">The Middle Ground: A Reusable Iterable</h3>
+<p>There's also a middle ground, for when you need to loop <strong>more than once</strong> <em>and</em> the data is too big to keep in a list. Write a small <strong>iterable</strong> class whose <code>__iter__</code> makes a <strong>new generator every time</strong> it's called:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">class</span><span class="w"> </span><span class="nc">PlayHistory</span><span class="p">:</span>
+    <span class="c1"># An iterable, not an iterator: __iter__ hands back a brand new generator</span>
+    <span class="c1"># on every call, so this object can be looped over as often as you like.</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="nb">next</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>                             <span class="c1"># skip the header</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">artist</span><span class="p">,</span> <span class="n">ms</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">","</span><span class="p">)</span>
+                <span class="k">yield</span> <span class="n">artist</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">ms</span><span class="p">)</span>
+</code></pre></div>
+
+<p>The trick is that <code>__iter__</code> here contains <code>yield</code>, so it is itself a generator function. Every time a <code>for</code> loop (or <code>sum()</code>, or <code>max()</code>) calls <code>iter()</code> on the object, it gets a <strong>brand-new generator</strong> that opens the file again from the top.</p>
+<p><strong>Analogy:</strong> a generator is like a <strong>newspaper</strong>: once you've read it and thrown it away, it's gone. <code>PlayHistory</code> is like a <strong>newspaper subscription</strong>: every time you ask, a fresh copy arrives.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">history</span> <span class="o">=</span> <span class="n">PlayHistory</span><span class="p">(</span><span class="n">log</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"rows:         </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">_</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">history</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>            <span class="c1"># one full pass</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"longest play: </span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">ms</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">_</span><span class="p">,</span><span class="w"> </span><span class="n">ms</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">history</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> ms"</span><span class="p">)</span>    <span class="c1"># another full pass, no problem</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>rows:         200,000
+longest play: 239,999 ms
+</code></pre></div>
+
+<p>Two full passes over the file, still only one row in memory at a time, and no "used up" bug, because each loop gets its own fresh generator. Libraries use this same trick to give you big datasets that you can loop over again and again.</p>
+<p><strong>So, use a list when</strong> you need the values more than once, need to count them, need to index or slice them, or the data is small enough that none of this matters.</p>
+<p><strong>Use a generator when</strong> the data is big, the source is slow, the sequence never ends, or you're building a pipeline that passes values straight through.</p>
+<h3 id="where-youll-see-this">Where You'll See This</h3>
+<p>This isn't a rare feature you'll use once in a while. Values made on demand are all over the tools you're about to learn:</p>
+<ul>
+<li><strong>File objects.</strong> <code>for line in f</code> uses exactly the iterator steps we just covered.</li>
+<li><strong><code>csv.reader</code></strong> is an iterator too. It hands you rows one at a time instead of building a list.</li>
+<li><strong><code>range</code>, <code>enumerate</code>, <code>zip</code>, <code>map</code> and <code>filter</code></strong> are all lazy. They make values when you ask for them.</li>
+<li><strong>pandas:</strong> <code>read_csv(..., chunksize=...)</code> gives you back an iterator of chunks (small DataFrames), so you can work through a file that's bigger than your memory.</li>
+<li><strong>PyTorch and TensorFlow</strong> give you training data as iterables that hand over one batch at a time. Like <code>PlayHistory</code>, you can loop over them again for every round of training.</li>
+</ul>
+<p>Once you know this pattern, you'll spot it everywhere. When a library gives you something that prints as an object instead of your data, it's almost always an iterator or an iterable waiting for you to loop over it.</p>
+<hr />
+<h2 id="real-world-example-going-through-an-api-page-by-page"><span class="h-icon"><svg class="icon"><use href="#icon-api"></use></svg></span>Real-World Example: Going Through an API Page by Page</h2>
+<p>This is the example that makes generators click for a lot of people.</p>
+<p>An <strong>API</strong> is a way for your program to ask another service (like a social network or a weather service) for data over the internet. Most APIs don't send you everything at once. They send results <strong>one page at a time</strong>: page 1 has the first few users, page 2 has the next few, and so on, until a page comes back empty.</p>
+<p>You'd like to just write <code>for user in all_users()</code> and forget that pages exist. A generator hides the paging completely:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">fetch_page</span><span class="p">(</span><span class="n">page_number</span><span class="p">):</span>
+    <span class="c1"># Stands in for a real network call -- chapter 17 replaces this with requests.</span>
+    <span class="n">fake_data</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="mi">1</span><span class="p">:</span> <span class="p">[</span><span class="s2">"amit"</span><span class="p">,</span> <span class="s2">"sara"</span><span class="p">,</span> <span class="s2">"raj"</span><span class="p">],</span>
+        <span class="mi">2</span><span class="p">:</span> <span class="p">[</span><span class="s2">"neha"</span><span class="p">,</span> <span class="s2">"vikram"</span><span class="p">],</span>
+        <span class="mi">3</span><span class="p">:</span> <span class="p">[],</span>                          <span class="c1"># an empty page means we have reached the end</span>
+    <span class="p">}</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"    [fetching page </span><span class="si">{</span><span class="n">page_number</span><span class="si">}</span><span class="s2">]"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fake_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">page_number</span><span class="p">,</span> <span class="p">[])</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">all_users</span><span class="p">():</span>
+    <span class="n">page</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">users</span> <span class="o">=</span> <span class="n">fetch_page</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">users</span><span class="p">:</span>                   <span class="c1"># no more results</span>
+            <span class="k">return</span>                      <span class="c1"># ends the generator</span>
+        <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">users</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">user</span>
+        <span class="n">page</span> <span class="o">+=</span> <span class="mi">1</span>
+</code></pre></div>
+
+<p>Let's read <code>all_users()</code> carefully:</p>
+<ul>
+<li>It starts at <code>page = 1</code>.</li>
+<li><code>while True</code> keeps fetching pages until something stops it.</li>
+<li>If a page comes back <strong>empty</strong>, <code>return</code> ends the generator (remember: in a generator, <code>return</code> means "stop now").</li>
+<li>Otherwise, it <code>yield</code>s each user on that page, one at a time, and then moves on to the next page.</li>
+</ul>
+<p><code>fetch_page</code> is a stand-in for a real network call. In real code, it would use a library like <code>requests</code> to download each page from the internet.</p>
+<p>The code that <strong>uses</strong> the generator just sees one long run of users, and has no idea there are pages:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">all_users</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>    [fetching page 1]
+amit
+sara
+raj
+    [fetching page 2]
+neha
+vikram
+    [fetching page 3]
+</code></pre></div>
+
+<p>Look at the <strong>order</strong> of that output. The "fetching" messages are <strong>mixed in</strong> with the results: page 2 isn't requested until every user from page 1 has been handed over. The generator only fetches the next page when the loop actually needs more users.</p>
+<p><strong>Analogy:</strong> a good waiter doesn't bring all ten courses to your table at once. They bring the next course only when you've finished the current one. If you say "I'm full" after the second course, the kitchen never cooks the rest.</p>
+<p>And that's exactly what happens if the loop stops early. The remaining pages are <strong>never fetched at all</strong>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">all_users</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">user</span> <span class="o">==</span> <span class="s2">"sara"</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"found who we were looking for, stopping"</span><span class="p">)</span>
+        <span class="k">break</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>    [fetching page 1]
+amit
+sara
+found who we were looking for, stopping
+</code></pre></div>
+
+<p>Only <strong>one</strong> page fetched instead of three. With a real API, that's a network request you didn't have to make (and real APIs often limit how many requests you can make, or charge for them). On a big dataset, it's the difference between a script that starts working straight away and one that sits there downloading for ten minutes first.</p>
+<hr />
+<h2 id="quick-reference-summary"><span class="h-icon"><svg class="icon"><use href="#icon-table"></use></svg></span>Quick Reference Summary</h2>
+<p><strong>The two steps behind every loop</strong></p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">iter</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>      <span class="c1"># get an iterator from an iterable</span>
+<span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>     <span class="c1"># get the next value; raises StopIteration when empty</span>
+</code></pre></div>
+
+<p>A <code>for</code> loop calls <code>iter()</code> once, then calls <code>next()</code> again and again, and catches <code>StopIteration</code> for you.</p>
+<p><strong>Writing an iterator the long way</strong> (a sketch: <code>done</code> and <code>value</code> stand for your own logic)</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">class</span><span class="w"> </span><span class="nc">MyIterator</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">done</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">StopIteration</span>
+        <span class="k">return</span> <span class="n">value</span>
+</code></pre></div>
+
+<p><strong>Writing the same thing as a generator</strong></p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">my_generator</span><span class="p">():</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">done</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">value</span>          <span class="c1"># pauses here, resumes on the next request</span>
+</code></pre></div>
+
+<p><strong>Key words</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Iterable</td>
+<td>Something you can loop over (a list, a string, a file, a <code>range</code>)</td>
+</tr>
+<tr>
+<td>Iterator</td>
+<td>The object that walks through it, one <code>next()</code> at a time</td>
+</tr>
+<tr>
+<td><code>StopIteration</code></td>
+<td>The signal an iterator raises when it has nothing left</td>
+</tr>
+<tr>
+<td>Generator function</td>
+<td>A function that uses <code>yield</code></td>
+</tr>
+<tr>
+<td>Generator</td>
+<td>The object you get when you call a generator function</td>
+</tr>
+<tr>
+<td><code>yield</code></td>
+<td>Hand back a value and pause</td>
+</tr>
+<tr>
+<td><code>return</code> (in a generator)</td>
+<td>Stop the generator</td>
+</tr>
+<tr>
+<td>Lazy</td>
+<td>Work out values only when they are asked for</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Comprehensions</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>[x for x in xs]</code></td>
+<td>list</td>
+</tr>
+<tr>
+<td><code>{x for x in xs}</code></td>
+<td>set</td>
+</tr>
+<tr>
+<td><code>{k: v for k, v in xs}</code></td>
+<td>dict</td>
+</tr>
+<tr>
+<td><code>(x for x in xs)</code></td>
+<td>generator</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Choosing</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Use a list</th>
+<th>Use a generator</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Values needed more than once</td>
+<td>One pass through the data</td>
+</tr>
+<tr>
+<td><code>len()</code>, indexing or slicing needed</td>
+<td>Data too large for memory</td>
+</tr>
+<tr>
+<td>Small collections</td>
+<td>Infinite or unknown-length sequences</td>
+</tr>
+<tr>
+<td>Easy debugging</td>
+<td>Chained processing pipelines</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>The bug to remember</strong></p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">gen</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="nb">sum</span><span class="p">(</span><span class="n">gen</span><span class="p">)</span>     <span class="c1"># 6</span>
+<span class="nb">sum</span><span class="p">(</span><span class="n">gen</span><span class="p">)</span>     <span class="c1"># 0  -- already exhausted, and nothing warns you</span>
+</code></pre></div>
+
+      <div class="article-end">
+        <p><strong>An iterator is a bookmark that only moves forward, and a generator is a function that can pause and pick up again where it left off.</strong> Everything in this guide follows from those two ideas: why a <code>for</code> loop stops on its own, why a used-up generator gives you <code>0</code> without complaining, how a few lines of <code>yield</code> can replace a whole class, and how you can process a file far bigger than your memory one line at a time. Next up, in chapter 13, we look at closures and decorators: how a function can remember values, and what the <code>@</code> symbol you often see above functions in Python code means.</p>
+      </div>
+    </main>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="f-left">Python Programming Series &nbsp;/&nbsp; Article 12 of the course</div>
+  <div class="f-right"><a href="#top">Back to top ↑</a></div>
+</footer>
+<script>
+(function(){
+  var t=document.getElementById('navToggle'),s=document.getElementById('sidebar');
+  if(t&&s){t.addEventListener('click',function(){s.classList.toggle('open');var o=s.classList.contains('open');t.innerHTML=o?'<svg class="icon"><use href="#icon-close"></use></svg>':'<svg class="icon"><use href="#icon-menu"></use></svg>';});s.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){s.classList.remove('open');t.innerHTML='<svg class="icon"><use href="#icon-menu"></use></svg>';});});}
+  var tl=Array.prototype.slice.call(document.querySelectorAll('.toc a')),sc=tl.map(function(a){return document.getElementById(a.getAttribute('href').slice(1));}).filter(Boolean);
+  if('IntersectionObserver' in window&&sc.length){var bi={};tl.forEach(function(a){bi[a.getAttribute('href').slice(1)]=a;});var obs=new IntersectionObserver(function(es){es.forEach(function(e){var l=bi[e.target.id];if(!l)return;if(e.isIntersecting){tl.forEach(function(a){a.classList.remove('active');});l.classList.add('active');}});},{rootMargin:'-15% 0px -70% 0px',threshold:0});sc.forEach(function(s){obs.observe(s);});}
+  document.querySelectorAll('.code-card').forEach(function(c){var b=c.querySelector('.copy-btn'),e=c.querySelector('code');if(!b||!e)return;b.addEventListener('click',function(){var tx=e.innerText,done=function(){var o=b.innerHTML;b.innerHTML='<svg class="icon"><use href="#icon-check"></use></svg> Copied';setTimeout(function(){b.innerHTML=o;},1600);};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(tx).then(done,done);else{var ta=document.createElement('textarea');ta.value=tx;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(x){}document.body.removeChild(ta);done();}});});
+})();
+</script>
+</body>
+</html>

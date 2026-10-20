@@ -1,0 +1,1526 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Web Scraping · Python Programming Series</title>
+<meta name="description" content="A beginner-friendly guide to web scraping in Python: robots.txt and permission, how HTML works, BeautifulSoup, CSS selectors, tables, robust parsing, pagination, saving to CSV, encodings and scraping responsibly.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+
+:root{
+  --paper:#F3F8FC;--surface:#FFFFFF;--tint:#E8F2FB;
+  --ink:#0E2238;--ink-soft:#3D5570;--ink-faint:#7F95AB;
+  --violet:#0B6FCC;--violet-deep:#0A4F9E;--violet-soft:#E2EFFB;
+  --pink:#3FA34D;--pink-text:#0A7466;--pink-soft:#E0F5F2;
+  --mint:#0FA3A3;--mint-text:#08787A;--mint-soft:#DDF4F4;
+  --sun:#FFB627;--sun-soft:#FFF4D9;
+  --orange:#E89B00;--orange-text:#9A6400;--orange-soft:#FFF0D1;
+  --sky:#013243;--sky-text:#013243;--sky-soft:#E1ECF0;
+  --line:#D6E4F0;--line-strong:#B9CFE3;
+  --code-bg:#0B1E33;--code-head:#08172A;--code-line:#17304D;--out-bg:#071425;
+  --r-s:8px;--r-m:14px;--r-l:22px;
+  --font-d:'Bricolage Grotesque','Arial Rounded MT Bold',sans-serif;
+  --font-b:'Figtree',-apple-system,'Segoe UI',sans-serif;
+  --font-m:'JetBrains Mono','SFMono-Regular',Consolas,monospace;
+}
+*,*::before,*::after{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-b);font-size:17px;line-height:1.68;-webkit-font-smoothing:antialiased;}
+a{color:var(--violet-deep);text-decoration-color:rgba(11,111,204,.35);text-underline-offset:3px;text-decoration-thickness:2px;}
+a:hover{text-decoration-color:currentColor;}
+::selection{background:var(--pink);color:#fff;}
+:focus-visible{outline:3px solid var(--pink);outline-offset:2px;border-radius:4px;}
+.icon{width:1em;height:1em;display:inline-block;vertical-align:-.15em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+
+.shell{max-width:1300px;margin:0 auto;padding:0 clamp(16px,4vw,44px);}
+.topbar{display:none;position:sticky;top:0;z-index:40;align-items:center;justify-content:space-between;padding:12px clamp(16px,4vw,44px);background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-bottom:2px solid var(--violet-soft);}
+.topbar .brand{font-family:var(--font-d);font-weight:800;font-size:.98rem;color:var(--ink);}
+.topbar .brand span{color:var(--violet);}
+.topbar button{border:2px solid var(--violet-soft);background:var(--surface);border-radius:var(--r-s);width:40px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--violet);}
+
+/* ---------- Hero: the one loud moment ---------- */
+.hero{position:relative;margin:clamp(16px,2.5vw,28px) 0 clamp(36px,5vw,56px);padding:clamp(36px,5.5vw,68px) clamp(22px,4.5vw,60px);background:var(--violet);color:#fff;border-radius:var(--r-l);overflow:hidden;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:clamp(28px,4vw,56px);align-items:center;}
+.hero::before{content:"";position:absolute;width:420px;height:420px;border-radius:50%;background:var(--violet-deep);right:-120px;top:-160px;}
+.hero::after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;background:var(--pink);left:-70px;bottom:-90px;opacity:.9;}
+.hero-copy,.hero-art{position:relative;z-index:1;}
+.hero-eyebrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-weight:600;font-size:.95rem;color:rgba(255,255,255,.86);margin-bottom:20px;}
+.hero-eyebrow .badge{background:var(--sun);color:var(--ink);font-family:var(--font-d);font-weight:800;padding:4px 13px;border-radius:999px;font-size:.92rem;}
+h1.title{font-family:var(--font-d);font-weight:800;font-size:clamp(2.15rem,4.6vw,3.7rem);line-height:1.02;letter-spacing:-.025em;margin:0 0 20px;max-width:16ch;color:#fff;}
+.hero-sub{font-size:clamp(1rem,1.5vw,1.12rem);color:rgba(255,255,255,.9);max-width:58ch;margin:0 0 28px;}
+.hero-sub strong{color:#fff;font-weight:700;}
+.hero-chips{display:flex;flex-wrap:wrap;gap:10px;}
+.chip{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.13);border:1.5px solid rgba(255,255,255,.28);padding:7px 14px 7px 10px;border-radius:999px;font-size:.88rem;font-weight:600;color:#fff;}
+.chip .icon{width:1.15em;height:1.15em;}
+.chip:nth-child(1) .icon{color:var(--sun);}
+.chip:nth-child(2) .icon{color:#7FF0D2;}
+.chip:nth-child(3) .icon{color:#C5F27A;}
+.chip:nth-child(4) .icon{color:#9FD6FF;}
+
+.hero-art{display:flex;flex-direction:column;align-items:center;}
+.blueprint{width:min(250px,100%);border:2.5px dashed rgba(255,255,255,.75);border-radius:var(--r-m);padding:14px 16px 12px;font-family:var(--font-m);font-size:.8rem;color:#fff;background:rgba(255,255,255,.06);}
+.bp-title{font-weight:700;margin-bottom:8px;}
+.bp-title .kw{color:#C5F27A;}
+.bp-title .cn{color:var(--sun);}
+.bp-line{padding:2px 0 2px 14px;color:rgba(255,255,255,.82);}
+.bp-line.m{color:#7FF0D2;}
+.fan{width:min(330px,100%);height:44px;display:block;}
+.fan path{stroke:rgba(255,255,255,.7);stroke-width:2;fill:none;stroke-dasharray:4 4;vector-effect:non-scaling-stroke;}
+.objs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:min(360px,100%);}
+.obj{border-radius:12px;padding:10px 10px 9px;font-family:var(--font-m);font-size:.72rem;line-height:1.5;color:var(--ink);box-shadow:0 6px 0 rgba(14,34,56,.28);animation:stamp .5s cubic-bezier(.3,1.5,.6,1) both;}
+.obj b{display:block;font-family:var(--font-d);font-size:1rem;font-weight:800;margin-bottom:3px;}
+.obj span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.o1{background:var(--sun);transform:rotate(-4deg);animation-delay:.25s;}
+.o2{background:#7FF0D2;transform:rotate(2deg);animation-delay:.45s;}
+.o3{background:#C5F27A;transform:rotate(-1.5deg);animation-delay:.65s;}
+@keyframes stamp{from{opacity:0;translate:0 -26px;scale:.85;}to{opacity:1;translate:0 0;scale:1;}}
+.art-cap{margin:18px 0 0;font-family:var(--font-d);font-weight:700;font-size:.95rem;color:rgba(255,255,255,.9);}
+
+/* ---------- Layout + sidebar ---------- */
+.layout{display:grid;grid-template-columns:265px minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:start;padding-bottom:90px;}
+.sidebar{position:sticky;top:24px;max-height:calc(100vh - 48px);overflow-y:auto;padding:16px 10px 16px 0;}
+.sidebar::-webkit-scrollbar{width:5px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:3px;}
+.toc-label{font-family:var(--font-d);font-weight:800;font-size:1rem;color:var(--ink);margin:0 0 10px;padding-left:12px;}
+.toc{list-style:none;margin:0;padding:0;}
+.toc li{margin:0 0 2px;}
+.toc a{display:flex;align-items:center;gap:10px;padding:7px 12px;font-size:.88rem;font-weight:500;color:var(--ink-soft);text-decoration:none;border-radius:10px;transition:background .15s,color .15s;}
+.toc a .icon{width:1.05em;height:1.05em;flex:none;color:var(--violet);}
+.toc a:hover{background:var(--violet-soft);color:var(--ink);}
+.toc a.active{background:var(--violet);color:#fff;font-weight:600;}
+.toc a.active .icon{color:var(--sun);}
+
+/* ---------- Article ---------- */
+.article{min-width:0;padding-top:8px;max-width:820px;}
+.article h2{--acc:var(--violet);font-family:var(--font-d);font-weight:800;font-size:clamp(1.55rem,2.6vw,2rem);line-height:1.15;letter-spacing:-.015em;margin:64px 0 18px;scroll-margin-top:24px;display:flex;align-items:center;gap:14px;}
+.article h2:nth-of-type(5n+2){--acc:var(--pink);}
+.article h2:nth-of-type(5n+3){--acc:var(--mint);}
+.article h2:nth-of-type(5n+4){--acc:var(--orange);}
+.article h2:nth-of-type(5n+5){--acc:var(--sky);}
+.article>h2:first-of-type{margin-top:4px;}
+.article>hr:first-child{display:none;}
+.article h2 .h-icon{width:2.6rem;height:2.6rem;flex:none;display:grid;place-items:center;background:var(--acc);color:#fff;border-radius:12px;transform:rotate(-4deg);box-shadow:0 4px 0 rgba(14,34,56,.18);}
+.article h2 .h-icon .icon{width:1.35rem;height:1.35rem;stroke-width:2;}
+.article h3{font-family:var(--font-d);font-weight:700;font-size:1.2rem;margin:34px 0 10px;scroll-margin-top:24px;color:var(--ink);}
+.article p{margin:0 0 17px;}
+.article ul,.article ol{margin:0 0 20px;padding-left:1.35em;}
+.article li{margin-bottom:8px;padding-left:.2em;}
+.article ul li::marker{color:var(--pink);font-size:1.15em;}
+.article ol li::marker{color:var(--violet);font-family:var(--font-d);font-weight:800;}
+.article strong{font-weight:700;}
+.article hr{border:0;height:6px;width:110px;margin:52px auto;border-radius:6px;background:linear-gradient(90deg,var(--violet) 0 20%,var(--pink) 20% 40%,var(--mint) 40% 60%,var(--sun) 60% 80%,var(--sky) 80% 100%);}
+.article code{font-family:var(--font-m);font-size:.84em;background:var(--pink-soft);padding:.12em .4em;border-radius:6px;color:var(--pink-text);}
+.article blockquote{margin:22px 0;padding:16px 20px;border-left:5px solid var(--sun);background:var(--sun-soft);border-radius:0 var(--r-m) var(--r-m) 0;color:var(--ink);}
+.article blockquote p{margin:0;color:inherit;}
+
+.table-wrap{overflow-x:auto;margin:22px 0 28px;border-radius:var(--r-m);border:2px solid var(--violet-soft);background:var(--surface);}
+.article table{width:100%;border-collapse:collapse;font-size:.9rem;}
+.article thead th{background:var(--violet);color:#fff;font-family:var(--font-d);font-weight:700;text-align:left;padding:12px 16px;white-space:nowrap;font-size:.9rem;}
+.article tbody td{padding:11px 16px;border-bottom:1px solid var(--line);vertical-align:top;}
+.article tbody tr:last-child td{border-bottom:none;}
+.article tbody tr:nth-child(even){background:#F5F9FD;}
+.article tbody td code{white-space:nowrap;}
+
+/* ---------- Code ---------- */
+.code-card{margin:22px 0 26px;border-radius:var(--r-m);overflow:hidden;background:var(--code-bg);box-shadow:0 6px 0 var(--violet-soft);}
+.code-card .code-head{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:var(--code-head);border-bottom:1px solid var(--code-line);}
+.code-card .dots{display:flex;gap:6px;}
+.code-card .dots span{width:10px;height:10px;border-radius:50%;display:block;}
+.code-card .dots span:nth-child(1){background:var(--pink);}
+.code-card .dots span:nth-child(2){background:var(--sun);}
+.code-card .dots span:nth-child(3){background:var(--mint);}
+.code-card .lang{font-family:var(--font-m);font-size:.72rem;color:#7E9CC0;}
+.code-card .copy-btn{font-family:var(--font-b);font-weight:600;font-size:.76rem;color:#DCEBFA;background:rgba(255,255,255,.06);border:1px solid #23456B;border-radius:7px;padding:4px 10px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .15s,border-color .15s;}
+.code-card .copy-btn:hover{background:var(--violet);border-color:var(--violet);color:#fff;}
+.code-card .copy-btn .icon{width:.95em;height:.95em;}
+.code-card pre{margin:0;padding:16px 20px;overflow-x:auto;font-size:.85rem;line-height:1.6;}
+.code-card code{font-family:var(--font-m);font-size:1em;line-height:inherit;color:#E6F1FF;background:none;padding:0;border-radius:0;}
+.code-card .k,.code-card .kn,.code-card .kd,.code-card .kc,.code-card .ow{color:#5CC8FF;}
+.code-card .nb,.code-card .bp{color:#9FD6FF;}
+.code-card .nf,.code-card .fm{color:#A6E36B;}
+.code-card .s,.code-card .s1,.code-card .s2,.code-card .sa,.code-card .sd,.code-card .se{color:#FFD166;}
+.code-card .si{color:#6EE7D8;}
+.code-card .mi,.code-card .mf{color:#6EE7D8;}
+.code-card .o,.code-card .p{color:#9FB6CF;}
+.code-card .c,.code-card .c1,.code-card .cm{color:#6F8BA8;font-style:italic;}
+.code-card .n{color:#E6F1FF;}
+.code-card .nc,.code-card .ne{color:#FFB86B;font-weight:600;}
+
+.output-card{margin:-26px 0 26px;border-radius:0 0 var(--r-m) var(--r-m);overflow:hidden;background:var(--out-bg);border-top:2px dashed #23456B;box-shadow:0 6px 0 var(--violet-soft);position:relative;z-index:1;}
+.output-card::before{content:"Output";display:block;font-family:var(--font-b);font-weight:700;font-size:.74rem;color:#A6E36B;padding:9px 20px 0;}
+.output-card pre{margin:0;padding:4px 20px 16px;overflow-x:auto;font-size:.82rem;line-height:1.6;}
+.output-card code{font-family:var(--font-m);font-size:1em;line-height:inherit;color:#BFD6EE;background:none;padding:0;border-radius:0;}
+
+.diagram-card{margin:22px 0 26px;border-radius:var(--r-m);overflow:hidden;position:relative;border:2.5px dashed var(--line-strong);background:var(--surface);}
+.diagram-card::before{content:"diagram";position:absolute;top:10px;right:14px;font-family:var(--font-b);font-weight:700;font-size:.74rem;color:var(--violet);}
+.diagram-card pre{margin:0;padding:26px 22px 20px;overflow-x:auto;}
+.diagram-card pre{line-height:1.3;font-size:.84rem;}
+.diagram-card code{font-family:var(--font-m);font-size:1em;line-height:inherit;color:var(--violet-deep);font-weight:500;background:none;padding:0;white-space:pre;}
+
+.svg-diagram{margin:24px 0 28px;padding:22px 20px 18px;background:var(--surface);border:2px solid var(--violet-soft);border-radius:var(--r-m);}
+.svg-diagram{overflow-x:auto;}
+.svg-diagram svg{width:100%;min-width:560px;height:auto;display:block;}
+.svg-diagram .cap{font-size:.86rem;font-weight:500;color:var(--ink-faint);text-align:center;margin-top:12px;}
+
+.article-end{margin-top:56px;padding:30px 30px;border-radius:var(--r-l);background:var(--violet);color:#fff;position:relative;overflow:hidden;}
+.article-end::after{content:"";position:absolute;width:140px;height:140px;border-radius:50%;background:var(--sun);right:-50px;bottom:-60px;}
+.article-end p{margin:0;font-size:1.06rem;color:rgba(255,255,255,.92);position:relative;z-index:1;max-width:62ch;}
+.article-end p strong{color:#fff;}
+
+footer.site-footer{border-top:2px solid var(--violet-soft);margin-top:30px;padding:22px clamp(16px,4vw,44px) 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+footer.site-footer .f-left{font-size:.88rem;font-weight:500;color:var(--ink-faint);}
+footer.site-footer a{font-size:.9rem;font-weight:600;}
+
+@media(max-width:960px){
+  .topbar{display:flex;}
+  .layout{grid-template-columns:1fr;}
+  .article{max-width:none;}
+  .sidebar{position:fixed;inset:60px 0 0 0;z-index:35;background:var(--paper);padding:18px clamp(16px,4vw,44px) 24px;transform:translateX(-100%);transition:transform .2s;max-height:none;height:calc(100vh - 60px);}
+  .sidebar.open{transform:translateX(0);}
+  .hero{grid-template-columns:1fr;}
+}
+@media(max-width:520px){
+  .article h2 .h-icon{width:2.2rem;height:2.2rem;}
+  .obj{font-size:.66rem;padding:9px 8px;}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}.sidebar{transition:none;}.obj{animation:none;}}
+
+/* NumPy hero illustration */
+.cells{display:grid;grid-template-columns:repeat(4,1fr);border:2px solid rgba(255,255,255,.8);border-radius:8px;overflow:hidden;margin-top:4px;}
+.cells span{text-align:center;padding:7px 0;font-weight:700;color:#fff;}
+.cells span+span{border-left:2px solid rgba(255,255,255,.8);}
+.objs.four{grid-template-columns:repeat(4,1fr);width:min(380px,100%);gap:9px;}
+.objs.four .obj{text-align:center;padding:10px 4px 9px;}
+.o4{background:#9FD6FF;transform:rotate(3deg);animation-delay:.85s;}
+
+/* Article 11 extras */
+.cells.three{grid-template-columns:repeat(3,1fr);}
+.cells.three span{font-size:.72rem;padding:6px 0;}
+.objs .obj{min-width:0;}
+.obj.seq{text-align:center;padding:10px 6px 9px;}
+.obj.seq code{display:block;font-family:var(--font-m);font-size:.74rem;font-weight:700;margin:2px 0 4px;color:var(--ink);background:none;padding:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.obj.seq span{font-size:.68rem;white-space:normal;}
+.code-card.term .code-head{background:#06121F;}
+.code-card .lang{text-transform:none;}
+.diagram-card.textfile::before{content:"text";}
+@media(max-width:520px){.obj.seq code{font-size:.62rem;}}
+
+.article h2 code,.article h3 code,.article p code,.article li code{overflow-wrap:anywhere;}
+</style>
+</head>
+<body>
+<svg style="display:none" aria-hidden="true"><defs>
+<symbol id="icon-leak" viewBox="0 0 24 24"><path d="M12 2s6 7 6 12a6 6 0 0 1-12 0c0-5 6-12 6-12z"/><path d="M9.5 15a2.5 2.5 0 0 0 2.5 2.5"/></symbol>
+<symbol id="icon-door" viewBox="0 0 24 24"><path d="M4 21V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v17"/><path d="M2 21h20"/><circle cx="12.5" cy="12" r="1" fill="currentColor"/><path d="M19 8l3 3-3 3M16 11h6"/></symbol>
+<symbol id="icon-build" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></symbol>
+<symbol id="icon-key" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3L21 2M17 6l3 3M14.5 8.5l2 2"/></symbol>
+<symbol id="icon-shield" viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z"/><path d="M9 12l2 2 4-4"/></symbol>
+<symbol id="icon-stopwatch" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M10 2h4M12 2v3"/></symbol>
+<symbol id="icon-layers" viewBox="0 0 24 24"><path d="M3 7c0-2 4-3 9-3s9 1 9 3"/><path d="M3 7h18"/><path d="M4 12h16" stroke-dasharray="2 2"/><path d="M3 17h18c0 2-4 3-9 3s-9-1-9-3z"/></symbol>
+<symbol id="icon-scale" viewBox="0 0 24 24"><path d="M12 3v18M7 21h10M5 7h14"/><path d="M5 7l-3 7a3 3 0 0 0 6 0zM19 7l-3 7a3 3 0 0 0 6 0z"/></symbol>
+<symbol id="icon-toolbox" viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="12" rx="1.5"/><path d="M8 8V5h8v3M2 13h20M10 13v2h4v-2"/></symbol>
+<symbol id="icon-stack" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="5" rx="1"/><rect x="4" y="10" width="16" height="5" rx="1"/><rect x="4" y="17" width="16" height="4" rx="1"/></symbol>
+<symbol id="icon-undo" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></symbol>
+<symbol id="icon-exitstack" viewBox="0 0 24 24"><rect x="3" y="12" width="7" height="9" rx="1"/><rect x="8.5" y="7" width="7" height="9" rx="1"/><rect x="14" y="2" width="7" height="9" rx="1"/></symbol>
+<symbol id="icon-loop" viewBox="0 0 24 24"><path d="M17 2l3 3-3 3"/><path d="M4 11V9a4 4 0 0 1 4-4h12"/><path d="M7 22l-3-3 3-3"/><path d="M20 13v2a4 4 0 0 1-4 4H4"/></symbol>
+<symbol id="icon-func" viewBox="0 0 24 24"><path d="M15 4h-2a3 3 0 0 0-3 3v10a3 3 0 0 1-3 3H5"/><path d="M7 11h8"/><path d="M16 14l4 5M20 14l-4 5"/></symbol>
+<symbol id="icon-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8 14h2M14 14h2M8 17h2"/></symbol>
+<symbol id="icon-puzzle" viewBox="0 0 24 24"><path d="M4 7h4a2 2 0 1 1 4 0h4v4a2 2 0 1 1 0 4v4h-4a2 2 0 1 0-4 0H4v-4a2 2 0 1 0 0-4z"/></symbol>
+<symbol id="icon-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/><path d="M8 10.5h5"/></symbol>
+<symbol id="icon-brackets" viewBox="0 0 24 24"><path d="M8 3C4 6 4 18 8 21"/><path d="M16 3c4 3 4 15 0 18"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></symbol>
+<symbol id="icon-ban" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></symbol>
+<symbol id="icon-plug" viewBox="0 0 24 24"><path d="M9 2v5M15 2v5"/><path d="M6 7h12v4a6 6 0 0 1-12 0z"/><path d="M12 17v5"/></symbol>
+<symbol id="icon-send" viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-8z"/><path d="M11 13l10-10"/></symbol>
+<symbol id="icon-download" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 19h16"/></symbol>
+<symbol id="icon-gauge" viewBox="0 0 24 24"><path d="M3 16a9 9 0 0 1 18 0"/><path d="M12 16l4-5"/><circle cx="12" cy="16" r="1.2" fill="currentColor"/><path d="M3 20h18"/></symbol>
+<symbol id="icon-brain" viewBox="0 0 24 24"><circle cx="6" cy="7" r="2"/><circle cx="6" cy="17" r="2"/><circle cx="18" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><path d="M8 7.8l2.3 3M8 16.2l2.3-3M14 12h2"/></symbol>
+<symbol id="icon-handshake" viewBox="0 0 24 24"><path d="M2 12l4-4 4 2 3-2 3 1 6 3"/><path d="M6 8v6l5 4 2-1 2 1 3-3"/><path d="M11 13l2 2"/></symbol>
+<symbol id="icon-warn" viewBox="0 0 24 24"><path d="M12 3l10 18H2z"/><path d="M12 10v5"/><circle cx="12" cy="18" r=".8" fill="currentColor"/></symbol>
+<symbol id="icon-table" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="1.5"/><line x1="2" y1="9" x2="22" y2="9"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15.5" y1="3" x2="15.5" y2="21"/></symbol>
+<symbol id="icon-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="13" rx="1.6"/><path d="M5 16H4.5A1.5 1.5 0 0 1 3 14.5v-10A1.5 1.5 0 0 1 4.5 3h10A1.5 1.5 0 0 1 16 4.5V5"/></symbol>
+<symbol id="icon-check" viewBox="0 0 24 24"><path d="M4 12.5 L9.5 18 L20 5"/></symbol>
+<symbol id="icon-menu" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
+<symbol id="icon-close" viewBox="0 0 24 24"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></symbol>
+</defs></svg>
+
+
+<div class="topbar">
+  <span class="brand">§18 &nbsp;<span>Web Scraping</span></span>
+  <button id="navToggle" aria-label="Toggle navigation">
+    <svg class="icon"><use href="#icon-menu"></use></svg>
+  </button>
+</div>
+
+<div class="shell" id="top">
+  <section class="hero">
+  <div class="hero-copy">
+    <div class="hero-eyebrow"><span class="badge">Article 18</span> Python Programming Series</div>
+    <h1 class="title">Web Scraping: Reading Data from Pages Built for People</h1>
+    <p class="hero-sub">In chapter 17 we asked a server for data, and it handed it over as JSON: already organised, in the shape its makers intended. This guide is about the other case. The data is on a <strong>web page</strong>, meant for a <strong>person</strong> to read, and nobody built a way for programs to get at it.</p>
+    <div class="hero-chips">
+      <div class="chip"><svg class="icon"><use href="#icon-shield"></use></svg> Is it allowed? robots.txt and terms</div>
+      <div class="chip"><svg class="icon"><use href="#icon-search"></use></svg> find, find_all and CSS selectors</div>
+      <div class="chip"><svg class="icon"><use href="#icon-build"></use></svg> Scrapers that survive missing data</div>
+      <div class="chip"><svg class="icon"><use href="#icon-send"></use></svg> A polite real request</div>
+    </div>
+  </div>
+  <div class="hero-art" aria-hidden="true">
+    <div class="blueprint">
+      <div class="bp-title"><span class="kw">soup</span>.<span class="cn">select</span>(".product")</div>
+      <div class="cells three"><span>title</span><span>price</span><span>stock</span></div>
+    </div>
+    <svg class="fan" viewBox="0 0 330 44" preserveAspectRatio="none"><path d="M165 0 C165 24 55 18 55 44"/><path d="M165 0 L165 44"/><path d="M165 0 C165 24 275 18 275 44"/></svg>
+    <div class="objs">
+      <div class="obj seq o1"><b>allowed?</b><code>robots.txt</code><span>check first</span></div>
+      <div class="obj seq o2"><b>parse</b><code>BeautifulSoup</code><span>not a regex</span></div>
+      <div class="obj seq o3"><b>save</b><code>DictWriter</code><span>rows to CSV</span></div>
+    </div>
+    <p class="art-cap">Pages for people, data for programs</p>
+  </div>
+</section>
+
+  <div class="layout">
+    <nav class="sidebar" id="sidebar">
+      <div class="toc-label">On this page</div>
+      <ul class="toc">
+<li><a href="#part-1-before-you-write-any-code"><svg class="icon"><use href="#icon-shield"></use></svg><span>Part 1: Before You Write Any Code</span></a></li>
+<li><a href="#part-2-how-a-web-page-is-put-together"><svg class="icon"><use href="#icon-layers"></use></svg><span>Part 2: How a Web Page Is Put Together</span></a></li>
+<li><a href="#part-3-why-chapter-16s-regex-cant-do-this"><svg class="icon"><use href="#icon-ban"></use></svg><span>Part 3: Why Chapter 16&#x27;s Regex Can&#x27;t Do This</span></a></li>
+<li><a href="#part-4-finding-things"><svg class="icon"><use href="#icon-search"></use></svg><span>Part 4: Finding Things</span></a></li>
+<li><a href="#part-5-css-selectors"><svg class="icon"><use href="#icon-brackets"></use></svg><span>Part 5: CSS Selectors</span></a></li>
+<li><a href="#part-6-pulling-out-a-table"><svg class="icon"><use href="#icon-table"></use></svg><span>Part 6: Pulling Out a Table</span></a></li>
+<li><a href="#part-7-writing-a-scraper-that-doesnt-fall-over"><svg class="icon"><use href="#icon-build"></use></svg><span>Part 7: Writing a Scraper That Doesn&#x27;t Fall Over</span></a></li>
+<li><a href="#part-8-following-the-pages"><svg class="icon"><use href="#icon-stack"></use></svg><span>Part 8: Following the Pages</span></a></li>
+<li><a href="#part-9-saving-the-result"><svg class="icon"><use href="#icon-download"></use></svg><span>Part 9: Saving the Result</span></a></li>
+<li><a href="#part-10-one-real-request"><svg class="icon"><use href="#icon-send"></use></svg><span>Part 10: One Real Request</span></a></li>
+<li><a href="#part-11-scraping-responsibly"><svg class="icon"><use href="#icon-handshake"></use></svg><span>Part 11: Scraping Responsibly</span></a></li>
+<li><a href="#part-12-common-mistakes"><svg class="icon"><use href="#icon-warn"></use></svg><span>Part 12: Common Mistakes</span></a></li>
+<li><a href="#quick-reference-summary"><svg class="icon"><use href="#icon-table"></use></svg><span>Quick Reference Summary</span></a></li>
+      </ul>
+    </nav>
+
+    <main class="article">
+<p><strong>Scraping means reading a page that was written for humans and pulling the data out of it.</strong> It's really useful, and it's also the most fragile thing in this course. You're relying on the layout of someone else's HTML, and they can change it any day without telling you.</p>
+<p><strong>Analogy:</strong> an API is like a shop giving you a <strong>neat printed price list</strong>. Scraping is like walking around the shop <strong>copying prices off the shelf labels</strong> with a notepad. You can get the same information, but you have to find each label yourself, and if the shop rearranges its shelves overnight, your route no longer works.</p>
+<p>That's why this guide starts with two questions to answer <strong>before</strong> writing any code, and ends with the question of whether you should be doing it at all.</p>
+<p>Here is what we will cover:</p>
+<ol>
+<li>Whether to scrape at all, and whether you're allowed to</li>
+<li>How a web page is put together</li>
+<li>Why chapter 16's regex can't do this job, shown on a real page</li>
+<li>BeautifulSoup: <code>find</code>, <code>find_all</code>, attributes and text</li>
+<li>CSS selectors, which are usually the shorter way</li>
+<li>Pulling out a table</li>
+<li>Writing a scraper that survives missing pieces</li>
+<li>Following pagination with a chapter 12 generator</li>
+<li>Saving the result to CSV, from chapter 10</li>
+<li>One real request, and how to make it politely</li>
+<li>Scraping responsibly</li>
+</ol>
+<p><strong>About the pages in this guide.</strong> Almost everything here reads HTML files saved in a <code>sample_data/</code> folder, so the output is the same every time and works offline. Three examples near the end share <strong>one real request</strong>, to a website built specifically for people to practise on. They're marked.</p>
+<hr />
+<h2 id="part-1-before-you-write-any-code"><span class="h-icon"><svg class="icon"><use href="#icon-shield"></use></svg></span>Part 1: Before You Write Any Code</h2>
+<h3 id="question-1-is-there-an-api">Question 1: Is There an API?</h3>
+<p>This is the whole point of chapter 17. An API gives you organised data, a clear agreement about what you'll get, and permission to use it. Scraping gives you none of those.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>API (ch. 17)</th>
+<th>Scraping</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>You get</td>
+<td>JSON, already structured</td>
+<td>HTML meant for a person</td>
+</tr>
+<tr>
+<td>Stability</td>
+<td>changes are versioned and announced</td>
+<td>changes whenever a designer feels like it</td>
+</tr>
+<tr>
+<td>Permission</td>
+<td>explicit, in the terms</td>
+<td>you have to go and check</td>
+</tr>
+<tr>
+<td>Speed</td>
+<td>one request, exactly the fields you asked for</td>
+<td>a whole page of markup for three numbers</td>
+</tr>
+<tr>
+<td>Breaks when</td>
+<td>they retire a version</td>
+<td>they move a <code>&lt;div&gt;</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Look for an API before you write a scraper.</strong> Some ways to find one:</p>
+<ul>
+<li>Try <code>example.com/api</code>, search for "<em>site name</em> API", and read the site's developer page.</li>
+<li>Open your browser's <strong>developer tools</strong> (usually the F12 key, or right-click and choose Inspect) and watch the <strong>Network</strong> tab while you use the site. A page that loads more data as you scroll is usually calling a <strong>JSON API</strong> behind the scenes, and you could often call that directly with chapter 17's tools.</li>
+</ul>
+<p><strong>Analogy:</strong> before copying a phone book by hand, check whether the phone company already sells it as a <strong>spreadsheet</strong>.</p>
+<h3 id="question-2-are-you-allowed-to">Question 2: Are You Allowed To?</h3>
+<p>That's really <strong>three separate questions</strong>, and they can have different answers.</p>
+<h3 id="robotstxt"><code>robots.txt</code></h3>
+<p><strong><code>robots.txt</code></strong> is a small text file at the root of a website (for example <code>https://example.shop/robots.txt</code>) that says which paths <strong>automated programs</strong> should stay away from. It's a <strong>request, not a lock</strong>: nothing physically stops a program from ignoring it. But ignoring it makes it very clear that you knew the rules and didn't care.</p>
+<p><strong>Analogy:</strong> <code>robots.txt</code> is like a <strong>"Staff only" sign</strong> on a door. The door isn't locked, and you could walk through. But if you're caught on the other side, "I saw the sign and ignored it" is a bad position to be in.</p>
+<p>Python can read it with a standard library module:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">urllib.robotparser</span><span class="w"> </span><span class="kn">import</span> <span class="n">RobotFileParser</span>
+
+<span class="n">ROBOTS</span> <span class="o">=</span> <span class="s2">"""</span>
+<span class="s2">User-agent: *</span>
+<span class="s2">Crawl-delay: 2</span>
+<span class="s2">Disallow: /cart/</span>
+<span class="s2">Disallow: /checkout/</span>
+<span class="s2">Disallow: /search?</span>
+<span class="s2">Allow: /</span>
+
+<span class="s2">User-agent: GreedyBot</span>
+<span class="s2">Disallow: /</span>
+<span class="s2">"""</span>
+
+<span class="n">rules</span> <span class="o">=</span> <span class="n">RobotFileParser</span><span class="p">()</span>
+<span class="n">rules</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">ROBOTS</span><span class="o">.</span><span class="n">splitlines</span><span class="p">())</span>            <span class="c1"># parse text we already have</span>
+
+<span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"/books/"</span><span class="p">,</span> <span class="s2">"/books/page-2.html"</span><span class="p">,</span> <span class="s2">"/cart/"</span><span class="p">,</span> <span class="s2">"/checkout/pay"</span><span class="p">]:</span>
+    <span class="n">allowed</span> <span class="o">=</span> <span class="n">rules</span><span class="o">.</span><span class="n">can_fetch</span><span class="p">(</span><span class="s2">"*"</span><span class="p">,</span> <span class="s2">"https://example.shop"</span> <span class="o">+</span> <span class="n">path</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">path</span><span class="si">:</span><span class="s2">&lt;22</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">'allowed'</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">allowed</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">'DISALLOWED'</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>  /books/                allowed
+  /books/page-2.html     allowed
+  /cart/                 DISALLOWED
+  /checkout/pay          DISALLOWED
+</code></pre></div>
+
+<p>Let's read that file line by line:</p>
+<ul>
+<li><code>User-agent: *</code> means "the rules below apply to <strong>every</strong> program". (<code>*</code> means "everyone".)</li>
+<li><code>Crawl-delay: 2</code> asks for a pause of 2 seconds between requests.</li>
+<li><code>Disallow: /cart/</code> and <code>Disallow: /checkout/</code> say "please don't visit anything under these paths". Shopping baskets and payments are no place for a scraper.</li>
+<li><code>Disallow: /search?</code> asks programs not to run the site's search, which is expensive for the site.</li>
+<li><code>Allow: /</code> says "everything else is fine".</li>
+<li>The second block, <code>User-agent: GreedyBot</code> with <code>Disallow: /</code>, applies only to a program calling itself <code>GreedyBot</code>, and bans it from the <strong>whole site</strong>.</li>
+</ul>
+<p>In the code, <code>rules.parse(ROBOTS.splitlines())</code> reads rules from text we already have, and <code>rules.can_fetch("*", url)</code> answers the question "may a general program (<code>*</code>) fetch this URL?".</p>
+<p>That file tells you two more things:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="s2">"crawl delay asked of everyone:"</span><span class="p">,</span> <span class="n">rules</span><span class="o">.</span><span class="n">crawl_delay</span><span class="p">(</span><span class="s2">"*"</span><span class="p">),</span> <span class="s2">"seconds"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"GreedyBot may fetch the home page:"</span><span class="p">,</span> <span class="n">rules</span><span class="o">.</span><span class="n">can_fetch</span><span class="p">(</span><span class="s2">"GreedyBot"</span><span class="p">,</span> <span class="s2">"https://example.shop/"</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>crawl delay asked of everyone: 2 seconds
+GreedyBot may fetch the home page: False
+</code></pre></div>
+
+<p><code>Crawl-delay: 2</code> is the site asking for <strong>no more than one request every two seconds</strong>. <code>GreedyBot</code> has been named and banned completely, which is what happens to a scraper that behaves badly.</p>
+<p>In a real script you'd fetch the live file instead of pasting it in:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">rules</span> <span class="o">=</span> <span class="n">RobotFileParser</span><span class="p">()</span>
+<span class="n">rules</span><span class="o">.</span><span class="n">set_url</span><span class="p">(</span><span class="s2">"https://example.shop/robots.txt"</span><span class="p">)</span>
+<span class="n">rules</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+</code></pre></div>
+
+<p><code>set_url</code> tells the parser where the file lives, and <code>read()</code> downloads and parses it.</p>
+<p>If a site has <strong>no</strong> <code>robots.txt</code>, the request gets a 404 and the parser treats everything as allowed. That only means <strong>no rules were written down</strong>. It doesn't mean anything goes. (One detail worth knowing: if the server answers <code>401</code> or <code>403</code>, meaning the file exists but you're not allowed to read it, Python's parser plays safe and treats <strong>everything as disallowed</strong>. It does the same if the server itself is failing with a <code>5xx</code> error, since it can't tell what the rules would have said.)</p>
+<p>One more detail, about the <strong>order</strong> of rules. When an <code>Allow</code> and a <code>Disallow</code> line both match a path, the robots.txt standard says the <strong>most specific</strong> (longest) rule wins, and recent Python releases follow that. Older Python releases instead use the <strong>first</strong> matching line, reading from the top. Our example lists the <code>Disallow</code> lines before <code>Allow: /</code>, so both give the same answers. If you write test rules of your own, put the specific lines first and the broad <code>Allow: /</code> last, and every version will agree.</p>
+<h3 id="the-terms-of-service">The Terms of Service</h3>
+<p>The <strong>terms of service</strong> (sometimes called "terms of use") are the legally important document, and they're <strong>separate</strong> from <code>robots.txt</code>. Many sites forbid automated collection outright. Read them. They're usually linked at the bottom of every page.</p>
+<h3 id="personal-data">Personal Data</h3>
+<p><strong>Personal data</strong> is a separate question again. Names, emails, photos and profiles are protected by laws like the EU's <strong>GDPR</strong>, and similar laws in many other countries (India's Digital Personal Data Protection Act, for example), <strong>even when the data is publicly visible</strong>. "It was on a public page" doesn't make it fine to collect, and this is the part most likely to turn a scraping project into a legal problem.</p>
+<div class="diagram-card"><pre><code>   ┌────────────────────┐      ┌────────────────────┐      ┌────────────────────┐
+   │ robots.txt         │      │ terms of service   │      │ personal data?     │
+   │ "may programs go   │  +   │ "what does the     │  +   │ "would collecting  │
+   │  there?"           │      │  contract allow?"  │      │  this harm people?"│
+   └────────────────────┘      └────────────────────┘      └────────────────────┘
+            all three need a good answer before you write the scraper
+</code></pre></div>
+
+<p>The rest of this guide assumes you've checked all three and the answer was yes.</p>
+<hr />
+<h2 id="part-2-how-a-web-page-is-put-together"><span class="h-icon"><svg class="icon"><use href="#icon-layers"></use></svg></span>Part 2: How a Web Page Is Put Together</h2>
+<p>To scrape a page, you need to know what a page is made of. Every web page is written in <strong>HTML</strong> (HyperText Markup Language): plain text with <strong>tags</strong> that mark what each piece is.</p>
+<p>HTML is a <strong>tree of elements</strong>. Each element has:</p>
+<ul>
+<li>a <strong>tag name</strong> (like <code>p</code> for a paragraph or <code>a</code> for a link),</li>
+<li>optional <strong>attributes</strong> (extra information, like where a link goes),</li>
+<li>and <strong>content</strong>, which can be text or more elements.</li>
+</ul>
+<p>Here's one product from a shop page:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">html</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="p">&lt;</span><span class="nt">article</span> <span class="na">class</span><span class="o">=</span><span class="s">"product"</span> <span class="na">data-sku</span><span class="o">=</span><span class="s">"9781617294433"</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">h3</span><span class="p">&gt;&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"/book/9781617294433.html"</span><span class="p">&gt;</span>Deep Learning with Python<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;&lt;/</span><span class="nt">h3</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">p</span> <span class="na">class</span><span class="o">=</span><span class="s">"price"</span><span class="p">&gt;</span>£51.77<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">article</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<ul>
+<li><code>article</code>, <code>h3</code>, <code>a</code> and <code>p</code> are <strong>tags</strong>. Most come in pairs: <code>&lt;p&gt;</code> opens a paragraph and <code>&lt;/p&gt;</code> closes it.</li>
+<li><code>class</code>, <code>data-sku</code> and <code>href</code> are <strong>attributes</strong>, written inside the opening tag as <code>name="value"</code>. You'll target <code>class</code> and <code>id</code> most often, because the site's own styling uses them.</li>
+<li>The <code>&lt;a&gt;</code> is <strong>inside</strong> the <code>&lt;h3&gt;</code>, which is inside the <code>&lt;article&gt;</code>. That nesting is the tree you'll move around in.</li>
+</ul>
+<p><strong>Analogy:</strong> HTML is like a set of <strong>labelled boxes inside boxes</strong>. The <code>&lt;article&gt;</code> is a big box labelled "product". Inside it are smaller boxes: a heading box (with a link box inside that), and a price box. Scraping is opening the right boxes and reading the labels and contents.</p>
+<div class="diagram-card"><pre><code>   article  (class="product", data-sku="9781617294433")
+   ├── h3
+   │   └── a  (href="/book/9781617294433.html")
+   │       └── "Deep Learning with Python"
+   └── p  (class="price")
+       └── "£51.77"
+</code></pre></div>
+
+<h3 id="common-tags-youll-meet">Common Tags You'll Meet</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Tag</th>
+<th>Means</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&lt;html&gt;</code>, <code>&lt;head&gt;</code>, <code>&lt;body&gt;</code></td>
+<td>the whole page, its hidden settings, and its visible part</td>
+</tr>
+<tr>
+<td><code>&lt;title&gt;</code></td>
+<td>the text shown in the browser tab</td>
+</tr>
+<tr>
+<td><code>&lt;h1&gt;</code> to <code>&lt;h6&gt;</code></td>
+<td>headings, biggest to smallest</td>
+</tr>
+<tr>
+<td><code>&lt;p&gt;</code></td>
+<td>a paragraph</td>
+</tr>
+<tr>
+<td><code>&lt;a href="..."&gt;</code></td>
+<td>a link; <code>href</code> is where it goes</td>
+</tr>
+<tr>
+<td><code>&lt;img src="..."&gt;</code></td>
+<td>an image; <code>src</code> is the image file</td>
+</tr>
+<tr>
+<td><code>&lt;div&gt;</code>, <code>&lt;span&gt;</code></td>
+<td>general-purpose boxes with no meaning of their own</td>
+</tr>
+<tr>
+<td><code>&lt;article&gt;</code>, <code>&lt;section&gt;</code>, <code>&lt;main&gt;</code>, <code>&lt;nav&gt;</code>, <code>&lt;header&gt;</code>, <code>&lt;footer&gt;</code></td>
+<td>boxes that do say what they hold</td>
+</tr>
+<tr>
+<td><code>&lt;ul&gt;</code>, <code>&lt;ol&gt;</code>, <code>&lt;li&gt;</code></td>
+<td>lists and list items</td>
+</tr>
+<tr>
+<td><code>&lt;table&gt;</code>, <code>&lt;tr&gt;</code>, <code>&lt;th&gt;</code>, <code>&lt;td&gt;</code></td>
+<td>tables, rows, header cells and data cells</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="two-attributes-worth-knowing-well">Two Attributes Worth Knowing Well</h3>
+<ul>
+<li><strong><code>class</code></strong> groups similar elements so the site can style them together. Every product card has <code>class="product"</code>, every price has <code>class="price"</code>. That's exactly what makes it useful for scraping: it says <strong>what</strong> an element is.</li>
+<li><strong><code>id</code></strong> names one <strong>unique</strong> element on the page, like <code>id="catalogue"</code>.</li>
+<li>Attributes starting with <strong><code>data-</code></strong> (like <code>data-sku</code>) are custom values the site's developers added for their own code. They're often the cleanest data on the page.</li>
+</ul>
+<h3 id="our-sample-pages">Our Sample Pages</h3>
+<p><code>sample_data/</code> has three pages from a small bookshop, written for this chapter. Here's the start of the first one:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="n">page1</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"sample_data/shop_page_1.html"</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">page1</span><span class="p">[:</span><span class="mi">640</span><span class="p">])</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;title&gt;The Bookshop - page 1&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;header&gt;
+    &lt;h1&gt;The Bookshop&lt;/h1&gt;
+    &lt;p class="tagline"&gt;Books for people who write code&lt;/p&gt;
+  &lt;/header&gt;
+
+  &lt;!-- &lt;article class="product" data-sku="0000000000000"&gt;
+         &lt;h3&gt;&lt;a href="/book/retired.html"&gt;Retired Title&lt;/a&gt;&lt;/h3&gt;
+         &lt;p class="price"&gt;&amp;pound;99.99&lt;/p&gt;
+       &lt;/article&gt; --&gt;
+
+  &lt;main id="catalogue"&gt;
+    &lt;article class="product" data-sku="9781617294433"&gt;
+      &lt;h3&gt;&lt;a href="/book/9781617294433.html"&gt;Deep Learning with Python&lt;/a&gt;&lt;/h3&gt;
+      &lt;p class="author"&gt;François Chollet&lt;/p&gt;
+      &lt;p class="pri
+</code></pre></div>
+
+<p><code>Path(...).read_text(...)</code> (from the <code>pathlib</code> module) reads the whole file as one string, and <code>page1[:640]</code> prints the first 640 characters.</p>
+<p>Notice the block between <code>&lt;!--</code> and <code>--&gt;</code>. That's an HTML <strong>comment</strong>. A browser doesn't show it, and anything reading the page properly should skip it too. Here, someone left an old, retired product commented out. <strong>Keep it in mind</strong>: it's about to cause trouble.</p>
+<p>Also notice <code>&amp;pound;</code> inside the comment. That's an <strong>HTML entity</strong>, a way of writing special characters using plain letters. <code>&amp;pound;</code> means <code>£</code>, and <code>&amp;copy;</code> means <code>©</code>. A proper HTML reader turns these back into the real characters for you.</p>
+<hr />
+<h2 id="part-3-why-chapter-16s-regex-cant-do-this"><span class="h-icon"><svg class="icon"><use href="#icon-ban"></use></svg></span>Part 3: Why Chapter 16's Regex Can't Do This</h2>
+<p>Chapter 16's section on "when a regex is the wrong tool" showed one failing on a tiny three-tag example. Here's the same problem on a realistic page. The pattern looks exactly right:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s1">'&lt;article class="product" data-sku="(\d+)"&gt;'</span><span class="p">,</span> <span class="n">page1</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>['0000000000000', '9781617294433', '9781492056355']
+</code></pre></div>
+
+<p>The pattern says: find <code>&lt;article class="product" data-sku="</code>, then capture one or more digits, then <code>"&gt;</code>. Three results, and the page has three products, so it looks like it worked.</p>
+<p>It didn't. Compare it with what an <strong>HTML parser</strong> finds:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">bs4</span><span class="w"> </span><span class="kn">import</span> <span class="n">BeautifulSoup</span>
+
+<span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">page1</span><span class="p">,</span> <span class="s2">"html.parser"</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">([</span><span class="n">article</span><span class="p">[</span><span class="s2">"data-sku"</span><span class="p">]</span> <span class="k">for</span> <span class="n">article</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s2">"article"</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">"product"</span><span class="p">)])</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>['9781617294433', '9781593279288', '9781492056355']
+</code></pre></div>
+
+<p>Two different lists <strong>of the same length</strong>, which is the worst kind of wrong, because nothing looks off.</p>
+<ul>
+<li><code>0000000000000</code> is the retired product <strong>inside the HTML comment</strong>. It isn't on the page. The regex only sees text, and has no idea what a comment is.</li>
+<li><code>9781593279288</code> is a real product the regex <strong>missed</strong>, because its <code>data-sku</code> is on the <strong>next line</strong> (the HTML has a line break between <code>class="product"</code> and <code>data-sku</code>) and the pattern expected a single space.</li>
+</ul>
+<p>Both mistakes are <strong>silent</strong>, and a report built on that list would be wrong in two ways at once.</p>
+<p><strong>Analogy:</strong> using a regex on HTML is like counting the people at a party by <strong>counting coats on the coat rack</strong>. Usually it's close. But someone left an old coat behind last week (the comment), and someone else hung theirs on a different hook (the line break). The numbers can even come out the same while being wrong about who's there.</p>
+<p>A <strong>parser</strong> reads the page the way a browser does: comments are comments, line breaks inside a tag are just spacing, and you get a <strong>tree you can ask questions about</strong>.</p>
+<h3 id="meet-beautifulsoup">Meet BeautifulSoup</h3>
+<p><strong>BeautifulSoup</strong> (installed as the package <code>beautifulsoup4</code>, imported as <code>bs4</code>) is the most popular HTML parser library for Python. It's in this course's <code>requirements.txt</code> from chapter 17, so it's already installed if you followed that chapter's setup.</p>
+<p><code>BeautifulSoup(page1, "html.parser")</code> reads the page into a <strong>soup object</strong>: the whole tree, ready to search. We'll call it <code>soup</code> from now on.</p>
+<p><code>"html.parser"</code> is the parser <strong>built into Python</strong>, and it's what this guide uses. <code>"lxml"</code> is faster but needs installing. For a page you're reading once, the difference doesn't matter.</p>
+<hr />
+<h2 id="part-4-finding-things"><span class="h-icon"><svg class="icon"><use href="#icon-search"></use></svg></span>Part 4: Finding Things</h2>
+<p>Two methods do most of the work:</p>
+<ul>
+<li><code>find(...)</code> returns the <strong>first</strong> match, or <code>None</code>.</li>
+<li><code>find_all(...)</code> returns a <strong>list</strong> of every match, which might be empty.</li>
+</ul>
+<p>You give them a <strong>tag name</strong>, and optionally a <strong>class</strong> or other attributes to narrow it down.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">first</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">"article"</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">"product"</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">first</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">first</span><span class="o">.</span><span class="n">h3</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Tag
+Deep Learning with Python
+</code></pre></div>
+
+<ul>
+<li><code>soup.find("article", class_="product")</code> finds the first <code>&lt;article&gt;</code> whose class includes <code>product</code>.</li>
+<li>What comes back is a <strong><code>Tag</code></strong> object: one element of the tree, which you can search inside in exactly the same way.</li>
+<li><code>first.h3.get_text(strip=True)</code> reads the text of the heading inside it.</li>
+</ul>
+<p>The argument is <strong><code>class_</code>, with an underscore</strong>. <code>class</code> is a Python keyword (chapter 8, where it starts a class definition), so it can't be used as a parameter name. BeautifulSoup adds the underscore to get around that.</p>
+<p><strong>Analogy:</strong> <code>find</code> is asking a librarian for "<strong>a</strong> book about Python", and getting the first one they spot. <code>find_all</code> is asking for "<strong>every</strong> book about Python", and getting a pile (possibly an empty one).</p>
+<h3 id="reading-a-tag-text-attributes-and-the-tags-inside-it">Reading a Tag: Text, Attributes, and the Tags Inside It</h3>
+<p>A tag gives you three things to read: its <strong>text</strong>, its <strong>attributes</strong>, and the <strong>tags inside it</strong>.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="s2">"text of the whole card:"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">" "</span><span class="p">,</span> <span class="n">first</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="s2">" "</span><span class="p">,</span> <span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"just the title  :"</span><span class="p">,</span> <span class="n">first</span><span class="o">.</span><span class="n">h3</span><span class="o">.</span><span class="n">a</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"the link        :"</span><span class="p">,</span> <span class="n">first</span><span class="o">.</span><span class="n">h3</span><span class="o">.</span><span class="n">a</span><span class="p">[</span><span class="s2">"href"</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"the sku         :"</span><span class="p">,</span> <span class="n">first</span><span class="p">[</span><span class="s2">"data-sku"</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"the price       :"</span><span class="p">,</span> <span class="n">first</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">"p"</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">"price"</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>text of the whole card:
+  Deep Learning with Python François Chollet £51.77 Rating In stock (22 available)
+
+just the title  : Deep Learning with Python
+the link        : /book/9781617294433.html
+the sku         : 9781617294433
+the price       : £51.77
+</code></pre></div>
+
+<ul>
+<li><code>first.get_text(" ", strip=True)</code> gets <strong>all</strong> the text inside the card, with a space between each piece and extra whitespace tidied away.</li>
+<li><code>first.h3.a.get_text(strip=True)</code> goes into the heading, then into the link, and reads only the title.</li>
+<li><code>first.h3.a["href"]</code> reads the link's <code>href</code> <strong>attribute</strong>, with square brackets like a dictionary.</li>
+<li><code>first["data-sku"]</code> reads an attribute of the article itself.</li>
+<li><code>first.find("p", class_="price").text</code> searches <strong>inside the card</strong> for the price paragraph.</li>
+</ul>
+<p><code>first.h3.a</code> is a <strong>shortcut</strong>. Writing <code>.h3</code> after a tag gives you the first <code>&lt;h3&gt;</code> inside it, and <code>.a</code> then gives you the first <code>&lt;a&gt;</code> inside that. It's handy, but fragile. If a tag is missing you get <code>None</code>, and the next step in the chain raises <code>AttributeError</code>, which Part 7 deals with. <strong>Use it for exploring, not in code you rely on.</strong></p>
+<h3 id="moving-around-the-tree">Moving Around the Tree</h3>
+<p>Besides looking <strong>inside</strong> a tag, you can also step <strong>outwards</strong> and <strong>sideways</strong> from it. This is handy when the thing you can find easily sits right next to the thing you actually want:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">price_tag</span> <span class="o">=</span> <span class="n">first</span><span class="o">.</span><span class="n">select_one</span><span class="p">(</span><span class="s2">"p.price"</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"the tag itself  :"</span><span class="p">,</span> <span class="n">price_tag</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"its parent      :"</span><span class="p">,</span> <span class="n">price_tag</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">price_tag</span><span class="o">.</span><span class="n">parent</span><span class="p">[</span><span class="s2">"data-sku"</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"p just before it:"</span><span class="p">,</span> <span class="n">price_tag</span><span class="o">.</span><span class="n">find_previous_sibling</span><span class="p">(</span><span class="s2">"p"</span><span class="p">)</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"p just after it :"</span><span class="p">,</span> <span class="n">price_tag</span><span class="o">.</span><span class="n">find_next_sibling</span><span class="p">(</span><span class="s2">"p"</span><span class="p">)[</span><span class="s2">"class"</span><span class="p">])</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>the tag itself  : &lt;p class="price"&gt;£51.77&lt;/p&gt;
+its parent      : article 9781617294433
+p just before it: François Chollet
+p just after it : ['rating', 'star-four']
+</code></pre></div>
+
+<ul>
+<li><code>.parent</code> steps <strong>out</strong> one level: the price's parent is the <code>&lt;article&gt;</code>.</li>
+<li><code>.find_previous_sibling("p")</code> and <code>.find_next_sibling("p")</code> look <strong>sideways</strong>, at the <code>&lt;p&gt;</code> elements just before and after it inside the same parent.</li>
+</ul>
+<p><strong>Analogy:</strong> if the tree is a family tree, <code>.parent</code> is the parent, and siblings are brothers and sisters: elements with the same parent, sitting side by side.</p>
+<h3 id="three-ways-to-get-text-and-the-one-that-surprises-people">Three Ways to Get Text, and the One That Surprises People</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Way</th>
+<th>Gives you</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.text</code></td>
+<td>all text inside, including from nested tags</td>
+</tr>
+<tr>
+<td><code>.get_text(strip=True)</code></td>
+<td>the same, with whitespace tidied</td>
+</tr>
+<tr>
+<td><code>.string</code></td>
+<td>the text, but only if the tag holds exactly one thing</td>
+</tr>
+</tbody>
+</table></div>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">title_tag</span> <span class="o">=</span> <span class="n">first</span><span class="o">.</span><span class="n">h3</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"h3 .text  :"</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">title_tag</span><span class="o">.</span><span class="n">text</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"h3 .string:"</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">title_tag</span><span class="o">.</span><span class="n">string</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"article .text  :"</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">first</span><span class="o">.</span><span class="n">text</span><span class="p">[:</span><span class="mi">40</span><span class="p">]),</span> <span class="s2">"..."</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"article .string:"</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">first</span><span class="o">.</span><span class="n">string</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>h3 .text  : 'Deep Learning with Python'
+h3 .string: 'Deep Learning with Python'
+
+article .text  : '\nDeep Learning with Python\nFrançois Chol' ...
+article .string: None
+</code></pre></div>
+
+<p><code>repr(...)</code> shows strings with their quotes and with <code>\n</code> for line breaks, so we can see exactly what came back.</p>
+<ul>
+<li>On the <code>&lt;h3&gt;</code>, <code>.text</code> and <code>.string</code> agree.</li>
+<li>On the <code>&lt;article&gt;</code>, <code>.text</code> includes all the line breaks from the HTML (<code>'\nDeep Learning with Python\nFrançois Chol...'</code>), which is why <code>.get_text(strip=True)</code> is usually nicer.</li>
+<li><code>.string</code> on the <code>&lt;article&gt;</code> is <strong><code>None</code></strong>.</li>
+</ul>
+<p><code>.string</code> worked on the <code>&lt;h3&gt;</code> because it holds <strong>exactly one thing</strong>, the <code>&lt;a&gt;</code>, which in turn holds exactly one thing, the text. <code>.string</code> follows that chain down. On the <code>&lt;article&gt;</code> it's <code>None</code>, because there are several children and no single string to return.</p>
+<p>That's not an error, so a script would carry on with the <code>None</code>, and the problem would show up somewhere else later. <strong>Just use <code>.get_text()</code> and forget <code>.string</code> exists.</strong></p>
+<h3 id="attributes-are-a-dictionary-except-class">Attributes Are a Dictionary, Except <code>class</code></h3>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="s2">"the article's attributes:"</span><span class="p">,</span> <span class="n">first</span><span class="o">.</span><span class="n">attrs</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="n">rating</span> <span class="o">=</span> <span class="n">first</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">"p"</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">"rating"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"class      :"</span><span class="p">,</span> <span class="n">rating</span><span class="p">[</span><span class="s2">"class"</span><span class="p">],</span> <span class="s2">"&lt;- a list"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"data-sku   :"</span><span class="p">,</span> <span class="n">first</span><span class="p">[</span><span class="s2">"data-sku"</span><span class="p">],</span> <span class="s2">"&lt;- a string"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"one class  :"</span><span class="p">,</span> <span class="n">rating</span><span class="p">[</span><span class="s2">"class"</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>the article's attributes: {'class': ['product'], 'data-sku': '9781617294433'}
+
+class      : ['rating', 'star-four'] &lt;- a list
+data-sku   : 9781617294433 &lt;- a string
+one class  : star-four
+</code></pre></div>
+
+<p><code>.attrs</code> gives you <strong>every attribute</strong> of a tag as a dictionary. Look closely at the values:</p>
+<ul>
+<li><code>data-sku</code> is a plain <strong>string</strong>.</li>
+<li><code>class</code> is a <strong>list</strong>: <code>['rating', 'star-four']</code>.</li>
+</ul>
+<p><code>class</code> comes back as a list because an element can have <strong>several classes</strong> at once. Here, <code>rating</code> says "this is a rating" and <code>star-four</code> says which one. A few other attributes that can hold several space-separated values, such as <code>rel</code> on links, come back as lists too:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">button</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="s1">'&lt;a href="/basket" rel="nofollow noopener" class="btn primary"&gt;Buy&lt;/a&gt;'</span><span class="p">,</span>
+                       <span class="s2">"html.parser"</span><span class="p">)</span><span class="o">.</span><span class="n">a</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">button</span><span class="o">.</span><span class="n">attrs</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>{'href': '/basket', 'rel': ['nofollow', 'noopener'], 'class': ['btn', 'primary']}
+</code></pre></div>
+
+<p>Everything else (<code>href</code>, <code>id</code>, <code>data-...</code> and most others) is a plain string.</p>
+<p>So <strong>comparing <code>class</code> to a string never matches</strong>. Check whether the class is <strong>in</strong> the list instead:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="s1">'rating["class"] == "rating":'</span><span class="p">,</span> <span class="n">rating</span><span class="p">[</span><span class="s2">"class"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"rating"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'"rating" in rating["class"]:'</span><span class="p">,</span> <span class="s2">"rating"</span> <span class="ow">in</span> <span class="n">rating</span><span class="p">[</span><span class="s2">"class"</span><span class="p">])</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>rating["class"] == "rating": False
+"rating" in rating["class"]: True
+</code></pre></div>
+
+<p><strong>Analogy:</strong> asking <code>rating["class"] == "rating"</code> is like asking "is this person's <strong>full name</strong> exactly 'Rating'?" The answer is no, because their full name is "Rating Star-Four". Asking <code>"rating" in rating["class"]</code> is like asking "is <strong>one of their names</strong> 'Rating'?", which is yes.</p>
+<p>(<code>find(..., class_="rating")</code> and CSS selectors already do the "is it in the list" check for you, which is why they worked earlier without any fuss.)</p>
+<h3 id="finding-many-and-narrowing-down">Finding Many, and Narrowing Down</h3>
+<p>Put together, the usual pattern is: <code>find_all</code> the repeating <strong>cards</strong>, then search <strong>inside each card</strong> for its fields.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">for</span> <span class="n">article</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s2">"article"</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">"product"</span><span class="p">):</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">article</span><span class="o">.</span><span class="n">h3</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">price</span> <span class="o">=</span> <span class="n">article</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">"p"</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">"price"</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+    <span class="n">stock</span> <span class="o">=</span> <span class="n">article</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">"p"</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">"stock"</span><span class="p">)</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">title</span><span class="si">:</span><span class="s2">&lt;28</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">price</span><span class="si">:</span><span class="s2">&gt;8</span><span class="si">}</span><span class="s2">   </span><span class="si">{</span><span class="n">stock</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>  Deep Learning with Python      £51.77   In stock (22 available)
+  Python Crash Course            £23.99   In stock (8 available)
+  Fluent Python                  £44.50   Out of stock
+</code></pre></div>
+
+<p>Searching inside each <code>article</code> (instead of the whole <code>soup</code>) is what keeps each title paired with <strong>its own</strong> price and stock. If you instead collected all the titles from the whole page in one list and all the prices in another, a single missing price would shift every price after it onto the wrong book.</p>
+<p>The f-string formatting lines the results up: <code>:&lt;28</code> pads the title to 28 characters on the left, and <code>:&gt;8</code> right-aligns the price in 8 characters.</p>
+<hr />
+<h2 id="part-5-css-selectors"><span class="h-icon"><svg class="icon"><use href="#icon-brackets"></use></svg></span>Part 5: CSS Selectors</h2>
+<p><code>select()</code> and <code>select_one()</code> take a <strong>CSS selector</strong>: the same pattern language the site's own stylesheet uses to pick elements. (<strong>CSS</strong>, Cascading Style Sheets, is the language that controls how a page looks: colours, fonts, spacing.) For anything nested, selectors are much shorter than chaining <code>find</code> calls.</p>
+<ul>
+<li><code>select(...)</code> returns a <strong>list</strong> of every match, like <code>find_all</code>.</li>
+<li><code>select_one(...)</code> returns the <strong>first</strong> match or <code>None</code>, like <code>find</code>.</li>
+</ul>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Selector</th>
+<th>Matches</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>p</code></td>
+<td>every <code>&lt;p&gt;</code></td>
+</tr>
+<tr>
+<td><code>.price</code></td>
+<td>anything with <code>class="price"</code></td>
+</tr>
+<tr>
+<td><code>#catalogue</code></td>
+<td>the element with <code>id="catalogue"</code></td>
+</tr>
+<tr>
+<td><code>article.product</code></td>
+<td><code>&lt;article&gt;</code> elements that have <code>class="product"</code></td>
+</tr>
+<tr>
+<td><code>article p.price</code></td>
+<td>a <code>.price</code> anywhere inside an <code>&lt;article&gt;</code></td>
+</tr>
+<tr>
+<td><code>article &gt; h3</code></td>
+<td>an <code>&lt;h3&gt;</code> that is a <strong>direct</strong> child</td>
+</tr>
+<tr>
+<td><code>a[href]</code></td>
+<td><code>&lt;a&gt;</code> elements that have an <code>href</code></td>
+</tr>
+<tr>
+<td><code>p.stock.in-stock</code></td>
+<td>both classes at once</td>
+</tr>
+</tbody>
+</table></div>
+<p>Two symbols carry most of the meaning: a <strong>dot</strong> (<code>.</code>) means "class", and a <strong>hash</strong> (<code>#</code>) means "id". A <strong>space</strong> between two parts means "somewhere inside", and <code>&gt;</code> means "directly inside".</p>
+<p><strong>Analogy:</strong> a CSS selector is like a <strong>postal address read from big to small</strong>. <code>#catalogue h3 a</code> means "in the catalogue, find a heading, and inside it find a link", just as "India, Mumbai, Marine Drive, building 12" narrows down step by step.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="s2">"prices        :"</span><span class="p">,</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">"article.product p.price"</span><span class="p">)])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"in stock      :"</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">soup</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">"p.stock.in-stock"</span><span class="p">)),</span> <span class="s2">"of"</span><span class="p">,</span>
+                          <span class="nb">len</span><span class="p">(</span><span class="n">soup</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">"article.product"</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"first title   :"</span><span class="p">,</span> <span class="n">soup</span><span class="o">.</span><span class="n">select_one</span><span class="p">(</span><span class="s2">"#catalogue h3 a"</span><span class="p">)</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"the next link :"</span><span class="p">,</span> <span class="n">soup</span><span class="o">.</span><span class="n">select_one</span><span class="p">(</span><span class="s2">"nav.pagination a.next"</span><span class="p">)[</span><span class="s2">"href"</span><span class="p">])</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>prices        : ['£51.77', '£23.99', '£44.50']
+in stock      : 2 of 3
+first title   : Deep Learning with Python
+the next link : shop_page_2.html
+</code></pre></div>
+
+<p>What each line found:</p>
+<ul>
+<li><code>"article.product p.price"</code>: every price paragraph inside a product card, so all three prices.</li>
+<li><code>"p.stock.in-stock"</code>: stock paragraphs that have <strong>both</strong> the <code>stock</code> and <code>in-stock</code> classes. Two of the three books are in stock. (<code>Fluent Python</code> has <code>out-of-stock</code> instead.)</li>
+<li><code>"#catalogue h3 a"</code>: inside the element with <code>id="catalogue"</code>, a link inside a heading. <code>select_one</code> returns just the first.</li>
+<li><code>"nav.pagination a.next"</code>: the "Next" link inside the pagination bar, which we'll follow in Part 8.</li>
+</ul>
+<h3 id="copying-a-selector-from-your-browser">Copying a Selector from Your Browser</h3>
+<p>A tip that saves a lot of guessing: in your browser, <strong>right-click</strong> the thing you want and choose <strong>Inspect</strong>. The developer tools open with that element highlighted in the HTML. Then right-click the highlighted element and choose <strong>Copy → Copy selector</strong>.</p>
+<p>Trim it down to the part that says <strong>what</strong> the element is, not exactly <strong>where</strong> it sits. The copied version is usually something like <code>body &gt; main &gt; article:nth-child(2) &gt; p:nth-child(3)</code>, which is so specific that any change to the page breaks it. <code>article.product p.price</code> says the same thing in a way that survives a redesign.</p>
+<p>One caution: the Inspect panel shows the page <strong>as the browser has built it</strong>, which isn't always the HTML your script downloads. JavaScript may have added elements, and browsers quietly insert a <code>&lt;tbody&gt;</code> into any table that doesn't have one. A copied selector like <code>table &gt; tbody &gt; tr</code> can then find nothing in the downloaded HTML. <strong>View page source</strong> (Part 10) shows what the server actually sent, and that's what BeautifulSoup sees.</p>
+<hr />
+<h2 id="part-6-pulling-out-a-table"><span class="h-icon"><svg class="icon"><use href="#icon-table"></use></svg></span>Part 6: Pulling Out a Table</h2>
+<p><strong>Tables</strong> are the easiest thing to scrape, because their structure already matches what you want:</p>
+<ul>
+<li><code>&lt;tr&gt;</code> is a <strong>row</strong> ("table row"),</li>
+<li><code>&lt;th&gt;</code> is a <strong>heading</strong> cell ("table header"),</li>
+<li><code>&lt;td&gt;</code> is a <strong>data</strong> cell ("table data").</li>
+</ul>
+<p>Headings usually sit inside a <code>&lt;thead&gt;</code> section, and the rows of data inside a <code>&lt;tbody&gt;</code>.</p>
+<div class="diagram-card"><pre><code>   &lt;table class="specs"&gt;
+     &lt;thead&gt; &lt;tr&gt; &lt;th&gt;Method&lt;/th&gt;   &lt;th&gt;Days&lt;/th&gt; &lt;th&gt;Cost&lt;/th&gt;  &lt;/tr&gt; &lt;/thead&gt;   ← headers
+     &lt;tbody&gt; &lt;tr&gt; &lt;td&gt;Standard&lt;/td&gt; &lt;td&gt;5&lt;/td&gt;    &lt;td&gt;£2.99&lt;/td&gt; &lt;/tr&gt;            ← row 1
+             &lt;tr&gt; &lt;td&gt;Express&lt;/td&gt;  &lt;td&gt;2&lt;/td&gt;    &lt;td&gt;£6.49&lt;/td&gt; &lt;/tr&gt;            ← row 2
+             ...                                                     &lt;/tbody&gt;
+   &lt;/table&gt;
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">table</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">"table"</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">"specs"</span><span class="p">)</span>
+
+<span class="n">headers</span> <span class="o">=</span> <span class="p">[</span><span class="n">th</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">th</span> <span class="ow">in</span> <span class="n">table</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">"thead th"</span><span class="p">)]</span>
+<span class="n">rows</span> <span class="o">=</span> <span class="p">[[</span><span class="n">td</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">td</span> <span class="ow">in</span> <span class="n">tr</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s2">"td"</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">tr</span> <span class="ow">in</span> <span class="n">table</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">"tbody tr"</span><span class="p">)]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">" "</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>['Method', 'Days', 'Cost']
+  ['Standard', '5', '£2.99']
+  ['Express', '2', '£6.49']
+  ['Next day', '1', '£9.99']
+</code></pre></div>
+
+<ul>
+<li><code>headers</code> is a list comprehension: for every <code>&lt;th&gt;</code> inside <code>&lt;thead&gt;</code>, take its text.</li>
+<li><code>rows</code> is a <strong>nested</strong> list comprehension: for every <code>&lt;tr&gt;</code> in the body, build a list of the text of each of its <code>&lt;td&gt;</code> cells.</li>
+</ul>
+<p>That's a list of lists, already the shape chapter 10's <code>csv.writer</code> wants. Notice the <code>&amp;pound;</code> entities in the HTML came out as real <code>£</code> signs.</p>
+<h3 id="the-one-line-version-with-pandas">The One-Line Version with pandas</h3>
+<p>When you move on to <strong>pandas</strong> (see "Where to go next" in the course README), <code>pandas.read_html</code> does this whole job in one line. It finds <code>&lt;table&gt;</code> elements in the HTML and returns a list of DataFrames, one per table:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="n">shipping</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_html</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">page1</span><span class="p">),</span> <span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">"class"</span><span class="p">:</span> <span class="s2">"specs"</span><span class="p">})[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">shipping</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">shipping</span><span class="o">.</span><span class="n">dtypes</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>     Method  Days   Cost
+0  Standard     5  £2.99
+1   Express     2  £6.49
+2  Next day     1  £9.99
+
+Method      str
+Days      int64
+Cost        str
+dtype: object
+</code></pre></div>
+
+<ul>
+<li><code>io.StringIO(page1)</code> wraps our string so pandas reads it like a file. (Recent pandas versions want this instead of a raw string.)</li>
+<li><code>attrs={"class": "specs"}</code> picks the table with that class, and <code>[0]</code> takes the first (and only) match.</li>
+<li>Look at <code>dtypes</code>: pandas even turned the <code>Days</code> column into <strong>numbers</strong> (<code>int64</code>) by itself. The <code>Cost</code> column stays text because of the <code>£</code> sign, so it would still need chapter 16's cleaning. (Older pandas versions print <code>object</code> instead of <code>str</code> for text columns; it means the same thing here.)</li>
+</ul>
+<p><code>read_html</code> needs an extra parsing library installed alongside pandas, usually <code>lxml</code>, so it's a tool for later rather than something this chapter's <code>requirements.txt</code> covers.</p>
+<hr />
+<h2 id="part-7-writing-a-scraper-that-doesnt-fall-over"><span class="h-icon"><svg class="icon"><use href="#icon-build"></use></svg></span>Part 7: Writing a Scraper That Doesn't Fall Over</h2>
+<p>Every example so far has called <code>.text</code> <strong>straight on the result</strong> of a <code>find</code>, with no check. That worked on page 1, because page 1 has every field. Real pages often don't.</p>
+<p>A few lines of code are the difference between a scraper that reports "8 of 9 rows had a price" and one that <strong>crashes halfway through the night</strong>. Page 2 has a product with <strong>no price</strong>, just like real catalogues sometimes do:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">page2</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"sample_data/shop_page_2.html"</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+<span class="n">soup2</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">page2</span><span class="p">,</span> <span class="s2">"html.parser"</span><span class="p">)</span>
+
+<span class="n">article</span> <span class="o">=</span> <span class="n">soup2</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">"article.product"</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"found the price tag:"</span><span class="p">,</span> <span class="n">article</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">"p"</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">"price"</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>found the price tag: None
+</code></pre></div>
+
+<p><code>soup2.select("article.product")[1]</code> takes the <strong>second</strong> product on page 2 (counting from 0), and <code>find</code> looked for its price. It returned <code>None</code>, which is fine until the next line:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">try</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">article</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">"p"</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s2">"price"</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"AttributeError:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>AttributeError: 'NoneType' object has no attribute 'text'
+</code></pre></div>
+
+<p><code>'NoneType' object has no attribute 'text'</code> is an error you'll see <strong>a lot</strong> when scraping. It means "you asked for <code>.text</code> on something that wasn't found". It's the same problem as chapter 16's <code>re.search</code> returning <code>None</code>.</p>
+<p><strong>Analogy:</strong> it's like asking someone to <strong>read the label on the third jar</strong> in the cupboard, when there are only two jars. They can't read the label of nothing.</p>
+<h3 id="missing-attributes">Missing Attributes</h3>
+<p>Attributes fail differently. A missing one raises <strong><code>KeyError</code></strong> with <code>[...]</code>, and gives <strong><code>None</code></strong> with <code>.get()</code>, just like a dictionary in chapter 3:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">link</span> <span class="o">=</span> <span class="n">article</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">"a"</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">link</span><span class="p">[</span><span class="s2">"data-discount"</span><span class="p">]</span>
+<span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"KeyError:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">'with .get():'</span><span class="p">,</span> <span class="n">link</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"data-discount"</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'with a default:'</span><span class="p">,</span> <span class="n">link</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"data-discount"</span><span class="p">,</span> <span class="s2">"none"</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>KeyError: 'data-discount'
+with .get(): None
+with a default: none
+</code></pre></div>
+
+<p>So the rule is the same as for dictionaries: use <code>tag["name"]</code> when the attribute <strong>must</strong> be there (and an error would be right if it isn't), and <code>tag.get("name")</code> or <code>tag.get("name", default)</code> when it might be missing.</p>
+<h3 id="one-helper-for-every-field">One Helper for Every Field</h3>
+<p>So a parsing function that will hold up on a real site looks like this: <strong>one helper, and every field goes through it</strong>. <code>x if found else default</code> gives <code>x</code> when <code>found</code> is truthy and <code>default</code> otherwise:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">text_of</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">selector</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="c1"># The first match for `selector` as tidy text, or `default` if it is not there.</span>
+    <span class="n">found</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">select_one</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">found</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">if</span> <span class="n">found</span> <span class="k">else</span> <span class="n">default</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_product</span><span class="p">(</span><span class="n">article</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"sku"</span><span class="p">:</span> <span class="n">article</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"data-sku"</span><span class="p">),</span>
+        <span class="s2">"title"</span><span class="p">:</span> <span class="n">text_of</span><span class="p">(</span><span class="n">article</span><span class="p">,</span> <span class="s2">"h3 a"</span><span class="p">),</span>
+        <span class="s2">"author"</span><span class="p">:</span> <span class="n">text_of</span><span class="p">(</span><span class="n">article</span><span class="p">,</span> <span class="s2">"p.author"</span><span class="p">),</span>
+        <span class="s2">"price"</span><span class="p">:</span> <span class="n">text_of</span><span class="p">(</span><span class="n">article</span><span class="p">,</span> <span class="s2">"p.price"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">""</span><span class="p">),</span>
+        <span class="s2">"stock"</span><span class="p">:</span> <span class="n">text_of</span><span class="p">(</span><span class="n">article</span><span class="p">,</span> <span class="s2">"p.stock"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">"unknown"</span><span class="p">),</span>
+    <span class="p">}</span>
+
+
+<span class="k">for</span> <span class="n">article</span> <span class="ow">in</span> <span class="n">soup2</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">"article.product"</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">parse_product</span><span class="p">(</span><span class="n">article</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>{'sku': '9781593279929', 'title': 'Automate the Boring Stuff', 'author': 'Al Sweigart', 'price': '£27.95', 'stock': 'In stock (13 available)'}
+{'sku': '9781098139482', 'title': 'Effective Pandas', 'author': 'Matt Harrison', 'price': '', 'stock': 'In stock (3 available)'}
+{'sku': '9781492041139', 'title': 'Data Science from Scratch', 'author': 'Joel Grus', 'price': '£41.05', 'stock': 'In stock (11 available)'}
+</code></pre></div>
+
+<p>How it works:</p>
+<ul>
+<li><code>text_of(parent, selector, default)</code> looks for the selector inside <code>parent</code>. If it finds something, it returns its tidy text. If not, it returns the default instead of crashing.</li>
+<li><code>parse_product(article)</code> builds a <strong>dictionary</strong> for one product, sending every field through <code>text_of</code> (and using <code>.get</code> for the attribute).</li>
+<li>A missing price becomes <code>""</code> (an empty string), and a missing stock line would become <code>"unknown"</code>, so the gap is <strong>visible</strong> in the output.</li>
+</ul>
+<p>No exception, and the gap shows up in the output instead of being hidden. That second product, <code>Effective Pandas</code>, has <code>'price': ''</code>.</p>
+<p><strong>Analogy:</strong> <code>text_of</code> is like a careful assistant filling in a form from a messy document. When a field is missing, they <strong>write "not found" in the box</strong> instead of throwing the whole form away.</p>
+<h3 id="turning-prices-into-numbers">Turning Prices into Numbers</h3>
+<p>A price like <code>"£27.95"</code> is still text. Turning it into a number is chapter 16's job:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">to_price</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="n">digits</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">"[^\d.]"</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="n">text</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span>      <span class="c1"># chapter 16</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">digits</span><span class="p">)</span> <span class="k">if</span> <span class="n">digits</span> <span class="k">else</span> <span class="kc">None</span>
+
+
+<span class="k">for</span> <span class="n">article</span> <span class="ow">in</span> <span class="n">soup2</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">"article.product"</span><span class="p">):</span>
+    <span class="n">product</span> <span class="o">=</span> <span class="n">parse_product</span><span class="p">(</span><span class="n">article</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">product</span><span class="p">[</span><span class="s1">'title'</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;28</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">to_price</span><span class="p">(</span><span class="n">product</span><span class="p">[</span><span class="s1">'price'</span><span class="p">])</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>  Automate the Boring Stuff    27.95
+  Effective Pandas             None
+  Data Science from Scratch    41.05
+</code></pre></div>
+
+<ul>
+<li><code>re.sub(r"[^\d.]", "", text or "")</code> deletes everything that isn't a digit or a dot, leaving <code>"27.95"</code>.</li>
+<li><code>text or ""</code> means "use <code>text</code>, or an empty string if <code>text</code> is <code>None</code> or empty", so the function never crashes on a missing price.</li>
+<li>If nothing is left, it returns <code>None</code> instead of a number, which is the honest answer for a missing price.</li>
+</ul>
+<p>(Remember chapter 16's warning about this pattern: it's fine for prices like <code>£27.95</code>, but a value like <code>Rs. 500</code> would wrongly become <code>0.5</code>. Always check cleaned values on your real data.)</p>
+<hr />
+<h2 id="part-8-following-the-pages"><span class="h-icon"><svg class="icon"><use href="#icon-stack"></use></svg></span>Part 8: Following the Pages</h2>
+<p>In chapter 17 we paginated by asking for page 1, 2, 3 until one came back empty. A website usually tells you instead: there's a <strong>"next" link</strong>, until there isn't.</p>
+<div class="diagram-card"><pre><code>   shop_page_1.html ──"Next"──► shop_page_2.html ──"Next"──► shop_page_3.html ──(no Next link)──► stop
+</code></pre></div>
+
+<p>That's a generator again, and this time it stops when there's <strong>no next link</strong>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">crawl</span><span class="p">(</span><span class="n">start_page</span><span class="p">,</span> <span class="n">load</span><span class="p">):</span>
+    <span class="c1"># Yield the soup for each page, following the 'next' link until it runs out.</span>
+    <span class="n">page</span> <span class="o">=</span> <span class="n">start_page</span>
+    <span class="k">while</span> <span class="n">page</span><span class="p">:</span>
+        <span class="n">html</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
+        <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="s2">"html.parser"</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  (parsed </span><span class="si">{</span><span class="n">page</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">soup</span>
+
+        <span class="n">next_link</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">select_one</span><span class="p">(</span><span class="s2">"nav.pagination a.next"</span><span class="p">)</span>
+        <span class="n">page</span> <span class="o">=</span> <span class="n">next_link</span><span class="p">[</span><span class="s2">"href"</span><span class="p">]</span> <span class="k">if</span> <span class="n">next_link</span> <span class="k">else</span> <span class="kc">None</span>
+</code></pre></div>
+
+<p>How <code>crawl</code> works:</p>
+<ol>
+<li>Start with <code>page = start_page</code>.</li>
+<li>While there is a page: load its HTML with the <code>load</code> function, parse it, and <code>yield</code> the soup.</li>
+<li>Look for the "Next" link with <code>select_one("nav.pagination a.next")</code>.</li>
+<li>If there is one, its <code>href</code> becomes the next page. If not, <code>page</code> becomes <code>None</code>, and <code>while page:</code> ends the loop.</li>
+</ol>
+<p>Like chapter 17's <code>all_items</code>, it takes a <strong><code>load</code> function</strong> from the caller, so the same crawler works on saved files today and live pages tomorrow. (Scraping lots of pages by following links is often called <strong>crawling</strong>, and the program doing it a <strong>crawler</strong> or <strong>spider</strong>.)</p>
+<p>Here's a <code>load</code> function that reads our saved pages, and a loop that collects every product across the catalogue:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">load_from_samples</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">"sample_data/</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+
+
+<span class="n">products</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">page_soup</span> <span class="ow">in</span> <span class="n">crawl</span><span class="p">(</span><span class="s2">"shop_page_1.html"</span><span class="p">,</span> <span class="n">load_from_samples</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">article</span> <span class="ow">in</span> <span class="n">page_soup</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">"article.product"</span><span class="p">):</span>
+        <span class="n">products</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parse_product</span><span class="p">(</span><span class="n">article</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">products</span><span class="p">)</span><span class="si">}</span><span class="s2"> products across the whole catalogue"</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">products</span><span class="p">[:</span><span class="mi">4</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">product</span><span class="p">[</span><span class="s1">'title'</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;40</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">product</span><span class="p">[</span><span class="s1">'price'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>  (parsed shop_page_1.html)
+  (parsed shop_page_2.html)
+  (parsed shop_page_3.html)
+
+9 products across the whole catalogue
+  Deep Learning with Python                £51.77
+  Python Crash Course                      £23.99
+  Fluent Python                            £44.50
+  Automate the Boring Stuff                £27.95
+</code></pre></div>
+
+<p>Three pages, nine products, and the crawl <strong>stopped on its own</strong>, because page 3 has no next link.</p>
+<p>On a real site, the <code>href</code> is often a <strong>relative</strong> link like <code>/catalogue/page-2.html</code> instead of a full address. <code>urllib.parse.urljoin(current_url, href)</code> turns it into the full URL you can request.</p>
+<h3 id="stopping-early">Stopping Early</h3>
+<p>Because <code>crawl</code> is a generator, chapter 15's <code>islice</code> still works, and <strong>pages you don't reach are never loaded</strong>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">islice</span>
+
+<span class="k">for</span> <span class="n">page_soup</span> <span class="ow">in</span> <span class="n">islice</span><span class="p">(</span><span class="n">crawl</span><span class="p">(</span><span class="s2">"shop_page_1.html"</span><span class="p">,</span> <span class="n">load_from_samples</span><span class="p">),</span> <span class="mi">2</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"   "</span><span class="p">,</span> <span class="n">page_soup</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>  (parsed shop_page_1.html)
+    The Bookshop - page 1
+  (parsed shop_page_2.html)
+    The Bookshop - page 2
+</code></pre></div>
+
+<p>We asked for two pages, so page 3 was never loaded or parsed. <code>page_soup.title</code> is the shortcut for the <code>&lt;title&gt;</code> tag, the text in the browser tab. On a real site, stopping early like this saves requests, time, and the site's resources, which is especially handy while you're still developing and only need a page or two to test against.</p>
+<hr />
+<h2 id="part-9-saving-the-result"><span class="h-icon"><svg class="icon"><use href="#icon-download"></use></svg></span>Part 9: Saving the Result</h2>
+<p>The point of scraping is <strong>the file you end up with</strong>. Chapter 10's <code>csv.DictWriter</code> takes a list of dictionaries directly, which is exactly what <code>parse_product</code> produced:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">csv</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s2">"scraper_demo"</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">out_path</span> <span class="o">=</span> <span class="s2">"scraper_demo/books.csv"</span>
+
+<span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"sku"</span><span class="p">,</span> <span class="s2">"title"</span><span class="p">,</span> <span class="s2">"author"</span><span class="p">,</span> <span class="s2">"price"</span><span class="p">,</span> <span class="s2">"stock"</span><span class="p">]</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">DictWriter</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">fieldnames</span><span class="o">=</span><span class="n">fields</span><span class="p">)</span>
+    <span class="n">writer</span><span class="o">.</span><span class="n">writeheader</span><span class="p">()</span>
+    <span class="n">writer</span><span class="o">.</span><span class="n">writerows</span><span class="p">(</span><span class="n">products</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"wrote </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">products</span><span class="p">)</span><span class="si">}</span><span class="s2"> rows to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+
+<span class="n">lines</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">out_path</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">[:</span><span class="mi">5</span><span class="p">]))</span>                 <span class="c1"># the header and the first four rows</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>wrote 9 rows to scraper_demo/books.csv
+
+sku,title,author,price,stock
+9781617294433,Deep Learning with Python,François Chollet,£51.77,In stock (22 available)
+9781593279288,Python Crash Course,Eric Matthes,£23.99,In stock (8 available)
+9781492056355,Fluent Python,Luciano Ramalho,£44.50,Out of stock
+9781593279929,Automate the Boring Stuff,Al Sweigart,£27.95,In stock (13 available)
+</code></pre></div>
+
+<ul>
+<li><code>fieldnames=fields</code> sets the column order, matching the dictionary keys.</li>
+<li><code>writeheader()</code> writes the header row, and <code>writerows(products)</code> writes every product.</li>
+<li><code>newline=""</code> stops extra blank lines appearing on Windows, and <code>encoding="utf-8"</code> makes sure characters like <code>ç</code> and <code>£</code> are saved correctly.</li>
+</ul>
+<p>Then the cell reads the file back and prints the first five lines, which is always worth doing: <strong>look at what you saved</strong>.</p>
+<h3 id="a-quick-check-on-what-you-collected">A Quick Check on What You Collected</h3>
+<p>Chapter 15's <code>Counter</code> can now tell you something about what you collected. It's a natural next step, and a good <strong>check that the scrape worked</strong>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">Counter</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">Counter</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">"stock"</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">" ("</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">products</span><span class="p">)</span><span class="o">.</span><span class="n">most_common</span><span class="p">())</span>
+
+<span class="n">priced</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">products</span> <span class="k">if</span> <span class="n">to_price</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">"price"</span><span class="p">])</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">priced</span><span class="p">)</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">products</span><span class="p">)</span><span class="si">}</span><span class="s2"> products had a price"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"cheapest:"</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">priced</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">to_price</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">"price"</span><span class="p">]))[</span><span class="s2">"title"</span><span class="p">])</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>[('In stock', 7), ('Out of stock', 2)]
+8 of 9 products had a price
+cheapest: Python Crash Course
+</code></pre></div>
+
+<ul>
+<li><code>p["stock"].split(" (")[0]</code> turns <code>"In stock (22 available)"</code> into just <code>"In stock"</code>, so the <code>Counter</code> groups them.</li>
+<li><code>priced</code> keeps only the products whose price could be turned into a number. 8 of 9 had one, which matches the one missing price we saw on page 2.</li>
+<li><code>min(priced, key=...)</code> finds the cheapest by comparing the numeric prices.</li>
+</ul>
+<p>These quick counts catch scraping problems early. If the scrape had silently failed on a whole page, you'd see "6 products" instead of 9. If the price selector had broken, you'd see "0 of 9 had a price".</p>
+<hr />
+<h2 id="part-10-one-real-request"><span class="h-icon"><svg class="icon"><use href="#icon-send"></use></svg></span>Part 10: One Real Request</h2>
+<p>Everything so far read files from disk. Here's the same code against a <strong>live website</strong>, using <code>requests</code> from chapter 17 to fetch the page and BeautifulSoup to read it.</p>
+<p>The site is <strong><code>books.toscrape.com</code></strong>, which exists so people can practise scraping without bothering anyone. This is the only request in the whole guide.</p>
+<p>Three things make it a <strong>polite</strong> request:</p>
+<ul>
+<li>a real <strong><code>User-Agent</code></strong> saying what this is,</li>
+<li>a <strong><code>timeout</code></strong>, as chapter 17 insisted,</li>
+<li>a <strong><code>sleep</code></strong> afterwards, so a next request wouldn't follow straight away.</li>
+</ul>
+<p>(<strong>This one makes a real request.</strong> Its output is from the day the notebook was built.)</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"https://books.toscrape.com/"</span><span class="p">,</span>
+                        <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">"User-Agent"</span><span class="p">:</span> <span class="s2">"python-course-notebook/1.0 (learning example)"</span><span class="p">},</span>
+                        <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+
+<span class="c1"># response.text, not response.json(), because this body is HTML</span>
+<span class="n">first_price</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="s2">"html.parser"</span><span class="p">)</span><span class="o">.</span><span class="n">select_one</span><span class="p">(</span><span class="s2">"p.price_color"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"the first price reads:"</span><span class="p">,</span> <span class="n">first_price</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>the first price reads: Â£51.77
+</code></pre></div>
+
+<p>Notice <code>response.text</code>, not <code>response.json()</code>: this body is <strong>HTML</strong>, not JSON. Then <code>select_one("p.price_color")</code> finds the first price on the page.</p>
+<p>And the price reads <strong><code>Â£51.77</code></strong>. That's not a currency symbol anyone recognises.</p>
+<h3 id="where-did-a-come-from">Where Did <code>Â£</code> Come From?</h3>
+<p>Computers store text as <strong>bytes</strong> (numbers from 0 to 255). An <strong>encoding</strong> is the rulebook for turning characters into bytes and back again. The two that matter here:</p>
+<ul>
+<li><strong>UTF-8</strong>, the encoding almost every website uses today. It can store every character in every language. In UTF-8, <code>£</code> takes up <strong>two</strong> bytes.</li>
+<li><strong>Latin-1</strong> (also called ISO-8859-1), an older encoding where <strong>every byte is one character</strong>.</li>
+</ul>
+<p>The page is written in UTF-8, so <code>£</code> was sent as two bytes, and something read those two bytes as <strong>two separate characters</strong>: <code>Â</code> and <code>£</code>.</p>
+<p>You can recreate it without the internet. Encode <code>£</code> as UTF-8, then decode the bytes as Latin-1:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">pound</span> <span class="o">=</span> <span class="s2">"£"</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">"utf-8"</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"£ in UTF-8 is two bytes:"</span><span class="p">,</span> <span class="n">pound</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"read back as Latin-1   :"</span><span class="p">,</span> <span class="s2">"£51.77"</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">"utf-8"</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">"latin-1"</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>£ in UTF-8 is two bytes: b'\xc2\xa3'
+read back as Latin-1   : Â£51.77
+</code></pre></div>
+
+<p><code>b'\xc2\xa3'</code> is the two bytes (written in hexadecimal). Read back with the wrong rulebook, the first byte <code>\xc2</code> became <code>Â</code>, and the second byte <code>\xa3</code> happened to be <code>£</code> in Latin-1.</p>
+<p><strong>Analogy:</strong> it's like reading a message written in a <strong>code where some letters use two symbols</strong>, using a codebook where every symbol is one letter. Most letters come out fine, but the two-symbol ones turn into gibberish pairs.</p>
+<h3 id="who-got-it-wrong">Who Got It Wrong?</h3>
+<p>The something was <code>requests</code>. When a server doesn't say which encoding it used for a text page, <code>requests</code> <strong>assumes Latin-1</strong>. That's what an older version of the HTTP rules said to do, and <code>requests</code> still follows it. This site's server only says <code>text/html</code>, with no encoding. The HTML itself does declare UTF-8, but in a <code>&lt;meta&gt;</code> tag that <code>requests</code> never looks at. (<strong>This uses the real response from above.</strong>)</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="s2">"what requests assumed:"</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">encoding</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"what the bytes say    :"</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">apparent_encoding</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>what requests assumed: ISO-8859-1
+what the bytes say    : utf-8
+</code></pre></div>
+
+<ul>
+<li><code>response.encoding</code> is what <code>requests</code> <strong>assumed</strong> from the headers: <code>ISO-8859-1</code>, which is Latin-1.</li>
+<li><code>response.apparent_encoding</code> is a <strong>guess from the bytes themselves</strong>, made by a character-detection library that <code>requests</code> uses. Here it guesses right: <code>utf-8</code>.</li>
+</ul>
+<h3 id="the-fix">The Fix</h3>
+<p>Set <code>response.encoding</code> to the right value, and <code>response.text</code> is decoded again, correctly, <strong>without a second request</strong> (the bytes were already downloaded; only the reading changes). (<strong>This uses the real response from above.</strong>)</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">response</span><span class="o">.</span><span class="n">encoding</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">apparent_encoding</span>     <span class="c1"># believe the bytes</span>
+
+<span class="n">live</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="s2">"html.parser"</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">pod</span> <span class="ow">in</span> <span class="n">live</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">"article.product_pod"</span><span class="p">)[:</span><span class="mi">5</span><span class="p">]:</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">h3</span><span class="o">.</span><span class="n">a</span><span class="p">[</span><span class="s2">"title"</span><span class="p">]</span>
+    <span class="n">price</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">select_one</span><span class="p">(</span><span class="s2">"p.price_color"</span><span class="p">)</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">stock</span> <span class="o">=</span> <span class="n">pod</span><span class="o">.</span><span class="n">select_one</span><span class="p">(</span><span class="s2">"p.instock"</span><span class="p">)</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">title</span><span class="p">[:</span><span class="mi">34</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;34</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">price</span><span class="si">:</span><span class="s2">&gt;8</span><span class="si">}</span><span class="s2">   </span><span class="si">{</span><span class="n">stock</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>                               <span class="c1"># do not fetch the next page immediately</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>  A Light in the Attic                 £51.77   In stock
+  Tipping the Velvet                   £53.74   In stock
+  Soumission                           £50.10   In stock
+  Sharp Objects                        £47.82   In stock
+  Sapiens: A Brief History of Humank   £54.23   In stock
+</code></pre></div>
+
+<p>Now the prices read <code>£51.77</code>, and we can read the first five books.</p>
+<p>Garbled text like that <code>Â£</code> is called <strong>mojibake</strong> (a Japanese word meaning roughly "character transformation"). It's a common scraping bug, and an easy one to miss because <strong>nothing fails</strong>. The script happily writes a CSV full of <code>Â£</code>, and everything that uses the file inherits the mess.</p>
+<p>Two ways to avoid it:</p>
+<ol>
+<li>Set <code>response.encoding = "utf-8"</code> when you know the site uses UTF-8, which almost every site does now.</li>
+<li>Or give BeautifulSoup <strong><code>response.content</code></strong>, the raw bytes, and let it read the <code>&lt;meta&gt;</code> tag itself to work out the encoding.</li>
+</ol>
+<h3 id="the-title-came-from-an-attribute">The Title Came from an Attribute</h3>
+<p>Look at <code>pod.h3.a["title"]</code>. The title comes from the link's <code>title</code> <strong>attribute</strong>, not the visible text, because the visible text on that site is <strong>cut short</strong> with "..." for long titles. It's a small example of a general rule: <strong>look at the actual HTML before deciding where the data is.</strong> The same information often appears in more than one place, and one of them is usually more complete.</p>
+<p>Finally, <code>time.sleep(2)</code> pauses before anything else happens, matching the kind of <code>Crawl-delay</code> we saw in Part 1.</p>
+<h3 id="when-the-data-isnt-in-the-html-at-all">When the Data Isn't in the HTML at All</h3>
+<p>One more situation you'll meet. Some websites send an almost <strong>empty</strong> HTML page, and then <strong>JavaScript</strong> running in the browser fetches the data and builds the page. <code>requests</code> only downloads the HTML; it doesn't run JavaScript. So you get the empty shell, and your selectors find nothing.</p>
+<p>Two ways forward:</p>
+<ul>
+<li>Use the developer tools' <strong>Network</strong> tab (Part 1) to find the <strong>JSON API</strong> the page's JavaScript is calling, and call it directly with chapter 17's tools. This is usually the better answer.</li>
+<li>Use a <strong>browser automation</strong> tool such as Playwright or Selenium, which drives a real browser that runs the JavaScript. It's much slower and heavier, so it's a last resort.</li>
+</ul>
+<p>A quick check: right-click the page and choose <strong>View page source</strong>. That shows the HTML the server actually sent. If the data you want isn't in there, it's being loaded by JavaScript.</p>
+<hr />
+<h2 id="part-11-scraping-responsibly"><span class="h-icon"><svg class="icon"><use href="#icon-handshake"></use></svg></span>Part 11: Scraping Responsibly</h2>
+<p>The technical part of this chapter is short. This part is what decides whether your scraper is a <strong>useful tool</strong> or <strong>a problem for someone else</strong>.</p>
+<h3 id="dont-hurt-the-site">Don't Hurt the Site</h3>
+<p>A loop with no pause can send many requests a second, and to the site that looks like an <strong>attack</strong> and gets treated like one. One request every second or two is plenty for anything that isn't urgent, and <code>robots.txt</code> may ask for a specific delay, as ours did.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">urls</span><span class="p">:</span>
+    <span class="n">scrape</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>          <span class="c1"># or whatever Crawl-delay asked for</span>
+</code></pre></div>
+
+<p><strong>Analogy:</strong> a scraper with no pause is like a customer who asks a shopkeeper <strong>fifty questions a second</strong>. Even if every question is reasonable, the shopkeeper can't serve anyone else, and you'll be asked to leave.</p>
+<p><strong>Scrape once and save the pages.</strong> Re-reading a file on your disk costs the site nothing, and that's why this guide has <code>sample_data/</code>. While you're developing your parsing code, you'll run it dozens of times; run it against saved HTML, not the live site.</p>
+<h3 id="say-who-you-are">Say Who You Are</h3>
+<p>A real <code>User-Agent</code> with your project name and a contact address means that if something goes wrong, the site owner can <strong>email you</strong> instead of blocking your whole network. Pretending to be Chrome does the opposite. If you feel the need to disguise your scraper, ask yourself why.</p>
+<h3 id="take-only-what-you-need">Take Only What You Need</h3>
+<p>Fetching one page and pulling out four fields isn't the same as copying a whole database. Think about what you'd say if the site owner asked what you were doing.</p>
+<h3 id="the-legal-side-in-brief">The Legal Side, in Brief</h3>
+<p>This isn't legal advice, and the law is different from country to country. Some general points:</p>
+<ul>
+<li><strong><code>robots.txt</code> isn't a law</strong>, but ignoring it weakens any claim that you acted in good faith.</li>
+<li><strong>Terms of service are a contract</strong>, and many of them forbid automated collection. Breaking them can get your account closed and has been used in court cases.</li>
+<li><strong>Copyright still applies.</strong> Plain facts generally can't be copyrighted, but the text, photos and layout that present them generally can. Collecting prices is a different thing from republishing reviews.</li>
+<li><strong>Personal data is protected</strong> by laws like the GDPR in the EU, and similar laws in many other countries. Being publicly visible isn't the same as consent.</li>
+<li><strong>Getting around a login, a paywall or a CAPTCHA</strong> can break computer-misuse laws in many countries. This guide deliberately doesn't cover any of that.</li>
+</ul>
+<p><strong>The short version:</strong> read <code>robots.txt</code>, read the terms, go slowly, say who you are, take as little as you need, avoid personal data, and use the API if there is one. If a project needs you to ignore several of those, that's a sign to rethink it.</p>
+<hr />
+<h2 id="part-12-common-mistakes"><span class="h-icon"><svg class="icon"><use href="#icon-warn"></use></svg></span>Part 12: Common Mistakes</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What happens</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Scraping when an API exists</td>
+<td>Slower, more fragile, possibly not allowed</td>
+<td>Look for the API first</td>
+</tr>
+<tr>
+<td>A regex instead of a parser</td>
+<td>Silently finds comments and misses real elements</td>
+<td><code>BeautifulSoup</code></td>
+</tr>
+<tr>
+<td><code>.find(...).text</code> with no check</td>
+<td><code>'NoneType' object has no attribute 'text'</code></td>
+<td>Check for <code>None</code>, or use a helper</td>
+</tr>
+<tr>
+<td><code>tag["href"]</code> on a missing attribute</td>
+<td><code>KeyError</code></td>
+<td><code>tag.get("href")</code></td>
+</tr>
+<tr>
+<td><code>tag["class"] == "price"</code></td>
+<td>Never true; <code>class</code> is a list</td>
+<td><code>"price" in tag["class"]</code>, or <code>select</code></td>
+</tr>
+<tr>
+<td><code>.string</code> on a tag with children</td>
+<td><code>None</code>, and no error</td>
+<td><code>.get_text(strip=True)</code></td>
+</tr>
+<tr>
+<td>Prices reading <code>Â£51.77</code></td>
+<td>The server sent no charset, so Latin-1 was assumed</td>
+<td><code>response.encoding = "utf-8"</code></td>
+</tr>
+<tr>
+<td>A loop with no <code>sleep</code></td>
+<td>You look like an attack, and get blocked</td>
+<td>One request every second or two</td>
+</tr>
+<tr>
+<td>A fake browser <code>User-Agent</code></td>
+<td>Nobody can contact you; you get blocked anyway</td>
+<td>Name your project and give an address</td>
+</tr>
+<tr>
+<td>Copied browser selectors</td>
+<td>Break on any layout change</td>
+<td>Target <code>class</code> and <code>id</code>, not position</td>
+</tr>
+<tr>
+<td>Re-fetching while developing</td>
+<td>Wasted requests on the same page</td>
+<td>Save the HTML once, then work offline</td>
+</tr>
+</tbody>
+</table></div>
+<p>Notice how many of these fail <strong>silently</strong>: wrong data, <code>None</code>, garbled characters, with no error message. That's why the quick checks in Part 9 (counting rows, counting missing prices) are part of every good scraper.</p>
+<hr />
+<h2 id="quick-reference-summary"><span class="h-icon"><svg class="icon"><use href="#icon-table"></use></svg></span>Quick Reference Summary</h2>
+<p><strong>The whole shape</strong></p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bs4</span><span class="w"> </span><span class="kn">import</span> <span class="n">BeautifulSoup</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">"User-Agent"</span><span class="p">:</span> <span class="s2">"my-project/1.0 (me@example.com)"</span><span class="p">},</span>
+                        <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+<span class="n">response</span><span class="o">.</span><span class="n">encoding</span> <span class="o">=</span> <span class="s2">"utf-8"</span>          <span class="c1"># or the £ signs come out as Â£</span>
+<span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="s2">"html.parser"</span><span class="p">)</span>
+<span class="o">...</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</code></pre></div>
+
+<p><strong>Finding</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Gives you</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>soup.find("p")</code></td>
+<td>first <code>&lt;p&gt;</code>, or <code>None</code></td>
+</tr>
+<tr>
+<td><code>soup.find("p", class_="price")</code></td>
+<td>first with that class</td>
+</tr>
+<tr>
+<td><code>soup.find_all("article", class_="product")</code></td>
+<td>every match, as a list</td>
+</tr>
+<tr>
+<td><code>soup.select("article.product p.price")</code></td>
+<td>CSS selector, a list</td>
+</tr>
+<tr>
+<td><code>soup.select_one("#catalogue h3 a")</code></td>
+<td>CSS selector, first match</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Reading</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Gives you</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tag.get_text(strip=True)</code></td>
+<td>the text, tidied</td>
+</tr>
+<tr>
+<td><code>tag.text</code></td>
+<td>the text, as it is</td>
+</tr>
+<tr>
+<td><code>tag["href"]</code></td>
+<td>an attribute, <code>KeyError</code> if missing</td>
+</tr>
+<tr>
+<td><code>tag.get("href")</code></td>
+<td>an attribute, <code>None</code> if missing</td>
+</tr>
+<tr>
+<td><code>tag["class"]</code></td>
+<td>a <strong>list</strong> of classes</td>
+</tr>
+<tr>
+<td><code>tag.attrs</code></td>
+<td>every attribute, as a dict</td>
+</tr>
+<tr>
+<td><code>tag.parent</code>, <code>tag.find_next_sibling("p")</code></td>
+<td>moving out and sideways</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Selectors</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Selector</th>
+<th>Means</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.price</code></td>
+<td>by class</td>
+</tr>
+<tr>
+<td><code>#catalogue</code></td>
+<td>by id</td>
+</tr>
+<tr>
+<td><code>article.product</code></td>
+<td>tag and class together</td>
+</tr>
+<tr>
+<td><code>article p.price</code></td>
+<td>anywhere inside</td>
+</tr>
+<tr>
+<td><code>article &gt; h3</code></td>
+<td>direct child only</td>
+</tr>
+<tr>
+<td><code>a[href]</code></td>
+<td>has that attribute</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Not falling over</strong></p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">text_of</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">selector</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">found</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">select_one</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">found</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">if</span> <span class="n">found</span> <span class="k">else</span> <span class="n">default</span>
+</code></pre></div>
+
+<p><strong>Checking you're allowed</strong></p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">urllib.robotparser</span><span class="w"> </span><span class="kn">import</span> <span class="n">RobotFileParser</span>
+
+<span class="n">rules</span> <span class="o">=</span> <span class="n">RobotFileParser</span><span class="p">()</span>
+<span class="n">rules</span><span class="o">.</span><span class="n">set_url</span><span class="p">(</span><span class="s2">"https://example.com/robots.txt"</span><span class="p">)</span>
+<span class="n">rules</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+<span class="n">rules</span><span class="o">.</span><span class="n">can_fetch</span><span class="p">(</span><span class="s2">"*"</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>      <span class="c1"># True or False</span>
+<span class="n">rules</span><span class="o">.</span><span class="n">crawl_delay</span><span class="p">(</span><span class="s2">"*"</span><span class="p">)</span>         <span class="c1"># seconds, or None</span>
+</code></pre></div>
+
+<p><strong>Before you start</strong></p>
+<ol>
+<li>Is there an API?</li>
+<li>What does <code>robots.txt</code> say?</li>
+<li>What do the terms of service say?</li>
+<li>Is there personal data in this?</li>
+<li>How slowly can I afford to go?</li>
+</ol>
+
+      <div class="article-end">
+        <p><strong>Web scraping turns pages built for people into data for programs: read the HTML with a real parser like BeautifulSoup, find elements with <code>find</code>, <code>find_all</code> and CSS selectors, send every field through a helper that survives missing pieces, follow "next" links with a generator, and save the result to CSV.</strong> The code is the easy part. The habits are what matter: look for an API first, check <code>robots.txt</code>, the terms and any personal data, go slowly, say who you are, save pages instead of re-fetching them, and watch for silent failures like missing fields and <code>Â£</code>. Next up, chapter 19 is about writing code you can trust: type hints, docstrings, the <code>logging</code> module, and tests with <code>pytest</code>. Everything in chapters 17 and 18 depends on someone else's server behaving, which makes it exactly the kind of code that most needs testing.</p>
+      </div>
+    </main>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="f-left">Python Programming Series &nbsp;/&nbsp; Article 18 of the course</div>
+  <div class="f-right"><a href="#top">Back to top ↑</a></div>
+</footer>
+<script>
+(function(){
+  var t=document.getElementById('navToggle'),s=document.getElementById('sidebar');
+  if(t&&s){t.addEventListener('click',function(){s.classList.toggle('open');var o=s.classList.contains('open');t.innerHTML=o?'<svg class="icon"><use href="#icon-close"></use></svg>':'<svg class="icon"><use href="#icon-menu"></use></svg>';});s.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){s.classList.remove('open');t.innerHTML='<svg class="icon"><use href="#icon-menu"></use></svg>';});});}
+  var tl=Array.prototype.slice.call(document.querySelectorAll('.toc a')),sc=tl.map(function(a){return document.getElementById(a.getAttribute('href').slice(1));}).filter(Boolean);
+  if('IntersectionObserver' in window&&sc.length){var bi={};tl.forEach(function(a){bi[a.getAttribute('href').slice(1)]=a;});var obs=new IntersectionObserver(function(es){es.forEach(function(e){var l=bi[e.target.id];if(!l)return;if(e.isIntersecting){tl.forEach(function(a){a.classList.remove('active');});l.classList.add('active');}});},{rootMargin:'-15% 0px -70% 0px',threshold:0});sc.forEach(function(s){obs.observe(s);});}
+  document.querySelectorAll('.code-card').forEach(function(c){var b=c.querySelector('.copy-btn'),e=c.querySelector('code');if(!b||!e)return;b.addEventListener('click',function(){var tx=e.innerText,done=function(){var o=b.innerHTML;b.innerHTML='<svg class="icon"><use href="#icon-check"></use></svg> Copied';setTimeout(function(){b.innerHTML=o;},1600);};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(tx).then(done,done);else{var ta=document.createElement('textarea');ta.value=tx;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(x){}document.body.removeChild(ta);done();}});});
+})();
+</script>
+</body>
+</html>

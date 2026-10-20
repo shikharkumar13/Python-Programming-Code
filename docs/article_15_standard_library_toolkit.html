@@ -1,0 +1,1703 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Standard Library Toolkit · Python Programming Series</title>
+<meta name="description" content="A beginner-friendly guide to four Python standard library modules: collections (defaultdict, Counter, namedtuple, deque), itertools, functools (partial, lru_cache) and datetime, with the traps to avoid.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+
+:root{
+  --paper:#F3F8FC;--surface:#FFFFFF;--tint:#E8F2FB;
+  --ink:#0E2238;--ink-soft:#3D5570;--ink-faint:#7F95AB;
+  --violet:#0B6FCC;--violet-deep:#0A4F9E;--violet-soft:#E2EFFB;
+  --pink:#3FA34D;--pink-text:#0A7466;--pink-soft:#E0F5F2;
+  --mint:#0FA3A3;--mint-text:#08787A;--mint-soft:#DDF4F4;
+  --sun:#FFB627;--sun-soft:#FFF4D9;
+  --orange:#E89B00;--orange-text:#9A6400;--orange-soft:#FFF0D1;
+  --sky:#013243;--sky-text:#013243;--sky-soft:#E1ECF0;
+  --line:#D6E4F0;--line-strong:#B9CFE3;
+  --code-bg:#0B1E33;--code-head:#08172A;--code-line:#17304D;--out-bg:#071425;
+  --r-s:8px;--r-m:14px;--r-l:22px;
+  --font-d:'Bricolage Grotesque','Arial Rounded MT Bold',sans-serif;
+  --font-b:'Figtree',-apple-system,'Segoe UI',sans-serif;
+  --font-m:'JetBrains Mono','SFMono-Regular',Consolas,monospace;
+}
+*,*::before,*::after{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-b);font-size:17px;line-height:1.68;-webkit-font-smoothing:antialiased;}
+a{color:var(--violet-deep);text-decoration-color:rgba(11,111,204,.35);text-underline-offset:3px;text-decoration-thickness:2px;}
+a:hover{text-decoration-color:currentColor;}
+::selection{background:var(--pink);color:#fff;}
+:focus-visible{outline:3px solid var(--pink);outline-offset:2px;border-radius:4px;}
+.icon{width:1em;height:1em;display:inline-block;vertical-align:-.15em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+
+.shell{max-width:1300px;margin:0 auto;padding:0 clamp(16px,4vw,44px);}
+.topbar{display:none;position:sticky;top:0;z-index:40;align-items:center;justify-content:space-between;padding:12px clamp(16px,4vw,44px);background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-bottom:2px solid var(--violet-soft);}
+.topbar .brand{font-family:var(--font-d);font-weight:800;font-size:.98rem;color:var(--ink);}
+.topbar .brand span{color:var(--violet);}
+.topbar button{border:2px solid var(--violet-soft);background:var(--surface);border-radius:var(--r-s);width:40px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--violet);}
+
+/* ---------- Hero: the one loud moment ---------- */
+.hero{position:relative;margin:clamp(16px,2.5vw,28px) 0 clamp(36px,5vw,56px);padding:clamp(36px,5.5vw,68px) clamp(22px,4.5vw,60px);background:var(--violet);color:#fff;border-radius:var(--r-l);overflow:hidden;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:clamp(28px,4vw,56px);align-items:center;}
+.hero::before{content:"";position:absolute;width:420px;height:420px;border-radius:50%;background:var(--violet-deep);right:-120px;top:-160px;}
+.hero::after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;background:var(--pink);left:-70px;bottom:-90px;opacity:.9;}
+.hero-copy,.hero-art{position:relative;z-index:1;}
+.hero-eyebrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-weight:600;font-size:.95rem;color:rgba(255,255,255,.86);margin-bottom:20px;}
+.hero-eyebrow .badge{background:var(--sun);color:var(--ink);font-family:var(--font-d);font-weight:800;padding:4px 13px;border-radius:999px;font-size:.92rem;}
+h1.title{font-family:var(--font-d);font-weight:800;font-size:clamp(2.15rem,4.6vw,3.7rem);line-height:1.02;letter-spacing:-.025em;margin:0 0 20px;max-width:16ch;color:#fff;}
+.hero-sub{font-size:clamp(1rem,1.5vw,1.12rem);color:rgba(255,255,255,.9);max-width:58ch;margin:0 0 28px;}
+.hero-sub strong{color:#fff;font-weight:700;}
+.hero-chips{display:flex;flex-wrap:wrap;gap:10px;}
+.chip{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.13);border:1.5px solid rgba(255,255,255,.28);padding:7px 14px 7px 10px;border-radius:999px;font-size:.88rem;font-weight:600;color:#fff;}
+.chip .icon{width:1.15em;height:1.15em;}
+.chip:nth-child(1) .icon{color:var(--sun);}
+.chip:nth-child(2) .icon{color:#7FF0D2;}
+.chip:nth-child(3) .icon{color:#C5F27A;}
+.chip:nth-child(4) .icon{color:#9FD6FF;}
+
+.hero-art{display:flex;flex-direction:column;align-items:center;}
+.blueprint{width:min(250px,100%);border:2.5px dashed rgba(255,255,255,.75);border-radius:var(--r-m);padding:14px 16px 12px;font-family:var(--font-m);font-size:.8rem;color:#fff;background:rgba(255,255,255,.06);}
+.bp-title{font-weight:700;margin-bottom:8px;}
+.bp-title .kw{color:#C5F27A;}
+.bp-title .cn{color:var(--sun);}
+.bp-line{padding:2px 0 2px 14px;color:rgba(255,255,255,.82);}
+.bp-line.m{color:#7FF0D2;}
+.fan{width:min(330px,100%);height:44px;display:block;}
+.fan path{stroke:rgba(255,255,255,.7);stroke-width:2;fill:none;stroke-dasharray:4 4;vector-effect:non-scaling-stroke;}
+.objs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:min(360px,100%);}
+.obj{border-radius:12px;padding:10px 10px 9px;font-family:var(--font-m);font-size:.72rem;line-height:1.5;color:var(--ink);box-shadow:0 6px 0 rgba(14,34,56,.28);animation:stamp .5s cubic-bezier(.3,1.5,.6,1) both;}
+.obj b{display:block;font-family:var(--font-d);font-size:1rem;font-weight:800;margin-bottom:3px;}
+.obj span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.o1{background:var(--sun);transform:rotate(-4deg);animation-delay:.25s;}
+.o2{background:#7FF0D2;transform:rotate(2deg);animation-delay:.45s;}
+.o3{background:#C5F27A;transform:rotate(-1.5deg);animation-delay:.65s;}
+@keyframes stamp{from{opacity:0;translate:0 -26px;scale:.85;}to{opacity:1;translate:0 0;scale:1;}}
+.art-cap{margin:18px 0 0;font-family:var(--font-d);font-weight:700;font-size:.95rem;color:rgba(255,255,255,.9);}
+
+/* ---------- Layout + sidebar ---------- */
+.layout{display:grid;grid-template-columns:265px minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:start;padding-bottom:90px;}
+.sidebar{position:sticky;top:24px;max-height:calc(100vh - 48px);overflow-y:auto;padding:16px 10px 16px 0;}
+.sidebar::-webkit-scrollbar{width:5px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:3px;}
+.toc-label{font-family:var(--font-d);font-weight:800;font-size:1rem;color:var(--ink);margin:0 0 10px;padding-left:12px;}
+.toc{list-style:none;margin:0;padding:0;}
+.toc li{margin:0 0 2px;}
+.toc a{display:flex;align-items:center;gap:10px;padding:7px 12px;font-size:.88rem;font-weight:500;color:var(--ink-soft);text-decoration:none;border-radius:10px;transition:background .15s,color .15s;}
+.toc a .icon{width:1.05em;height:1.05em;flex:none;color:var(--violet);}
+.toc a:hover{background:var(--violet-soft);color:var(--ink);}
+.toc a.active{background:var(--violet);color:#fff;font-weight:600;}
+.toc a.active .icon{color:var(--sun);}
+
+/* ---------- Article ---------- */
+.article{min-width:0;padding-top:8px;max-width:820px;}
+.article h2{--acc:var(--violet);font-family:var(--font-d);font-weight:800;font-size:clamp(1.55rem,2.6vw,2rem);line-height:1.15;letter-spacing:-.015em;margin:64px 0 18px;scroll-margin-top:24px;display:flex;align-items:center;gap:14px;}
+.article h2:nth-of-type(5n+2){--acc:var(--pink);}
+.article h2:nth-of-type(5n+3){--acc:var(--mint);}
+.article h2:nth-of-type(5n+4){--acc:var(--orange);}
+.article h2:nth-of-type(5n+5){--acc:var(--sky);}
+.article>h2:first-of-type{margin-top:4px;}
+.article>hr:first-child{display:none;}
+.article h2 .h-icon{width:2.6rem;height:2.6rem;flex:none;display:grid;place-items:center;background:var(--acc);color:#fff;border-radius:12px;transform:rotate(-4deg);box-shadow:0 4px 0 rgba(14,34,56,.18);}
+.article h2 .h-icon .icon{width:1.35rem;height:1.35rem;stroke-width:2;}
+.article h3{font-family:var(--font-d);font-weight:700;font-size:1.2rem;margin:34px 0 10px;scroll-margin-top:24px;color:var(--ink);}
+.article p{margin:0 0 17px;}
+.article ul,.article ol{margin:0 0 20px;padding-left:1.35em;}
+.article li{margin-bottom:8px;padding-left:.2em;}
+.article ul li::marker{color:var(--pink);font-size:1.15em;}
+.article ol li::marker{color:var(--violet);font-family:var(--font-d);font-weight:800;}
+.article strong{font-weight:700;}
+.article hr{border:0;height:6px;width:110px;margin:52px auto;border-radius:6px;background:linear-gradient(90deg,var(--violet) 0 20%,var(--pink) 20% 40%,var(--mint) 40% 60%,var(--sun) 60% 80%,var(--sky) 80% 100%);}
+.article code{font-family:var(--font-m);font-size:.84em;background:var(--pink-soft);padding:.12em .4em;border-radius:6px;color:var(--pink-text);}
+.article blockquote{margin:22px 0;padding:16px 20px;border-left:5px solid var(--sun);background:var(--sun-soft);border-radius:0 var(--r-m) var(--r-m) 0;color:var(--ink);}
+.article blockquote p{margin:0;color:inherit;}
+
+.table-wrap{overflow-x:auto;margin:22px 0 28px;border-radius:var(--r-m);border:2px solid var(--violet-soft);background:var(--surface);}
+.article table{width:100%;border-collapse:collapse;font-size:.9rem;}
+.article thead th{background:var(--violet);color:#fff;font-family:var(--font-d);font-weight:700;text-align:left;padding:12px 16px;white-space:nowrap;font-size:.9rem;}
+.article tbody td{padding:11px 16px;border-bottom:1px solid var(--line);vertical-align:top;}
+.article tbody tr:last-child td{border-bottom:none;}
+.article tbody tr:nth-child(even){background:#F5F9FD;}
+.article tbody td code{white-space:nowrap;}
+
+/* ---------- Code ---------- */
+.code-card{margin:22px 0 26px;border-radius:var(--r-m);overflow:hidden;background:var(--code-bg);box-shadow:0 6px 0 var(--violet-soft);}
+.code-card .code-head{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:var(--code-head);border-bottom:1px solid var(--code-line);}
+.code-card .dots{display:flex;gap:6px;}
+.code-card .dots span{width:10px;height:10px;border-radius:50%;display:block;}
+.code-card .dots span:nth-child(1){background:var(--pink);}
+.code-card .dots span:nth-child(2){background:var(--sun);}
+.code-card .dots span:nth-child(3){background:var(--mint);}
+.code-card .lang{font-family:var(--font-m);font-size:.72rem;color:#7E9CC0;}
+.code-card .copy-btn{font-family:var(--font-b);font-weight:600;font-size:.76rem;color:#DCEBFA;background:rgba(255,255,255,.06);border:1px solid #23456B;border-radius:7px;padding:4px 10px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .15s,border-color .15s;}
+.code-card .copy-btn:hover{background:var(--violet);border-color:var(--violet);color:#fff;}
+.code-card .copy-btn .icon{width:.95em;height:.95em;}
+.code-card pre{margin:0;padding:16px 20px;overflow-x:auto;font-size:.85rem;line-height:1.6;}
+.code-card code{font-family:var(--font-m);font-size:1em;line-height:inherit;color:#E6F1FF;background:none;padding:0;border-radius:0;}
+.code-card .k,.code-card .kn,.code-card .kd,.code-card .kc,.code-card .ow{color:#5CC8FF;}
+.code-card .nb,.code-card .bp{color:#9FD6FF;}
+.code-card .nf,.code-card .fm{color:#A6E36B;}
+.code-card .s,.code-card .s1,.code-card .s2,.code-card .sa,.code-card .sd,.code-card .se{color:#FFD166;}
+.code-card .si{color:#6EE7D8;}
+.code-card .mi,.code-card .mf{color:#6EE7D8;}
+.code-card .o,.code-card .p{color:#9FB6CF;}
+.code-card .c,.code-card .c1,.code-card .cm{color:#6F8BA8;font-style:italic;}
+.code-card .n{color:#E6F1FF;}
+.code-card .nc,.code-card .ne{color:#FFB86B;font-weight:600;}
+
+.output-card{margin:-26px 0 26px;border-radius:0 0 var(--r-m) var(--r-m);overflow:hidden;background:var(--out-bg);border-top:2px dashed #23456B;box-shadow:0 6px 0 var(--violet-soft);position:relative;z-index:1;}
+.output-card::before{content:"Output";display:block;font-family:var(--font-b);font-weight:700;font-size:.74rem;color:#A6E36B;padding:9px 20px 0;}
+.output-card pre{margin:0;padding:4px 20px 16px;overflow-x:auto;font-size:.82rem;line-height:1.6;}
+.output-card code{font-family:var(--font-m);font-size:1em;line-height:inherit;color:#BFD6EE;background:none;padding:0;border-radius:0;}
+
+.diagram-card{margin:22px 0 26px;border-radius:var(--r-m);overflow:hidden;position:relative;border:2.5px dashed var(--line-strong);background:var(--surface);}
+.diagram-card::before{content:"diagram";position:absolute;top:10px;right:14px;font-family:var(--font-b);font-weight:700;font-size:.74rem;color:var(--violet);}
+.diagram-card pre{margin:0;padding:26px 22px 20px;overflow-x:auto;}
+.diagram-card pre{line-height:1.3;font-size:.84rem;}
+.diagram-card code{font-family:var(--font-m);font-size:1em;line-height:inherit;color:var(--violet-deep);font-weight:500;background:none;padding:0;white-space:pre;}
+
+.svg-diagram{margin:24px 0 28px;padding:22px 20px 18px;background:var(--surface);border:2px solid var(--violet-soft);border-radius:var(--r-m);}
+.svg-diagram{overflow-x:auto;}
+.svg-diagram svg{width:100%;min-width:560px;height:auto;display:block;}
+.svg-diagram .cap{font-size:.86rem;font-weight:500;color:var(--ink-faint);text-align:center;margin-top:12px;}
+
+.article-end{margin-top:56px;padding:30px 30px;border-radius:var(--r-l);background:var(--violet);color:#fff;position:relative;overflow:hidden;}
+.article-end::after{content:"";position:absolute;width:140px;height:140px;border-radius:50%;background:var(--sun);right:-50px;bottom:-60px;}
+.article-end p{margin:0;font-size:1.06rem;color:rgba(255,255,255,.92);position:relative;z-index:1;max-width:62ch;}
+.article-end p strong{color:#fff;}
+
+footer.site-footer{border-top:2px solid var(--violet-soft);margin-top:30px;padding:22px clamp(16px,4vw,44px) 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+footer.site-footer .f-left{font-size:.88rem;font-weight:500;color:var(--ink-faint);}
+footer.site-footer a{font-size:.9rem;font-weight:600;}
+
+@media(max-width:960px){
+  .topbar{display:flex;}
+  .layout{grid-template-columns:1fr;}
+  .article{max-width:none;}
+  .sidebar{position:fixed;inset:60px 0 0 0;z-index:35;background:var(--paper);padding:18px clamp(16px,4vw,44px) 24px;transform:translateX(-100%);transition:transform .2s;max-height:none;height:calc(100vh - 60px);}
+  .sidebar.open{transform:translateX(0);}
+  .hero{grid-template-columns:1fr;}
+}
+@media(max-width:520px){
+  .article h2 .h-icon{width:2.2rem;height:2.2rem;}
+  .obj{font-size:.66rem;padding:9px 8px;}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}.sidebar{transition:none;}.obj{animation:none;}}
+
+/* NumPy hero illustration */
+.cells{display:grid;grid-template-columns:repeat(4,1fr);border:2px solid rgba(255,255,255,.8);border-radius:8px;overflow:hidden;margin-top:4px;}
+.cells span{text-align:center;padding:7px 0;font-weight:700;color:#fff;}
+.cells span+span{border-left:2px solid rgba(255,255,255,.8);}
+.objs.four{grid-template-columns:repeat(4,1fr);width:min(380px,100%);gap:9px;}
+.objs.four .obj{text-align:center;padding:10px 4px 9px;}
+.o4{background:#9FD6FF;transform:rotate(3deg);animation-delay:.85s;}
+
+/* Article 11 extras */
+.cells.three{grid-template-columns:repeat(3,1fr);}
+.cells.three span{font-size:.72rem;padding:6px 0;}
+.objs .obj{min-width:0;}
+.obj.seq{text-align:center;padding:10px 6px 9px;}
+.obj.seq code{display:block;font-family:var(--font-m);font-size:.74rem;font-weight:700;margin:2px 0 4px;color:var(--ink);background:none;padding:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.obj.seq span{font-size:.68rem;white-space:normal;}
+.code-card.term .code-head{background:#06121F;}
+.code-card .lang{text-transform:none;}
+.diagram-card.textfile::before{content:"text";}
+@media(max-width:520px){.obj.seq code{font-size:.62rem;}}
+
+.article h2 code,.article h3 code,.article p code,.article li code{overflow-wrap:anywhere;}
+</style>
+</head>
+<body>
+<svg style="display:none" aria-hidden="true"><defs>
+<symbol id="icon-leak" viewBox="0 0 24 24"><path d="M12 2s6 7 6 12a6 6 0 0 1-12 0c0-5 6-12 6-12z"/><path d="M9.5 15a2.5 2.5 0 0 0 2.5 2.5"/></symbol>
+<symbol id="icon-door" viewBox="0 0 24 24"><path d="M4 21V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v17"/><path d="M2 21h20"/><circle cx="12.5" cy="12" r="1" fill="currentColor"/><path d="M19 8l3 3-3 3M16 11h6"/></symbol>
+<symbol id="icon-build" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></symbol>
+<symbol id="icon-key" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3L21 2M17 6l3 3M14.5 8.5l2 2"/></symbol>
+<symbol id="icon-shield" viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z"/><path d="M9 12l2 2 4-4"/></symbol>
+<symbol id="icon-stopwatch" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M10 2h4M12 2v3"/></symbol>
+<symbol id="icon-layers" viewBox="0 0 24 24"><path d="M3 7c0-2 4-3 9-3s9 1 9 3"/><path d="M3 7h18"/><path d="M4 12h16" stroke-dasharray="2 2"/><path d="M3 17h18c0 2-4 3-9 3s-9-1-9-3z"/></symbol>
+<symbol id="icon-scale" viewBox="0 0 24 24"><path d="M12 3v18M7 21h10M5 7h14"/><path d="M5 7l-3 7a3 3 0 0 0 6 0zM19 7l-3 7a3 3 0 0 0 6 0z"/></symbol>
+<symbol id="icon-toolbox" viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="12" rx="1.5"/><path d="M8 8V5h8v3M2 13h20M10 13v2h4v-2"/></symbol>
+<symbol id="icon-stack" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="5" rx="1"/><rect x="4" y="10" width="16" height="5" rx="1"/><rect x="4" y="17" width="16" height="4" rx="1"/></symbol>
+<symbol id="icon-undo" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></symbol>
+<symbol id="icon-exitstack" viewBox="0 0 24 24"><rect x="3" y="12" width="7" height="9" rx="1"/><rect x="8.5" y="7" width="7" height="9" rx="1"/><rect x="14" y="2" width="7" height="9" rx="1"/></symbol>
+<symbol id="icon-loop" viewBox="0 0 24 24"><path d="M17 2l3 3-3 3"/><path d="M4 11V9a4 4 0 0 1 4-4h12"/><path d="M7 22l-3-3 3-3"/><path d="M20 13v2a4 4 0 0 1-4 4H4"/></symbol>
+<symbol id="icon-func" viewBox="0 0 24 24"><path d="M15 4h-2a3 3 0 0 0-3 3v10a3 3 0 0 1-3 3H5"/><path d="M7 11h8"/><path d="M16 14l4 5M20 14l-4 5"/></symbol>
+<symbol id="icon-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8 14h2M14 14h2M8 17h2"/></symbol>
+<symbol id="icon-puzzle" viewBox="0 0 24 24"><path d="M4 7h4a2 2 0 1 1 4 0h4v4a2 2 0 1 1 0 4v4h-4a2 2 0 1 0-4 0H4v-4a2 2 0 1 0 0-4z"/></symbol>
+<symbol id="icon-warn" viewBox="0 0 24 24"><path d="M12 3l10 18H2z"/><path d="M12 10v5"/><circle cx="12" cy="18" r=".8" fill="currentColor"/></symbol>
+<symbol id="icon-table" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="1.5"/><line x1="2" y1="9" x2="22" y2="9"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15.5" y1="3" x2="15.5" y2="21"/></symbol>
+<symbol id="icon-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="13" rx="1.6"/><path d="M5 16H4.5A1.5 1.5 0 0 1 3 14.5v-10A1.5 1.5 0 0 1 4.5 3h10A1.5 1.5 0 0 1 16 4.5V5"/></symbol>
+<symbol id="icon-check" viewBox="0 0 24 24"><path d="M4 12.5 L9.5 18 L20 5"/></symbol>
+<symbol id="icon-menu" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
+<symbol id="icon-close" viewBox="0 0 24 24"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></symbol>
+</defs></svg>
+
+
+<div class="topbar">
+  <span class="brand">§15 &nbsp;<span>Standard Library</span></span>
+  <button id="navToggle" aria-label="Toggle navigation">
+    <svg class="icon"><use href="#icon-menu"></use></svg>
+  </button>
+</div>
+
+<div class="shell" id="top">
+  <section class="hero">
+  <div class="hero-copy">
+    <div class="hero-eyebrow"><span class="badge">Article 15</span> Python Programming Series</div>
+    <h1 class="title">The Standard Library Toolkit: collections, itertools, functools and datetime</h1>
+    <p class="hero-sub">Python comes with a huge set of ready-made modules called the <strong>standard library</strong>. You don't install anything to get them; they arrive with Python itself. This guide takes a close, beginner-friendly look at four of the most useful ones: <code>collections</code>, <code>itertools</code>, <code>functools</code> and <code>datetime</code>. Each one solves everyday problems that would otherwise take you many lines of fiddly code.</p>
+    <div class="hero-chips">
+      <div class="chip"><svg class="icon"><use href="#icon-toolbox"></use></svg> defaultdict, Counter, deque</div>
+      <div class="chip"><svg class="icon"><use href="#icon-loop"></use></svg> Lazy loops with itertools</div>
+      <div class="chip"><svg class="icon"><use href="#icon-func"></use></svg> partial and lru_cache</div>
+      <div class="chip"><svg class="icon"><use href="#icon-calendar"></use></svg> Dates you can sort and subtract</div>
+    </div>
+  </div>
+  <div class="hero-art" aria-hidden="true">
+    <div class="blueprint">
+      <div class="bp-title"><span class="kw">#</span> <span class="cn">ships with Python</span></div>
+      <div class="cells three"><span>collections</span><span>itertools</span><span>datetime</span></div>
+    </div>
+    <svg class="fan" viewBox="0 0 330 44" preserveAspectRatio="none"><path d="M165 0 C165 24 55 18 55 44"/><path d="M165 0 L165 44"/><path d="M165 0 C165 24 275 18 275 44"/></svg>
+    <div class="objs">
+      <div class="obj seq o1"><b>count</b><code>Counter()</code><span>tallies anything</span></div>
+      <div class="obj seq o2"><b>group</b><code>groupby()</code><span>sort it first</span></div>
+      <div class="obj seq o3"><b>dates</b><code>timedelta()</code><span>real date maths</span></div>
+    </div>
+    <p class="art-cap">No pip install needed</p>
+  </div>
+</section>
+
+  <div class="layout">
+    <nav class="sidebar" id="sidebar">
+      <div class="toc-label">On this page</div>
+      <ul class="toc">
+<li><a href="#part-1-collections"><svg class="icon"><use href="#icon-toolbox"></use></svg><span>Part 1: collections</span></a></li>
+<li><a href="#part-2-itertools"><svg class="icon"><use href="#icon-loop"></use></svg><span>Part 2: itertools</span></a></li>
+<li><a href="#part-3-functools"><svg class="icon"><use href="#icon-func"></use></svg><span>Part 3: functools</span></a></li>
+<li><a href="#part-4-datetime"><svg class="icon"><use href="#icon-calendar"></use></svg><span>Part 4: datetime</span></a></li>
+<li><a href="#part-5-putting-it-together"><svg class="icon"><use href="#icon-puzzle"></use></svg><span>Part 5: Putting It Together</span></a></li>
+<li><a href="#part-6-common-mistakes"><svg class="icon"><use href="#icon-warn"></use></svg><span>Part 6: Common Mistakes</span></a></li>
+<li><a href="#quick-reference-summary"><svg class="icon"><use href="#icon-table"></use></svg><span>Quick Reference Summary</span></a></li>
+      </ul>
+    </nav>
+
+    <main class="article">
+<p><strong>Analogy:</strong> think of the standard library as the <strong>toolbox that comes with a new house</strong>. Before you drive to the hardware store (installing an outside library with <code>pip</code>), it's worth opening the toolbox you already own. These four modules are four well-stocked drawers in that toolbox.</p>
+<p>You may already have seen one of these tools without an explanation. A sales report might build its totals like this:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
+
+<span class="n">revenue_by_category</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+<span class="n">orders_by_customer</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Both lines will make sense by the end of Part 1, and you'll see that the second one is really a job for a different tool.</p>
+<p>Everything in this guide comes with Python. There's no <code>pip install</code> and no <code>requirements.txt</code>, so nothing can go wrong on someone else's machine.</p>
+<p>Here is what we will cover:</p>
+<ol>
+<li><code>collections</code>: <code>defaultdict</code>, <code>Counter</code>, <code>namedtuple</code>, <code>deque</code></li>
+<li><code>itertools</code>: <code>chain</code>, <code>islice</code>, <code>groupby</code>, <code>product</code>, <code>combinations</code>, <code>count</code>, <code>cycle</code></li>
+<li><code>functools</code>: <code>partial</code>, and a second look at <code>lru_cache</code></li>
+<li><code>datetime</code>: reading dates from text, printing them, and doing maths with <code>timedelta</code></li>
+<li>The traps in each one, and how to spot them</li>
+</ol>
+<h3 id="the-data-well-use">The Data We'll Use</h3>
+<p>One small dataset of online shop orders runs through the whole guide, so each tool solves a problem you can already see. Each order is a <strong>tuple</strong> of five values: an order ID, the customer, the product category, the order date and the amount paid.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">ORDERS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="c1"># order_id, customer, category,      date,         amount</span>
+    <span class="p">(</span><span class="s2">"A001"</span><span class="p">,</span> <span class="s2">"Alice"</span><span class="p">,</span> <span class="s2">"Books"</span><span class="p">,</span>       <span class="s2">"2024-03-01"</span><span class="p">,</span>  <span class="mf">59.98</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"A002"</span><span class="p">,</span> <span class="s2">"Bob"</span><span class="p">,</span>   <span class="s2">"Electronics"</span><span class="p">,</span> <span class="s2">"2024-03-01"</span><span class="p">,</span>  <span class="mf">45.00</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"A003"</span><span class="p">,</span> <span class="s2">"Alice"</span><span class="p">,</span> <span class="s2">"Appliances"</span><span class="p">,</span>  <span class="s2">"2024-03-02"</span><span class="p">,</span>  <span class="mf">89.99</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"A004"</span><span class="p">,</span> <span class="s2">"Carol"</span><span class="p">,</span> <span class="s2">"Books"</span><span class="p">,</span>       <span class="s2">"2024-03-04"</span><span class="p">,</span>  <span class="mf">89.97</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"A005"</span><span class="p">,</span> <span class="s2">"Bob"</span><span class="p">,</span>   <span class="s2">"Electronics"</span><span class="p">,</span> <span class="s2">"2024-03-05"</span><span class="p">,</span>  <span class="mf">75.00</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"A006"</span><span class="p">,</span> <span class="s2">"Dave"</span><span class="p">,</span>  <span class="s2">"Appliances"</span><span class="p">,</span>  <span class="s2">"2024-03-05"</span><span class="p">,</span>  <span class="mf">89.99</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"A007"</span><span class="p">,</span> <span class="s2">"Alice"</span><span class="p">,</span> <span class="s2">"Books"</span><span class="p">,</span>       <span class="s2">"2024-03-08"</span><span class="p">,</span>  <span class="mf">24.99</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"A008"</span><span class="p">,</span> <span class="s2">"Carol"</span><span class="p">,</span> <span class="s2">"Books"</span><span class="p">,</span>       <span class="s2">"2024-03-11"</span><span class="p">,</span> <span class="mf">120.00</span><span class="p">),</span>
+<span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">ORDERS</span><span class="p">)</span><span class="si">}</span><span class="s2"> orders, $</span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">o</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">ORDERS</span><span class="p">)</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2"> total"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>8 orders, $594.92 total
+</code></pre></div>
+
+<hr />
+<h2 id="part-1-collections"><span class="h-icon"><svg class="icon"><use href="#icon-toolbox"></use></svg></span>Part 1: <code>collections</code></h2>
+<p>The <code>collections</code> module gives you <strong>four extra container types</strong>, each doing a job that the built-in ones (lists, dicts, tuples) handle awkwardly.</p>
+<h3 id="11-defaultdict-the-keyerror-you-keep-working-around">1.1 <code>defaultdict</code>: The <code>KeyError</code> You Keep Working Around</h3>
+<p><strong>Grouping</strong> (for example, "total revenue per category") is one of the most common things you'll do with a list of records, and a plain dictionary makes it clumsy. The problem is that the first time you touch a key, it doesn't exist yet:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">revenue</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">revenue</span><span class="p">[</span><span class="s2">"Books"</span><span class="p">]</span> <span class="o">+=</span> <span class="mf">59.98</span>
+<span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"KeyError:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>KeyError: 'Books'
+</code></pre></div>
+
+<p><code>revenue["Books"] += 59.98</code> really means <code>revenue["Books"] = revenue["Books"] + 59.98</code>, and Python can't read <code>revenue["Books"]</code> because there's nothing there yet.</p>
+<p>So every grouping loop needs an extra check first:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">revenue</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="k">for</span> <span class="n">order_id</span><span class="p">,</span> <span class="n">customer</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">amount</span> <span class="ow">in</span> <span class="n">ORDERS</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">category</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">revenue</span><span class="p">:</span>         <span class="c1"># the extra check</span>
+        <span class="n">revenue</span><span class="p">[</span><span class="n">category</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">revenue</span><span class="p">[</span><span class="n">category</span><span class="p">]</span> <span class="o">+=</span> <span class="n">amount</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">revenue</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>{'Books': 294.94, 'Electronics': 120.0, 'Appliances': 179.98}
+</code></pre></div>
+
+<p><code>dict.setdefault()</code> shortens that to one line, and you'll see it in plenty of code. It means "give me the value for this key, and if there isn't one, set it to this default first":</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">revenue</span><span class="p">[</span><span class="n">category</span><span class="p">]</span> <span class="o">=</span> <span class="n">revenue</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">category</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">+</span> <span class="n">amount</span>
+</code></pre></div>
+
+<p><code>defaultdict</code> goes further. You give it a <strong>function that makes the starting value</strong>, and it calls that function automatically whenever you touch a key that isn't there yet:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
+
+<span class="n">revenue</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>            <span class="c1"># float() is 0.0</span>
+
+<span class="k">for</span> <span class="n">order_id</span><span class="p">,</span> <span class="n">customer</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">amount</span> <span class="ow">in</span> <span class="n">ORDERS</span><span class="p">:</span>
+    <span class="n">revenue</span><span class="p">[</span><span class="n">category</span><span class="p">]</span> <span class="o">+=</span> <span class="n">amount</span>         <span class="c1"># no check, no setdefault</span>
+
+<span class="k">for</span> <span class="n">category</span><span class="p">,</span> <span class="n">total</span> <span class="ow">in</span> <span class="n">revenue</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">category</span><span class="si">:</span><span class="s2">&lt;12</span><span class="si">}</span><span class="s2"> $</span><span class="si">{</span><span class="n">total</span><span class="si">:</span><span class="s2">&gt;7.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Books        $ 294.94
+Electronics  $ 120.00
+Appliances   $ 179.98
+</code></pre></div>
+
+<p>No check, no <code>setdefault</code>. The first time <code>"Books"</code> is touched, <code>defaultdict</code> calls <code>float()</code>, which returns <code>0.0</code>, and then adds the amount.</p>
+<p><strong>Analogy:</strong> a <strong>filing cabinet that creates folders by itself</strong>. With a normal cabinet, asking for the "Books" folder when it doesn't exist gets you an error, so you have to create it first. With a <code>defaultdict</code> cabinet, asking for a missing folder makes a new empty one appear, ready to use.</p>
+<div class="diagram-card"><pre><code>   revenue["Books"] += 59.98
+
+   plain dict:   "Books" missing? ──► KeyError ✗
+
+   defaultdict(float):
+                 "Books" missing? ──► call float() → 0.0 ──► store it ──► 0.0 + 59.98 ✓
+</code></pre></div>
+
+<h3 id="pass-a-function-not-a-value">Pass a Function, Not a Value</h3>
+<p>The argument is a <strong>function</strong>, not a value. <code>defaultdict(float)</code> calls <code>float()</code> to get <code>0.0</code>, and <code>defaultdict(list)</code> calls <code>list()</code> to get a <strong>fresh empty list</strong>. You'll use that second one the most, because it turns grouping into two lines:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">orders_by_customer</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="n">ORDERS</span><span class="p">:</span>
+    <span class="n">orders_by_customer</span><span class="p">[</span><span class="n">order</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">order</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="k">for</span> <span class="n">customer</span><span class="p">,</span> <span class="n">ids</span> <span class="ow">in</span> <span class="n">orders_by_customer</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">customer</span><span class="si">:</span><span class="s2">&lt;6</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">ids</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Alice  ['A001', 'A003', 'A007']
+Bob    ['A002', 'A005']
+Carol  ['A004', 'A008']
+Dave   ['A006']
+</code></pre></div>
+
+<p>Each customer automatically got their own empty list the first time they appeared, and then their order IDs were appended to it.</p>
+<p>Notice it's <code>defaultdict(list)</code>, not <code>defaultdict([])</code>. The whole idea is that <strong>each new key gets its own fresh starting value</strong>. If you could pass one actual list, that same list object would be shared by every key, so an append to one customer would show up under all of them.</p>
+<p><strong>Analogy:</strong> it's the difference between giving each shopper <strong>their own new basket</strong> (<code>list</code>, a basket-making function) and making every shopper share <strong>one single basket</strong> (<code>[]</code>). With one shared basket, everyone's items get mixed up.</p>
+<p>Python doesn't let you make that mistake. It refuses anything that isn't a function (anything that isn't "callable"):</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">try</span><span class="p">:</span>
+    <span class="n">broken</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">([])</span>            <span class="c1"># deliberately wrong: a list, not a function</span>
+    <span class="n">broken</span><span class="p">[</span><span class="s2">"Books"</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"A001"</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"TypeError:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>TypeError: first argument must be callable or None
+</code></pre></div>
+
+<h3 id="the-trap-reading-a-missing-key-creates-it">The Trap: Reading a Missing Key Creates It</h3>
+<p>This is the part of <code>defaultdict</code> that surprises people. <strong>Looking up a key isn't just a read. It can change the dictionary:</strong></p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">counts</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="n">counts</span><span class="p">[</span><span class="s2">"Books"</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Electronics count   :"</span><span class="p">,</span> <span class="n">counts</span><span class="p">[</span><span class="s2">"Electronics"</span><span class="p">])</span>   <span class="c1"># just looking</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"the dictionary now  :"</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">counts</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"length              :"</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">counts</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Electronics count   : 0
+the dictionary now  : {'Books': 1, 'Electronics': 0}
+length              : 2
+</code></pre></div>
+
+<p>We only <em>looked</em> at <code>counts["Electronics"]</code>, but that lookup created the key with a value of <code>0</code>. The dictionary grew from 1 key to 2. If a report then loops over <code>counts.items()</code>, you get a row of zeros for every category anyone ever asked about.</p>
+<p><strong>Analogy:</strong> imagine a librarian who, every time you ask about a book that isn't on the shelf, quietly <strong>puts an empty box labelled with that title on the shelf</strong>. After a busy day, the shelves are full of empty boxes.</p>
+<p>Use <code>.get()</code> when you only want to look. <code>.get(key, default)</code> returns the default if the key is missing, <strong>without</strong> creating it:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">counts</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="n">counts</span><span class="p">[</span><span class="s2">"Books"</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"with .get():"</span><span class="p">,</span> <span class="n">counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"Electronics"</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"still just:"</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">counts</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>with .get(): 0
+still just: {'Books': 1}
+</code></pre></div>
+
+<p>A <code>defaultdict</code> is a real <code>dict</code> underneath, so everything you know about dictionaries works on it. When you've finished building it, <code>dict(d)</code> turns it back into a plain dictionary:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="s2">"is it a dict?"</span><span class="p">,</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="nb">dict</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"plain again  :"</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">counts</span><span class="p">))</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>is it a dict? True
+plain again  : dict
+</code></pre></div>
+
+<h3 id="12-counter-counting-made-easy">1.2 <code>Counter</code>: Counting Made Easy</h3>
+<p>You could count orders per customer with <code>defaultdict(int)</code>. That works, but counting is so common that it has its <strong>own</strong> container. Give <code>Counter</code> anything you can loop over, and it counts what's in it:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">Counter</span>
+
+<span class="n">by_customer</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">order</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="n">ORDERS</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">by_customer</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Alice's orders:"</span><span class="p">,</span> <span class="n">by_customer</span><span class="p">[</span><span class="s2">"Alice"</span><span class="p">])</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Counter({'Alice': 3, 'Bob': 2, 'Carol': 2, 'Dave': 1})
+Alice's orders: 3
+</code></pre></div>
+
+<p><strong>Analogy:</strong> a <code>Counter</code> is like the <strong>tally sheet</strong> used to count votes in an election. Every time a name comes up, you add a mark next to it. At the end, you can instantly see who has the most.</p>
+<p>The main reason to prefer it over <code>defaultdict(int)</code> is <code>most_common()</code>. It sorts the counts from biggest to smallest, which is usually the question you actually wanted answered. (<code>total()</code> adds up all the counts. It needs Python 3.10 or later.)</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">by_category</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">order</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="n">ORDERS</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"all categories  :"</span><span class="p">,</span> <span class="n">by_category</span><span class="o">.</span><span class="n">most_common</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"top 2           :"</span><span class="p">,</span> <span class="n">by_category</span><span class="o">.</span><span class="n">most_common</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"total items     :"</span><span class="p">,</span> <span class="n">by_category</span><span class="o">.</span><span class="n">total</span><span class="p">())</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>all categories  : [('Books', 4), ('Electronics', 2), ('Appliances', 2)]
+top 2           : [('Books', 4), ('Electronics', 2)]
+total items     : 8
+</code></pre></div>
+
+<p><code>Counter</code> also counts the <strong>words in a sentence</strong> or the <strong>characters in a string</strong>. That's often the first thing you do with a text dataset, like product reviews:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">review</span> <span class="o">=</span> <span class="s2">"the book was good the delivery was fast the price was fair"</span>
+
+<span class="n">words</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">review</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">words</span><span class="o">.</span><span class="n">most_common</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+
+<span class="n">letters</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="s2">"mississippi"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">letters</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>[('the', 3), ('was', 3), ('book', 1)]
+[('i', 4), ('m', 1), ('p', 2), ('s', 4)]
+</code></pre></div>
+
+<ul>
+<li><code>review.split()</code> breaks the sentence into a list of words, and <code>Counter</code> counts each word.</li>
+<li><code>Counter("mississippi")</code> counts each <strong>character</strong>, because looping over a string gives you its characters one by one.</li>
+</ul>
+<h3 id="counter-doesnt-create-missing-keys"><code>Counter</code> Doesn't Create Missing Keys</h3>
+<p>Compare this with <code>defaultdict</code>. In a <code>Counter</code>, a missing key simply <strong>reads as <code>0</code></strong>, and looking doesn't add anything:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">letters</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="s2">"mississippi"</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"count of 'z':"</span><span class="p">,</span> <span class="n">letters</span><span class="p">[</span><span class="s2">"z"</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"is 'z' in it?"</span><span class="p">,</span> <span class="s2">"z"</span> <span class="ow">in</span> <span class="n">letters</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"length still:"</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">letters</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>count of 'z': 0
+is 'z' in it? False
+length still: 4
+</code></pre></div>
+
+<h3 id="adding-and-subtracting-counters">Adding and Subtracting Counters</h3>
+<p>Counters can be <strong>subtracted</strong>, which answers "what changed?" in one line. It's like comparing two months of stock counts:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">february</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">({</span><span class="s2">"Books"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">"Electronics"</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">"Appliances"</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+<span class="n">march</span>    <span class="o">=</span> <span class="n">Counter</span><span class="p">({</span><span class="s2">"Books"</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">"Electronics"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">"Appliances"</span><span class="p">:</span> <span class="mi">2</span><span class="p">})</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"month on month:"</span><span class="p">,</span> <span class="n">march</span> <span class="o">-</span> <span class="n">february</span><span class="p">)</span>     <span class="c1"># only positive counts survive</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"combined      :"</span><span class="p">,</span> <span class="n">march</span> <span class="o">+</span> <span class="n">february</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>month on month: Counter({'Books': 1, 'Appliances': 1})
+combined      : Counter({'Books': 7, 'Electronics': 7, 'Appliances': 3})
+</code></pre></div>
+
+<p><code>march - february</code> dropped Electronics completely, because <strong>subtracting <code>Counter</code>s keeps only the positive counts</strong>. (Electronics went from 5 to 2, a change of -3, so it disappeared.) When you want the negative changes too, subtract the values yourself:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">change</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">march</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="n">february</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">march</span><span class="p">)</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="n">february</span><span class="p">)}</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">change</span><span class="o">.</span><span class="n">items</span><span class="p">())))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>{'Appliances': 1, 'Books': 1, 'Electronics': -3}
+</code></pre></div>
+
+<p><code>set(march) | set(february)</code> gives every category that appears in either month (the <code>|</code> combines two sets). Then the dict comprehension works out <code>march[k] - february[k]</code> for each one, and since a <code>Counter</code> reads a missing key as <code>0</code>, no category causes an error.</p>
+<h3 id="13-namedtuple-a-tuple-whose-fields-have-names">1.3 <code>namedtuple</code>: A Tuple Whose Fields Have Names</h3>
+<p>Our orders are tuples, and reading them means remembering which position is which:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">order</span> <span class="o">=</span> <span class="n">ORDERS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">order</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">order</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>       <span class="c1"># which fields are these again?</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Books 59.98
+</code></pre></div>
+
+<p>What was position 2 again? And position 4? Six months from now, you won't remember.</p>
+<p>Tuples are great for data that shouldn't change, like a payment record. The downside is that the <strong>position number</strong> is the only way to get at a field. <code>namedtuple</code> builds a new tuple type that has a <strong>name for each position</strong>.</p>
+<p><code>Order(*row)</code> uses <code>*</code> to spread each row out into the five arguments, one per field:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">namedtuple</span>
+
+<span class="n">Order</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">"Order"</span><span class="p">,</span> <span class="s2">"order_id customer category date amount"</span><span class="p">)</span>
+
+<span class="n">orders</span> <span class="o">=</span> <span class="p">[</span><span class="n">Order</span><span class="p">(</span><span class="o">*</span><span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">ORDERS</span><span class="p">]</span>
+<span class="n">first</span> <span class="o">=</span> <span class="n">orders</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">first</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">first</span><span class="o">.</span><span class="n">category</span><span class="p">,</span> <span class="n">first</span><span class="o">.</span><span class="n">amount</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Order(order_id='A001', customer='Alice', category='Books', date='2024-03-01', amount=59.98)
+Books 59.98
+</code></pre></div>
+
+<p><strong>Analogy:</strong> a plain tuple is like a row of <strong>unlabelled boxes</strong>: you have to remember that the third box holds the category. A namedtuple is the same row of boxes, but <strong>each box has a label</strong> on it.</p>
+<p>Look at what <code>print(first)</code> shows. A plain tuple prints as a row of values you have to decode. A namedtuple prints its field names too, which makes debugging much quicker.</p>
+<p>It's still a tuple, so everything you know about tuples still works. You can unpack it, index it by position, and you <strong>can't change it</strong>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">order_id</span><span class="p">,</span> <span class="n">customer</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">amount</span> <span class="o">=</span> <span class="n">first</span>     <span class="c1"># unpacking still works</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">order_id</span><span class="p">,</span> <span class="n">customer</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"index access :"</span><span class="p">,</span> <span class="n">first</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"is a tuple   :"</span><span class="p">,</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">first</span><span class="o">.</span><span class="n">amount</span> <span class="o">=</span> <span class="mf">0.0</span>                  <span class="c1"># not allowed: a tuple can't be changed</span>
+<span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"AttributeError:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>A001 Alice
+index access : Alice
+is a tuple   : True
+AttributeError: can't set attribute
+</code></pre></div>
+
+<h3 id="_replace-and-_asdict"><code>_replace()</code> and <code>_asdict()</code></h3>
+<p>Two methods you'll use:</p>
+<ul>
+<li>Since you can't edit a namedtuple, <code>_replace()</code> gives you a <strong>new</strong> one with one field changed. The original stays the same.</li>
+<li><code>_asdict()</code> turns it into a <strong>dictionary</strong>, which is what you want just before saving it as JSON (for example, with <code>json.dump</code>).</li>
+</ul>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">corrected</span> <span class="o">=</span> <span class="n">first</span><span class="o">.</span><span class="n">_replace</span><span class="p">(</span><span class="n">amount</span><span class="o">=</span><span class="mf">61.98</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"original :"</span><span class="p">,</span> <span class="n">first</span><span class="o">.</span><span class="n">amount</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"corrected:"</span><span class="p">,</span> <span class="n">corrected</span><span class="o">.</span><span class="n">amount</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"as a dict:"</span><span class="p">,</span> <span class="n">corrected</span><span class="o">.</span><span class="n">_asdict</span><span class="p">())</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>original : 59.98
+corrected: 61.98
+as a dict: {'order_id': 'A001', 'customer': 'Alice', 'category': 'Books', 'date': '2024-03-01', 'amount': 61.98}
+</code></pre></div>
+
+<p>The underscore at the start of these names makes them look private, but they're meant for you to use. The underscore is only there so they can't clash with a field you might name <code>replace</code> or <code>count</code>.</p>
+<h3 id="when-a-namedtuple-isnt-enough-dataclass">When a Namedtuple Isn't Enough: <code>@dataclass</code></h3>
+<p>A namedtuple is for <strong>plain data with no behaviour</strong>. Once the record needs <strong>methods</strong> (its own functions), or needs to <strong>change after it's created</strong>, a class is the answer. Writing that class by hand means an <code>__init__</code> that assigns every field, plus something like <code>__str__</code> so it prints nicely.</p>
+<p>The <code>dataclasses</code> module writes that code for you, using a <strong>decorator</strong> (the <code>@</code> line above the class).</p>
+<p>The <code>: str</code> and <code>: int</code> after each field name are <strong>type hints</strong>: labels that say what kind of value belongs there. Python doesn't actually check them at runtime, but <code>@dataclass</code> reads these lines to find out which fields the class has:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Shipment</span><span class="p">:</span>
+    <span class="n">order_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">carrier</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">days_in_transit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>            <span class="c1"># a default, like any function argument</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_late</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>                  <span class="c1"># methods, which a namedtuple cannot have</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">days_in_transit</span> <span class="o">&gt;</span> <span class="mi">5</span>
+
+
+<span class="n">s</span> <span class="o">=</span> <span class="n">Shipment</span><span class="p">(</span><span class="s2">"A001"</span><span class="p">,</span> <span class="s2">"BlueDart"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>                                <span class="c1"># the dataclass wrote the printing code for us</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"late?"</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">is_late</span><span class="p">())</span>
+
+<span class="n">s</span><span class="o">.</span><span class="n">days_in_transit</span> <span class="o">=</span> <span class="mi">7</span>                   <span class="c1"># can be changed, unlike a namedtuple</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"late now?"</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">is_late</span><span class="p">())</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Shipment(order_id='A001', carrier='BlueDart', days_in_transit=3)
+late? False
+late now? True
+</code></pre></div>
+
+<ul>
+<li><code>Shipment("A001", "BlueDart")</code> didn't pass <code>days_in_transit</code>, so it used the default of <code>3</code>.</li>
+<li><code>print(s)</code> showed all the fields neatly, because <code>@dataclass</code> wrote the printing code.</li>
+<li><code>is_late()</code> is a method, which a namedtuple can't have.</li>
+<li><code>s.days_in_transit = 7</code> changed a field, which a namedtuple wouldn't allow.</li>
+</ul>
+<p><strong>Analogy:</strong> writing a class by hand is like designing a form from a blank page. <code>@dataclass</code> is like a <strong>form builder</strong>: you list the fields you want, and it produces a neat, working form for you.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th><code>namedtuple</code></th>
+<th><code>@dataclass</code></th>
+<th>plain class</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Can change after creation</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Can have methods</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Behaves as a tuple</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td>You write</td>
+<td>one line</td>
+<td>the fields</td>
+<td>everything</td>
+</tr>
+</tbody>
+</table></div>
+<p>Use a namedtuple for <strong>rows of data</strong>, and a dataclass when the thing needs <strong>behaviour</strong>.</p>
+<h3 id="14-deque-a-list-thats-fast-at-both-ends">1.4 <code>deque</code>: A List That's Fast at Both Ends</h3>
+<p><code>list.append()</code> and <code>list.pop()</code> work on the <strong>end</strong> of a list, and they're fast. <code>list.pop(0)</code> works on the <strong>front</strong>, and to do that Python has to shift <strong>every remaining item</strong> one place to the left. On a short list you won't notice. On a long one, it's why a script that "worked on the sample" takes minutes on the full file.</p>
+<p><strong>Analogy:</strong> a Python list is like a <strong>row of numbered seats in a cinema</strong>. If the person in seat 1 leaves and everyone must stay numbered from 1, every single person has to shuffle one seat to the left. A <code>deque</code> is like a <strong>queue at a ticket counter</strong>: when the first person leaves, nobody needs to move seats; the next person simply becomes the front.</p>
+<div class="diagram-card"><pre><code>   list.pop(0)                                    deque.popleft()
+
+   [ A ][ B ][ C ][ D ][ E ]                       front ──► A  B  C  D  E ◄── back
+     ▲    ◄─── everyone shifts left ───             ▲                     ▲
+   remove                                        remove here         add here
+                                                 (instantly)         (instantly)
+   slow when the list is long                    fast at BOTH ends
+</code></pre></div>
+
+<p><code>deque</code> (say "deck", short for "double-ended queue") is built to be quick at <strong>both</strong> ends. Let's time it instead of taking that on trust:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">deque</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="n">N</span> <span class="o">=</span> <span class="mi">50_000</span>
+<span class="n">as_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">))</span>
+<span class="n">as_deque</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">))</span>
+
+<span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+<span class="k">while</span> <span class="n">as_list</span><span class="p">:</span>
+    <span class="n">as_list</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>                      <span class="c1"># shifts everything left, every time</span>
+<span class="n">list_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
+
+<span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+<span class="k">while</span> <span class="n">as_deque</span><span class="p">:</span>
+    <span class="n">as_deque</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>
+<span class="n">deque_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"removing </span><span class="si">{</span><span class="n">N</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> items from the front"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"deque was faster        :"</span><span class="p">,</span> <span class="n">deque_time</span> <span class="o">&lt;</span> <span class="n">list_time</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"by more than 10 times   :"</span><span class="p">,</span> <span class="n">list_time</span> <span class="o">&gt;</span> <span class="n">deque_time</span> <span class="o">*</span> <span class="mi">10</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>removing 50,000 items from the front
+deque was faster        : True
+by more than 10 times   : True
+</code></pre></div>
+
+<p>The exact times depend on your computer, so the cell prints the comparison instead of the raw numbers. The gap is big, and it grows as the data gets bigger.</p>
+<p><code>deque</code> has <code>append</code>/<code>pop</code> for the <strong>right</strong> end and <code>appendleft</code>/<code>popleft</code> for the <strong>left</strong> end:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">queue</span> <span class="o">=</span> <span class="n">deque</span><span class="p">([</span><span class="s2">"job-1"</span><span class="p">,</span> <span class="s2">"job-2"</span><span class="p">,</span> <span class="s2">"job-3"</span><span class="p">])</span>
+
+<span class="n">queue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"job-4"</span><span class="p">)</span>                   <span class="c1"># arrives at the back</span>
+<span class="n">queue</span><span class="o">.</span><span class="n">appendleft</span><span class="p">(</span><span class="s2">"urgent"</span><span class="p">)</span>              <span class="c1"># jumps the queue</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">queue</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"next up:"</span><span class="p">,</span> <span class="n">queue</span><span class="o">.</span><span class="n">popleft</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"remaining:"</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">queue</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>deque(['urgent', 'job-1', 'job-2', 'job-3', 'job-4'])
+next up: urgent
+remaining: ['job-1', 'job-2', 'job-3', 'job-4']
+</code></pre></div>
+
+<h3 id="maxlen-a-rolling-window"><code>maxlen</code>: A Rolling Window</h3>
+<p>What makes <code>deque</code> really useful for data work is <code>maxlen</code>. Give it one, and the container <strong>only keeps the most recent N items</strong>, dropping the oldest ones automatically. That's called a <strong>rolling window</strong>, and it's fiddly to write by hand:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">last_three</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">maxlen</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="n">ORDERS</span><span class="p">:</span>
+    <span class="n">last_three</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">order</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"the three most recent orders:"</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">last_three</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>the three most recent orders: ['A006', 'A007', 'A008']
+</code></pre></div>
+
+<p><strong>Analogy:</strong> the <strong>"Recently played"</strong> list in a music app. It only shows your last few songs. Every time you play a new one, the oldest drops off the end.</p>
+<div class="diagram-card"><pre><code>   deque(maxlen=3), appending A001 ... A008
+
+   after A003:  [A001, A002, A003]
+   after A004:  [A002, A003, A004]      ← A001 pushed out
+   after A005:  [A003, A004, A005]      ← A002 pushed out
+   ...
+   after A008:  [A006, A007, A008]      ← always just the last three
+</code></pre></div>
+
+<hr />
+<h2 id="part-2-itertools"><span class="h-icon"><svg class="icon"><use href="#icon-loop"></use></svg></span>Part 2: <code>itertools</code></h2>
+<p><code>itertools</code> is a toolbox of <strong>ready-made generators</strong>. Everything in it is <strong>lazy</strong>: nothing is worked out until you ask for it, and nothing large is held in memory.</p>
+<p><strong>Analogy:</strong> if writing your own generators is like building your own machines for a factory, <code>itertools</code> is a catalogue of <strong>ready-built machines</strong> that you just plug into your assembly line.</p>
+<h3 id="21-chain-several-sequences-one-loop">2.1 <code>chain</code>: Several Sequences, One Loop</h3>
+<p>Say you have three monthly export files and want one report. Without <code>chain</code>, you'd either write three loops or build one big combined list. Let's create the files first, so we're working with real files:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">csv</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s2">"toolkit_demo"</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">HEADER</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"order_id"</span><span class="p">,</span> <span class="s2">"customer"</span><span class="p">,</span> <span class="s2">"category"</span><span class="p">,</span> <span class="s2">"date"</span><span class="p">,</span> <span class="s2">"amount"</span><span class="p">]</span>
+<span class="n">months</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"2024_01"</span><span class="p">:</span> <span class="n">ORDERS</span><span class="p">[:</span><span class="mi">3</span><span class="p">],</span> <span class="s2">"2024_02"</span><span class="p">:</span> <span class="n">ORDERS</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">6</span><span class="p">],</span> <span class="s2">"2024_03"</span><span class="p">:</span> <span class="n">ORDERS</span><span class="p">[</span><span class="mi">6</span><span class="p">:]}</span>
+
+<span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">rows</span> <span class="ow">in</span> <span class="n">months</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">"toolkit_demo/orders_</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">.csv"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">HEADER</span><span class="p">)</span>
+        <span class="n">writer</span><span class="o">.</span><span class="n">writerows</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"wrote"</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">months</span><span class="p">),</span> <span class="s2">"files, each with a header row"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>wrote 3 files, each with a header row
+</code></pre></div>
+
+<p>Now let's read all three files as if they were one long file:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExitStack</span>     <span class="c1"># chapter 14</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">chain</span>
+
+<span class="n">paths</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"toolkit_demo/orders_</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">.csv"</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">months</span><span class="p">]</span>
+
+<span class="k">with</span> <span class="n">ExitStack</span><span class="p">()</span> <span class="k">as</span> <span class="n">stack</span><span class="p">:</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">stack</span><span class="o">.</span><span class="n">enter_context</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">]</span>
+
+    <span class="n">readers</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+        <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="nb">next</span><span class="p">(</span><span class="n">reader</span><span class="p">)</span>                    <span class="c1"># step over this file's header</span>
+        <span class="n">readers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reader</span><span class="p">)</span>
+
+    <span class="n">every_row</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="n">readers</span><span class="p">)</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">every_row</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"total across </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span><span class="si">}</span><span class="s2"> files: $</span><span class="si">{</span><span class="n">total</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>total across 3 files: $594.92
+</code></pre></div>
+
+<p>How it works:</p>
+<ul>
+<li><code>ExitStack</code> opens all three files and guarantees they will all be closed at the end.</li>
+<li>For each file, <code>csv.reader</code> reads rows, and <code>next(reader)</code> skips that file's header row.</li>
+<li><code>chain.from_iterable(readers)</code> joins the three readers into <strong>one long stream of rows</strong>.</li>
+<li><code>sum(...)</code> adds up the amount column (<code>row[4]</code>) across all of them.</li>
+</ul>
+<p><strong>Analogy:</strong> <code>chain</code> is like <strong>coupling railway coaches</strong>. Three separate coaches become one train, and passengers can walk from the first coach to the last without stepping outside.</p>
+<p><code>chain.from_iterable</code> takes <strong>one collection</strong> of iterables (here, a list of readers). <code>chain(a, b, c)</code> takes them as <strong>separate arguments</strong>. Both give back an iterator, so the three files were read one row at a time and never held in memory together:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">chain</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]))</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">chain</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">])))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>chain
+[1, 2, 3, 4, 5]
+</code></pre></div>
+
+<h3 id="22-islice-slicing-things-you-cant-normally-slice">2.2 <code>islice</code>: Slicing Things You Can't Normally Slice</h3>
+<p>Normal slicing (<code>[:5]</code>) works on lists, tuples and strings. A generator isn't one of those, so this fails:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">squares</span> <span class="o">=</span> <span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1_000_000</span><span class="p">))</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">squares</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>                  <span class="c1"># a generator can't be sliced like this</span>
+<span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"TypeError:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>TypeError: 'generator' object is not subscriptable
+</code></pre></div>
+
+<p><code>islice</code> slices <strong>any iterator</strong>, and only takes as much as you ask for. The other 999,995 squares are never worked out:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">islice</span>
+
+<span class="n">squares</span> <span class="o">=</span> <span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1_000_000</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"first five:"</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">islice</span><span class="p">(</span><span class="n">squares</span><span class="p">,</span> <span class="mi">5</span><span class="p">)))</span>
+
+<span class="n">squares</span> <span class="o">=</span> <span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1_000_000</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"items 10 to 14:"</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">islice</span><span class="p">(</span><span class="n">squares</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">)))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>first five: [0, 1, 4, 9, 16]
+items 10 to 14: [100, 121, 144, 169, 196]
+</code></pre></div>
+
+<p>Notice that we created <code>squares</code> again before the second <code>islice</code>. That's because the first <code>islice</code> used up the first five values, and a generator can't go back.</p>
+<p><strong>Analogy:</strong> <code>islice</code> is like taking <strong>just the first five chips</strong> out of a giant bag. You don't need to pour the whole bag onto the table to do that.</p>
+<p>The everyday use is <strong>skipping a header row</strong>. The <code>chain</code> example above did that with <code>next(reader)</code>. <code>islice</code> does it in one expression: <code>islice(f, 1, None)</code> means "start at line 1 (skipping line 0), and go to the end":</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"toolkit_demo/orders_2024_03.csv"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">islice</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>     <span class="c1"># everything after the header</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>A007,Alice,Books,2024-03-08,24.99
+A008,Carol,Books,2024-03-11,120.0
+</code></pre></div>
+
+<p>One limit to know: <code>islice</code> <strong>can't take a negative index</strong>. To find the last five items, Python would have to read to the end first, and an iterator doesn't know where its end is until it gets there:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">try</span><span class="p">:</span>
+    <span class="n">islice</span><span class="p">(</span><span class="n">ORDERS</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"ValueError:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>ValueError: Indices for islice() must be None or an integer: 0 &lt;= x &lt;= sys.maxsize.
+</code></pre></div>
+
+<p>For the last N items, use the <code>deque(maxlen=N)</code> trick from Part 1.4 instead.</p>
+<h3 id="23-groupby-easy-to-get-wrong">2.3 <code>groupby</code>: Easy to Get Wrong</h3>
+<p><code>groupby</code> goes through an iterable and groups items that share a key, <strong>but only items that sit next to each other</strong>. That detail is easy to miss, and missing it gives you a report that looks fine but is wrong.</p>
+<p>Our orders are in <strong>date</strong> order, not <strong>category</strong> order. Let's group them by category as they are:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">groupby</span>
+
+<span class="k">for</span> <span class="n">category</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">groupby</span><span class="p">(</span><span class="n">ORDERS</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="n">o</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">category</span><span class="si">:</span><span class="s2">&lt;12</span><span class="si">}</span><span class="s2"> count=</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">group</span><span class="p">))</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Books        count=1
+Electronics  count=1
+Appliances   count=1
+Books        count=1
+Electronics  count=1
+Appliances   count=1
+Books        count=2
+</code></pre></div>
+
+<p><strong>Seven groups from three categories</strong>, and Books shows up three separate times. Nothing raised an error and nothing warned us. A report built on that output would undercount every category.</p>
+<p><strong>Analogy:</strong> think of a supermarket cashier who puts items into bags as they come down the conveyor belt, and starts a <strong>new bag every time the type of item changes</strong>. If the items arrive mixed up (book, phone, toaster, book), you end up with lots of half-empty bags. If you first <strong>sort</strong> the items by type, every type ends up in exactly one bag.</p>
+<div class="diagram-card"><pre><code>   groupby on UNSORTED data (by category):
+
+   Books │ Electronics │ Appliances │ Books │ Electronics │ Appliances │ Books Books
+   ──────┴─────────────┴────────────┴───────┴─────────────┴────────────┴────────────
+     1          1             1         1          1             1           2      ← 7 groups ✗
+
+   groupby on SORTED data:
+
+   Appliances Appliances │ Books Books Books Books │ Electronics Electronics
+   ──────────────────────┴────────────────────────┴────────────────────────
+             2                       4                        2                     ← 3 groups ✓
+</code></pre></div>
+
+<p><code>groupby</code> needs the data <strong>sorted by the same key first</strong>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">by_category</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">ORDERS</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="n">o</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+<span class="k">for</span> <span class="n">category</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">groupby</span><span class="p">(</span><span class="n">by_category</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="n">o</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+    <span class="n">revenue</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">category</span><span class="si">:</span><span class="s2">&lt;12</span><span class="si">}</span><span class="s2"> count=</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span><span class="si">}</span><span class="s2">  $</span><span class="si">{</span><span class="n">revenue</span><span class="si">:</span><span class="s2">&gt;7.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Appliances   count=2  $ 179.98
+Books        count=4  $ 294.94
+Electronics  count=2  $ 120.00
+</code></pre></div>
+
+<p><strong>Sort by the key, then group by the same key.</strong> If you write one without the other, that's the bug.</p>
+<h3 id="the-second-trap-each-group-gets-used-up">The Second Trap: Each Group Gets Used Up</h3>
+<p>Each <code>group</code> is an iterator that only works <strong>while you're on it</strong>. Move on to the next group, and the previous one is used up. If you collect the pairs first and loop over them later, the groups come out empty:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">pairs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">groupby</span><span class="p">(</span><span class="n">by_category</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="n">o</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+
+<span class="k">for</span> <span class="n">category</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">category</span><span class="si">:</span><span class="s2">&lt;12</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">group</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Appliances   []
+Books        []
+Electronics  []
+</code></pre></div>
+
+<p>Three categories, three empty lists, and no error. Use up each group <strong>inside the loop</strong>, like the working version above does with <code>rows = list(group)</code>.</p>
+<p><strong>Analogy:</strong> like a museum tour guide who leads one group at a time. Once the guide has moved on to the next group, the previous group has already left the building. If you want to know who was in each group, write their names down while they're still in front of you.</p>
+<h3 id="often-the-simpler-tool-defaultdictlist">Often the Simpler Tool: <code>defaultdict(list)</code></h3>
+<p>Because of both traps, a <code>defaultdict(list)</code> is often the better tool. It doesn't need sorted data, and it gives you real lists that you can use as many times as you like:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">grouped</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="n">ORDERS</span><span class="p">:</span>
+    <span class="n">grouped</span><span class="p">[</span><span class="n">order</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">order</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">category</span><span class="p">,</span> <span class="n">rows</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">grouped</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">category</span><span class="si">:</span><span class="s2">&lt;12</span><span class="si">}</span><span class="s2"> count=</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Appliances   count=2
+Books        count=4
+Electronics  count=2
+</code></pre></div>
+
+<p>Use <code>groupby</code> when the data <strong>already arrives sorted</strong>, which is common when it comes from a database or a sorted file. Use a <code>defaultdict(list)</code> the rest of the time.</p>
+<h3 id="24-product-and-combinations-every-combination-without-nested-loops">2.4 <code>product</code> and <code>combinations</code>: Every Combination, Without Nested Loops</h3>
+<p><code>product</code> gives you <strong>every combination</strong> of several sequences. If you've ever written nested loops to try every setting, this replaces them. In machine learning, trying every combination of settings like this is called a <strong>hyperparameter grid</strong>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">product</span>
+
+<span class="n">learning_rates</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">]</span>
+<span class="n">depths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">]</span>
+
+<span class="n">grid</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">product</span><span class="p">(</span><span class="n">learning_rates</span><span class="p">,</span> <span class="n">depths</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">learning_rate</span><span class="p">,</span> <span class="n">depth</span> <span class="ow">in</span> <span class="n">grid</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  learning_rate=</span><span class="si">{</span><span class="n">learning_rate</span><span class="si">:</span><span class="s2">&lt;5</span><span class="si">}</span><span class="s2"> max_depth=</span><span class="si">{</span><span class="n">depth</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"combinations to try:"</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">grid</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>  learning_rate=0.01  max_depth=3
+  learning_rate=0.01  max_depth=5
+  learning_rate=0.01  max_depth=7
+  learning_rate=0.1   max_depth=3
+  learning_rate=0.1   max_depth=5
+  learning_rate=0.1   max_depth=7
+combinations to try: 6
+</code></pre></div>
+
+<p><strong>Analogy:</strong> choosing an <strong>outfit</strong>. With 2 jackets and 3 pairs of trousers, there are 2 × 3 = 6 possible outfits. <code>product</code> lists all six for you.</p>
+<div class="diagram-card"><pre><code>                   max_depth=3     max_depth=5     max_depth=7
+   lr=0.01        (0.01, 3)       (0.01, 5)       (0.01, 7)
+   lr=0.1         (0.1, 3)        (0.1, 5)        (0.1, 7)
+
+   2 learning rates × 3 depths = 6 combinations
+</code></pre></div>
+
+<p><code>combinations</code> picks groups <strong>from one sequence</strong>, with no repeats and <strong>without caring about order</strong>. Here it gives every pair of page versions to compare in an <strong>A/B test</strong> (a test where different users see different versions of a page, to see which works better):</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">combinations</span><span class="p">,</span> <span class="n">permutations</span>
+
+<span class="n">variants</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"control"</span><span class="p">,</span> <span class="s2">"blue-button"</span><span class="p">,</span> <span class="s2">"short-form"</span><span class="p">,</span> <span class="s2">"new-copy"</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"pairs to compare:"</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">combinations</span><span class="p">(</span><span class="n">variants</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">a</span><span class="si">}</span><span class="s2"> vs </span><span class="si">{</span><span class="n">b</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">combinations:"</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">combinations</span><span class="p">(</span><span class="n">variants</span><span class="p">,</span> <span class="mi">2</span><span class="p">))))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"permutations:"</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">permutations</span><span class="p">(</span><span class="n">variants</span><span class="p">,</span> <span class="mi">2</span><span class="p">))))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>pairs to compare:
+  control vs blue-button
+  control vs short-form
+  control vs new-copy
+  blue-button vs short-form
+  blue-button vs new-copy
+  short-form vs new-copy
+
+combinations: 6
+permutations: 12
+</code></pre></div>
+
+<p>Those last two numbers show the difference:</p>
+<ul>
+<li><code>combinations</code> treats <code>("control", "blue-button")</code> and <code>("blue-button", "control")</code> as the <strong>same pair</strong>, so it returns 6.</li>
+<li><code>permutations</code> counts <strong>different orders separately</strong>, so it returns 12.</li>
+</ul>
+<p><strong>Analogy:</strong> <strong>handshakes vs race medals</strong>. When Alice shakes hands with Bob, that's the same handshake as Bob shaking hands with Alice (a combination). But Alice winning gold and Bob silver is a different result from Bob gold and Alice silver (a permutation).</p>
+<p>These numbers <strong>grow fast</strong>. Pairs from 20 items come to 190. Groups of 5 from 20 items come to 15,504. Check the length before you loop over one.</p>
+<h3 id="25-count-and-cycle-iterators-that-never-end">2.5 <code>count</code> and <code>cycle</code>: Iterators That Never End</h3>
+<p><code>count</code> is like <code>range</code> with <strong>no stop value</strong>, which makes it a neat ID generator:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">count</span><span class="p">,</span> <span class="n">cycle</span>
+
+<span class="n">order_ids</span> <span class="o">=</span> <span class="n">count</span><span class="p">(</span><span class="mi">1001</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">([</span><span class="nb">next</span><span class="p">(</span><span class="n">order_ids</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"and it carries on:"</span><span class="p">,</span> <span class="nb">next</span><span class="p">(</span><span class="n">order_ids</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>[1001, 1002, 1003]
+and it carries on: 1004
+</code></pre></div>
+
+<p><strong>Analogy:</strong> the <strong>token machine</strong> at a bank: it hands out 1001, then 1002, then 1003, for as long as people keep arriving.</p>
+<p><code>cycle</code> <strong>repeats a sequence forever</strong>. That gives you <strong>round-robin</strong> assignment (taking turns in order) in one line:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">servers</span> <span class="o">=</span> <span class="n">cycle</span><span class="p">([</span><span class="s2">"eu-west-1"</span><span class="p">,</span> <span class="s2">"us-east-1"</span><span class="p">,</span> <span class="s2">"ap-south-1"</span><span class="p">])</span>
+
+<span class="k">for</span> <span class="n">job</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"job-1"</span><span class="p">,</span> <span class="s2">"job-2"</span><span class="p">,</span> <span class="s2">"job-3"</span><span class="p">,</span> <span class="s2">"job-4"</span><span class="p">,</span> <span class="s2">"job-5"</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">job</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="nb">next</span><span class="p">(</span><span class="n">servers</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>  job-1 -&gt; eu-west-1
+  job-2 -&gt; us-east-1
+  job-3 -&gt; ap-south-1
+  job-4 -&gt; eu-west-1
+  job-5 -&gt; us-east-1
+</code></pre></div>
+
+<p><strong>Analogy:</strong> a <strong>rota</strong> for washing up: Monday is Asha, Tuesday is Ben, Wednesday is Chen, then back to Asha on Thursday, and so on forever.</p>
+<p>Both go on <strong>forever</strong>, so <code>list(count())</code> never finishes, and neither does a <code>for</code> loop over one without a <code>break</code>. (We won't demonstrate that, because the cell would never stop running.)</p>
+<p>Pair them with <code>islice</code> when you want a fixed number:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">islice</span><span class="p">(</span><span class="n">count</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="mi">6</span><span class="p">)))</span>          <span class="c1"># start at 0, step 5, take 6</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">islice</span><span class="p">(</span><span class="n">cycle</span><span class="p">(</span><span class="s2">"AB"</span><span class="p">),</span> <span class="mi">5</span><span class="p">)))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>[0, 5, 10, 15, 20, 25]
+['A', 'B', 'A', 'B', 'A']
+</code></pre></div>
+
+<p><code>count(0, 5)</code> starts at 0 and steps by 5. <code>cycle("AB")</code> repeats the characters A and B.</p>
+<hr />
+<h2 id="part-3-functools"><span class="h-icon"><svg class="icon"><use href="#icon-func"></use></svg></span>Part 3: <code>functools</code></h2>
+<p><code>functools</code> is a module of tools for working <strong>with functions</strong>. You may already know <code>reduce</code>, <code>wraps</code> and <code>lru_cache</code> from it. Two more things here are worth knowing well.</p>
+<h3 id="31-partial-filling-in-arguments-ahead-of-time">3.1 <code>partial</code>: Filling In Arguments Ahead of Time</h3>
+<p>When you keep calling the same function with the <strong>same first argument</strong>, <code>partial</code> makes a <strong>new function</strong> with that argument already filled in:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">tag</span><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"[</span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2">"</span>
+
+
+<span class="n">warn</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="s2">"WARNING"</span><span class="p">)</span>
+<span class="n">error</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="s2">"ERROR"</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">warn</span><span class="p">(</span><span class="s2">"disk almost full"</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">(</span><span class="s2">"connection refused"</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>[WARNING] disk almost full
+[ERROR] connection refused
+</code></pre></div>
+
+<p><code>warn = partial(tag, "WARNING")</code> creates a new function. Calling <code>warn("disk almost full")</code> is the same as calling <code>tag("WARNING", "disk almost full")</code>.</p>
+<p><strong>Analogy:</strong> a <strong>pre-filled form</strong>. If you write lots of letters to the same company, you might print envelopes with their address already on them. You only have to add the part that changes each time.</p>
+<p>You could also write this as a <strong>closure</strong> (a function that remembers values), and you'd get exactly the same result. <code>partial</code> is just the short way to write it:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">make_tagger</span><span class="p">(</span><span class="n">level</span><span class="p">):</span>                 <span class="c1"># the chapter 13 version</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tagger</span><span class="p">(</span><span class="n">message</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">tag</span><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tagger</span>
+
+
+<span class="n">warn_closure</span> <span class="o">=</span> <span class="n">make_tagger</span><span class="p">(</span><span class="s2">"WARNING"</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">warn_closure</span><span class="p">(</span><span class="s2">"disk almost full"</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"same result:"</span><span class="p">,</span> <span class="n">warn_closure</span><span class="p">(</span><span class="s2">"disk almost full"</span><span class="p">)</span> <span class="o">==</span> <span class="n">warn</span><span class="p">(</span><span class="s2">"disk almost full"</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>[WARNING] disk almost full
+same result: True
+</code></pre></div>
+
+<h3 id="partial-with-built-in-functions"><code>partial</code> with Built-In Functions</h3>
+<p>It works on <strong>built-in functions</strong> too, which is where it saves the most typing. <code>int(text, base=16)</code> reads a number written in <strong>base 16</strong> (hexadecimal, the number system used in colour codes like <code>#ff0000</code>), so <code>"ff"</code> is 255. <code>lambda text: int(text, base=16)</code> would do the same job, but <code>partial</code> reads more clearly:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">from_hex</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">from_hex</span><span class="p">(</span><span class="s2">"ff"</span><span class="p">),</span> <span class="n">from_hex</span><span class="p">(</span><span class="s2">"1a"</span><span class="p">))</span>
+
+<span class="n">to_2dp</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="nb">round</span><span class="p">,</span> <span class="n">ndigits</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">([</span><span class="n">to_2dp</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1.18</span><span class="p">)</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">ORDERS</span><span class="p">[:</span><span class="mi">4</span><span class="p">]])</span>     <span class="c1"># amounts with 18% tax</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>255 26
+[70.78, 53.1, 106.19, 106.16]
+</code></pre></div>
+
+<p><code>to_2dp = partial(round, ndigits=2)</code> makes a "round to 2 decimal places" function. Here it rounds each order amount after adding 18% tax (multiplying by 1.18).</p>
+<h3 id="32-lru_cache-in-practice">3.2 <code>lru_cache</code> in Practice</h3>
+<p><code>@lru_cache</code> is a decorator that <strong>remembers results</strong>, so calling the function again with the same arguments returns the saved answer instantly instead of working it out again. There are two things to watch out for, and here's what both look like with real data.</p>
+<h3 id="arguments-have-to-be-hashable">Arguments Have to Be Hashable</h3>
+<p>The cache stores answers in a dictionary, using the arguments as <strong>keys</strong>. So every argument has to be something a dictionary accepts as a key (Python calls this <strong>hashable</strong>). A list isn't, because lists can change. A tuple is, so convert a list to a tuple before you pass it in:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">lru_cache</span>
+
+<span class="nd">@lru_cache</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">total</span><span class="p">(</span><span class="n">amounts</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"  (computing)"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">amounts</span><span class="p">)</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="n">total</span><span class="p">((</span><span class="mf">59.98</span><span class="p">,</span> <span class="mf">45.00</span><span class="p">,</span> <span class="mf">89.99</span><span class="p">)))</span>     <span class="c1"># a tuple is fine</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">total</span><span class="p">((</span><span class="mf">59.98</span><span class="p">,</span> <span class="mf">45.00</span><span class="p">,</span> <span class="mf">89.99</span><span class="p">)))</span>     <span class="c1"># second call is free</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">total</span><span class="p">([</span><span class="mf">59.98</span><span class="p">,</span> <span class="mf">45.00</span><span class="p">])</span>               <span class="c1"># a list is not</span>
+<span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"TypeError:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>  (computing)
+194.97
+194.97
+TypeError: unhashable type: 'list'
+</code></pre></div>
+
+<p>The first call printed <code>(computing)</code>; the second didn't, because the answer came straight from the cache.</p>
+<h3 id="a-cache-goes-stale">A Cache Goes Stale</h3>
+<p><code>lru_cache</code> assumes the function returns <strong>the same answer for the same arguments forever</strong>. If the function reads something that can change, it keeps handing back the <strong>old</strong> answer:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">prices</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"Books"</span><span class="p">:</span> <span class="mf">10.0</span><span class="p">}</span>
+
+<span class="nd">@lru_cache</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">price_of</span><span class="p">(</span><span class="n">category</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">prices</span><span class="p">[</span><span class="n">category</span><span class="p">]</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"first call        :"</span><span class="p">,</span> <span class="n">price_of</span><span class="p">(</span><span class="s2">"Books"</span><span class="p">))</span>
+
+<span class="n">prices</span><span class="p">[</span><span class="s2">"Books"</span><span class="p">]</span> <span class="o">=</span> <span class="mf">12.0</span>                  <span class="c1"># the price changes</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"after the change  :"</span><span class="p">,</span> <span class="n">price_of</span><span class="p">(</span><span class="s2">"Books"</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"cache_info        :"</span><span class="p">,</span> <span class="n">price_of</span><span class="o">.</span><span class="n">cache_info</span><span class="p">())</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>first call        : 10.0
+after the change  : 10.0
+cache_info        : CacheInfo(hits=1, misses=1, maxsize=128, currsize=1)
+</code></pre></div>
+
+<p>The function returned a price that doesn't exist anywhere in the program anymore. <code>cache_info()</code> shows why: one <strong>miss</strong> (the first call did the work), then one <strong>hit</strong> (the second call reused the old saved answer).</p>
+<p><strong>Analogy:</strong> an old <strong>price sticker</strong> on a product. The shop changed the price in its system, but the sticker on the shelf still shows the old one, and that's what you read.</p>
+<p><code>cache_clear()</code> throws the saved answers away:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">price_of</span><span class="o">.</span><span class="n">cache_clear</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"after cache_clear :"</span><span class="p">,</span> <span class="n">price_of</span><span class="p">(</span><span class="s2">"Books"</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"cache_info        :"</span><span class="p">,</span> <span class="n">price_of</span><span class="o">.</span><span class="n">cache_info</span><span class="p">())</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>after cache_clear : 12.0
+cache_info        : CacheInfo(hits=0, misses=1, maxsize=128, currsize=1)
+</code></pre></div>
+
+<p><strong>Only cache pure functions:</strong> same input, same output, and nothing read from anywhere that can change. A Fibonacci calculator is a perfect fit. A function that reads a file, a database, or a variable outside itself is a bad fit.</p>
+<hr />
+<h2 id="part-4-datetime"><span class="h-icon"><svg class="icon"><use href="#icon-calendar"></use></svg></span>Part 4: <code>datetime</code></h2>
+<p>Our orders store their dates as <strong>strings</strong> like <code>"2024-03-01"</code>. But a date inside a string isn't really a date to Python, just a sequence of characters. You can't subtract one from another, sort them reliably, or ask what day of the week it was. The <code>datetime</code> module gives you real date and time objects.</p>
+<h3 id="41-the-four-types">4.1 The Four Types</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Holds</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>date</code></td>
+<td>year, month, day</td>
+<td><code>date(2024, 3, 1)</code></td>
+</tr>
+<tr>
+<td><code>time</code></td>
+<td>hour, minute, second</td>
+<td><code>time(14, 30)</code></td>
+</tr>
+<tr>
+<td><code>datetime</code></td>
+<td>both together</td>
+<td><code>datetime(2024, 3, 1, 14, 30)</code></td>
+</tr>
+<tr>
+<td><code>timedelta</code></td>
+<td>a length of time</td>
+<td><code>timedelta(days=7)</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Analogy:</strong> a <code>date</code> is a page on a <strong>calendar</strong>, a <code>time</code> is a reading on a <strong>clock</strong>, a <code>datetime</code> is the calendar page with the clock time written on it, and a <code>timedelta</code> is a <strong>distance</strong> between two points in time ("7 days"), not a point itself.</p>
+<p><code>datetime</code> is the one you'll use most:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+
+<span class="n">launch</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">launch</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"year :"</span><span class="p">,</span> <span class="n">launch</span><span class="o">.</span><span class="n">year</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"day  :"</span><span class="p">,</span> <span class="n">launch</span><span class="o">.</span><span class="n">day</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"date part:"</span><span class="p">,</span> <span class="n">launch</span><span class="o">.</span><span class="n">date</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"time part:"</span><span class="p">,</span> <span class="n">launch</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>2024-03-01 14:30:00
+year : 2024
+day  : 1
+date part: 2024-03-01
+time part: 14:30:00
+</code></pre></div>
+
+<p><code>datetime.now()</code> gives you the <strong>current moment</strong>. The cell below doesn't print it, because the output would change every time it runs, but here's the type:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">right_now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">right_now</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"has a year:"</span><span class="p">,</span> <span class="n">right_now</span><span class="o">.</span><span class="n">year</span> <span class="o">&gt;</span> <span class="mi">2000</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>datetime
+has a year: True
+</code></pre></div>
+
+<h3 id="42-parsing-string-to-datetime">4.2 Parsing: String to <code>datetime</code></h3>
+<p><code>strptime</code> (think "<strong>str</strong>ing <strong>p</strong>arse <strong>time</strong>") reads a date out of a string, using a <strong>format</strong> you give it. The format is made of <code>%</code> codes that describe what the string looks like. <code>%Y</code> is the 4-digit year, <code>%m</code> the month and <code>%d</code> the day (the full list is in Part 4.3):</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">order_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="s2">"2024-03-01"</span><span class="p">,</span> <span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2">"</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">order_date</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"weekday:"</span><span class="p">,</span> <span class="n">order_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%A"</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>2024-03-01 00:00:00
+weekday: Friday
+</code></pre></div>
+
+<p><strong>Analogy:</strong> <code>strptime</code> is like reading a handwritten date on a form. You need to know whether the writer puts the day or the month first; the format string tells Python exactly that.</p>
+<p>Once it's a real <code>datetime</code>, you can ask questions a string could never answer, like which <strong>weekday</strong> it was (<code>%A</code> gives the weekday name).</p>
+<h3 id="why-this-matters-strings-sort-in-the-wrong-order">Why This Matters: Strings Sort in the Wrong Order</h3>
+<p>A date written <strong>day first</strong> sorts alphabetically, which has nothing to do with time:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">dates</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"09/03/2024"</span><span class="p">,</span> <span class="s2">"15/02/2024"</span><span class="p">,</span> <span class="s2">"01/12/2023"</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"sorted as strings:"</span><span class="p">,</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">dates</span><span class="p">))</span>
+
+<span class="n">parsed</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s2">"</span><span class="si">%d</span><span class="s2">/%m/%Y"</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"sorted as dates  :"</span><span class="p">,</span> <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"</span><span class="si">%d</span><span class="s2">/%m/%Y"</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">parsed</span><span class="p">])</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>sorted as strings: ['01/12/2023', '09/03/2024', '15/02/2024']
+sorted as dates  : ['01/12/2023', '15/02/2024', '09/03/2024']
+</code></pre></div>
+
+<p>Sorting the strings put December 2023 first, then <strong>March</strong> 2024, then <strong>February</strong> 2024. That's because string sorting compares character by character: <code>"09..."</code> comes before <code>"15..."</code> no matter what month or year follows. Only the parsed dates come out in real time order.</p>
+<h3 id="iso-8601-the-format-that-sorts-correctly">ISO 8601: The Format That Sorts Correctly</h3>
+<p>The exception is <strong>ISO 8601</strong>, the <code>YYYY-MM-DD</code> format our orders use. The parts go from <strong>biggest (year) to smallest (day)</strong>, so alphabetical order happens to match date order. That's a good reason to store dates this way in every file you write.</p>
+<p><strong>Analogy:</strong> it's like writing an address from biggest to smallest: country, city, street, house. Sorting by the first part groups things correctly, then the next part, and so on.</p>
+<p>Python has a parser just for this format, <code>fromisoformat</code>, so there's no format string to get wrong:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">ORDERS</span><span class="p">)[:</span><span class="mi">3</span><span class="p">])</span>        <span class="c1"># strings, and correctly ordered</span>
+
+<span class="n">parsed</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="s2">"2024-03-01"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">parsed</span><span class="p">,</span> <span class="s2">"|"</span><span class="p">,</span> <span class="n">parsed</span><span class="o">.</span><span class="n">isoformat</span><span class="p">())</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>['2024-03-01', '2024-03-01', '2024-03-02']
+2024-03-01 00:00:00 | 2024-03-01T00:00:00
+</code></pre></div>
+
+<p>When the format doesn't match the string, <code>strptime</code> raises a <code>ValueError</code>, which you can catch with <code>try/except</code>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">try</span><span class="p">:</span>
+    <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="s2">"01/03/2024"</span><span class="p">,</span> <span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2">"</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"ValueError:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>ValueError: time data '01/03/2024' does not match format '%Y-%m-%d'
+</code></pre></div>
+
+<h3 id="43-formatting-datetime-to-string">4.3 Formatting: <code>datetime</code> to String</h3>
+<p><code>strftime</code> (think "<strong>str</strong>ing <strong>f</strong>ormat <strong>time</strong>") is <code>strptime</code> in reverse: it takes a datetime and a format, and gives you a string.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Means</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>%Y</code></td>
+<td>4-digit year</td>
+<td><code>2024</code></td>
+</tr>
+<tr>
+<td><code>%m</code></td>
+<td>month, zero-padded</td>
+<td><code>03</code></td>
+</tr>
+<tr>
+<td><code>%d</code></td>
+<td>day, zero-padded</td>
+<td><code>01</code></td>
+</tr>
+<tr>
+<td><code>%B</code></td>
+<td>month name</td>
+<td><code>March</code></td>
+</tr>
+<tr>
+<td><code>%b</code></td>
+<td>short month name</td>
+<td><code>Mar</code></td>
+</tr>
+<tr>
+<td><code>%A</code></td>
+<td>weekday name</td>
+<td><code>Friday</code></td>
+</tr>
+<tr>
+<td><code>%H:%M</code></td>
+<td>24-hour time</td>
+<td><code>14:30</code></td>
+</tr>
+<tr>
+<td><code>%Y-%m-%d</code></td>
+<td>ISO date</td>
+<td><code>2024-03-01</code></td>
+</tr>
+</tbody>
+</table></div>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">moment</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">moment</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2">"</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">moment</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"</span><span class="si">%d</span><span class="s2"> %B %Y"</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">moment</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%A, </span><span class="si">%d</span><span class="s2"> %b %Y at %H:%M"</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>2024-03-01
+01 March 2024
+Friday, 01 Mar 2024 at 14:30
+</code></pre></div>
+
+<p>The same moment, written three different ways, just by changing the format string.</p>
+<h3 id="44-timedelta-date-arithmetic">4.4 <code>timedelta</code>: Date Arithmetic</h3>
+<p>Two simple rules cover most date maths:</p>
+<ul>
+<li><strong>Subtract</strong> two datetimes and you get a <code>timedelta</code> (a length of time).</li>
+<li><strong>Add</strong> a <code>timedelta</code> to a datetime and you get another datetime.</li>
+</ul>
+<p>So you never need to write a loop to count how many days have passed.</p>
+<div class="diagram-card"><pre><code>   2024-03-01                                   2024-03-11                 2024-04-10
+   first order ─────────── span = 10 days ────► last order ─── + 30 days ──► payment due
+       │                                            │
+       └──────── last - first = timedelta(days=10) ─┘
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">first</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">ORDERS</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">3</span><span class="p">])</span>
+<span class="n">last</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">ORDERS</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">3</span><span class="p">])</span>
+
+<span class="n">span</span> <span class="o">=</span> <span class="n">last</span> <span class="o">-</span> <span class="n">first</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"first order:"</span><span class="p">,</span> <span class="n">first</span><span class="o">.</span><span class="n">date</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"last order :"</span><span class="p">,</span> <span class="n">last</span><span class="o">.</span><span class="n">date</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"span       :"</span><span class="p">,</span> <span class="n">span</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"in days    :"</span><span class="p">,</span> <span class="n">span</span><span class="o">.</span><span class="n">days</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"in hours   :"</span><span class="p">,</span> <span class="n">span</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">/</span> <span class="mi">3600</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>first order: 2024-03-01
+last order : 2024-03-11
+span       : 10 days, 0:00:00
+in days    : 10
+in hours   : 240.0
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">deadline</span> <span class="o">=</span> <span class="n">last</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"payment due:"</span><span class="p">,</span> <span class="n">deadline</span><span class="o">.</span><span class="n">date</span><span class="p">())</span>
+
+<span class="n">reminder</span> <span class="o">=</span> <span class="n">deadline</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">hours</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"reminder at:"</span><span class="p">,</span> <span class="n">reminder</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>payment due: 2024-04-10
+reminder at: 2024-04-02 12:00:00
+</code></pre></div>
+
+<p><code>timedelta(days=7, hours=12)</code> is seven and a half days, so the reminder lands at noon, 7.5 days before the deadline.</p>
+<p>Use <code>.days</code> for whole days and <code>.total_seconds()</code> for everything else. There's no <code>.hours</code> or <code>.months</code>, because <strong>months aren't all the same length</strong> (28 to 31 days). For "one month later, same day number" you'd need <code>dateutil.relativedelta</code>, which is a separate package you'd have to install, so it's outside this guide.</p>
+<h3 id="45-naive-and-aware-datetimes">4.5 Naive and Aware Datetimes</h3>
+<p>A datetime with <strong>no timezone</strong> attached is called <strong>naive</strong>. One that <strong>has</strong> a timezone is called <strong>aware</strong>. Mixing the two raises an error, and it's better to meet that error here than in the middle of a real project:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">timezone</span>
+
+<span class="n">naive</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">aware</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">tzinfo</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"naive:"</span><span class="p">,</span> <span class="n">naive</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"aware:"</span><span class="p">,</span> <span class="n">aware</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">aware</span> <span class="o">-</span> <span class="n">naive</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"TypeError:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>naive: 2024-03-01 09:00:00
+aware: 2024-03-01 09:00:00+00:00
+TypeError: can't subtract offset-naive and offset-aware datetimes
+</code></pre></div>
+
+<p><strong>Analogy:</strong> a naive datetime is like a message saying "<strong>let's meet at 9 o'clock</strong>" without saying which city. 9 o'clock in Mumbai and 9 o'clock in London are different moments. An aware datetime says "9 o'clock, London time", so there's no confusion. Python refuses to compare the two, because it can't know what the vague one meant.</p>
+<p><strong>UTC</strong> (Coordinated Universal Time) is the world's reference clock, the "neutral" timezone that every other timezone is measured from. The <code>+00:00</code> at the end of the aware datetime means "0 hours away from UTC".</p>
+<p>Pick one style and stick with it. For anything that moves between computers (like data from an API), store times in <strong>UTC as aware datetimes</strong>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">stamped</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">tzinfo</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"stored as:"</span><span class="p">,</span> <span class="n">stamped</span><span class="o">.</span><span class="n">isoformat</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"read back:"</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="s2">"2024-03-01T09:00:00+00:00"</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>stored as: 2024-03-01T09:00:00+00:00
+read back: 2024-03-01 09:00:00+00:00
+</code></pre></div>
+
+<hr />
+<h2 id="part-5-putting-it-together"><span class="h-icon"><svg class="icon"><use href="#icon-puzzle"></use></svg></span>Part 5: Putting It Together</h2>
+<p>Here's a small report that uses three of the four modules on the same data: <code>namedtuple</code> for readable rows, <code>datetime</code> for the dates, <code>defaultdict</code> and <code>Counter</code> for grouping and counting, and <code>groupby</code> on data we sorted ourselves. <code>sorted(..., reverse=True)</code> sorts from biggest to smallest.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">namedtuple</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">groupby</span>
+
+<span class="n">Order</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">"Order"</span><span class="p">,</span> <span class="s2">"order_id customer category date amount"</span><span class="p">)</span>
+
+<span class="n">orders</span> <span class="o">=</span> <span class="p">[</span><span class="n">Order</span><span class="p">(</span><span class="n">oid</span><span class="p">,</span> <span class="n">cust</span><span class="p">,</span> <span class="n">cat</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">d</span><span class="p">),</span> <span class="n">amt</span><span class="p">)</span>
+          <span class="k">for</span> <span class="n">oid</span><span class="p">,</span> <span class="n">cust</span><span class="p">,</span> <span class="n">cat</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">amt</span> <span class="ow">in</span> <span class="n">ORDERS</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">orders</span><span class="p">)</span><span class="si">}</span><span class="s2"> orders from </span><span class="si">{</span><span class="n">orders</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">date</span><span class="p">()</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">orders</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">date</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"total revenue: $</span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">amount</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">o</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">orders</span><span class="p">)</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+
+<span class="n">revenue</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="n">orders</span><span class="p">:</span>
+    <span class="n">revenue</span><span class="p">[</span><span class="n">order</span><span class="o">.</span><span class="n">category</span><span class="p">]</span> <span class="o">+=</span> <span class="n">order</span><span class="o">.</span><span class="n">amount</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"revenue by category"</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">category</span><span class="p">,</span> <span class="n">total</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">revenue</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">pair</span><span class="p">:</span> <span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">category</span><span class="si">:</span><span class="s2">&lt;12</span><span class="si">}</span><span class="s2"> $</span><span class="si">{</span><span class="n">total</span><span class="si">:</span><span class="s2">&gt;7.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">busiest weekdays"</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">day</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">Counter</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%A"</span><span class="p">)</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">orders</span><span class="p">)</span><span class="o">.</span><span class="n">most_common</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">day</span><span class="si">:</span><span class="s2">&lt;10</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2"> orders"</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">spend per customer"</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">customer</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">groupby</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">orders</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="n">o</span><span class="o">.</span><span class="n">customer</span><span class="p">),</span>
+                               <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="n">o</span><span class="o">.</span><span class="n">customer</span><span class="p">):</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">customer</span><span class="si">:</span><span class="s2">&lt;6</span><span class="si">}</span><span class="s2"> orders: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span><span class="si">}</span><span class="s2">   $</span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">amount</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">r</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">rows</span><span class="p">)</span><span class="si">:</span><span class="s2">&gt;7.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>8 orders from 2024-03-01 to 2024-03-11
+total revenue: $594.92
+
+revenue by category
+  Books        $ 294.94
+  Appliances   $ 179.98
+  Electronics  $ 120.00
+
+busiest weekdays
+  Friday     3 orders
+  Monday     2 orders
+  Tuesday    2 orders
+
+spend per customer
+  Alice  orders: 3   $ 174.96
+  Bob    orders: 2   $ 120.00
+  Carol  orders: 2   $ 209.97
+  Dave   orders: 1   $  89.99
+</code></pre></div>
+
+<p>Let's walk through what each part of that report used:</p>
+<ul>
+<li><strong>The header</strong> uses <code>namedtuple</code> (so we can write <code>orders[0].date</code> instead of <code>orders[0][3]</code>) and <code>datetime.fromisoformat</code> to turn the date strings into real dates.</li>
+<li><strong>Revenue by category</strong> uses <code>defaultdict(float)</code> to total the amounts, then sorts by the total, biggest first.</li>
+<li><strong>Busiest weekdays</strong> uses <code>strftime("%A")</code> to turn each date into a weekday name, and <code>Counter(...).most_common(3)</code> to rank them.</li>
+<li><strong>Spend per customer</strong> uses <code>groupby</code>, and it works correctly because we <strong>sorted by customer first</strong>.</li>
+</ul>
+<p>Every line of that is standard library. It runs on any computer with nothing but Python installed.</p>
+<hr />
+<h2 id="part-6-common-mistakes"><span class="h-icon"><svg class="icon"><use href="#icon-warn"></use></svg></span>Part 6: Common Mistakes</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What happens</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>defaultdict([])</code> instead of <code>defaultdict(list)</code></td>
+<td><code>TypeError</code> on creation</td>
+<td>Pass the function, not a value</td>
+</tr>
+<tr>
+<td>Looking up a key in a <code>defaultdict</code></td>
+<td>The key is created, silently</td>
+<td>Use <code>.get(key, default)</code> to read</td>
+</tr>
+<tr>
+<td><code>groupby</code> without sorting first</td>
+<td>The same key appears in several groups</td>
+<td>Sort by the key you group by</td>
+</tr>
+<tr>
+<td>Keeping <code>groupby</code> groups for later</td>
+<td>Every group is empty</td>
+<td>Consume each group inside the loop</td>
+</tr>
+<tr>
+<td><code>list(count())</code> or <code>for x in cycle(...)</code></td>
+<td>Runs forever</td>
+<td>Wrap in <code>islice</code>, or <code>break</code></td>
+</tr>
+<tr>
+<td><code>lru_cache</code> on a function taking a list</td>
+<td><code>TypeError: unhashable type</code></td>
+<td>Pass a tuple</td>
+</tr>
+<tr>
+<td><code>lru_cache</code> on a function that reads changing data</td>
+<td>Stale answers, no error</td>
+<td>Only cache pure functions</td>
+</tr>
+<tr>
+<td>Sorting dates as strings</td>
+<td>Wrong order, no error</td>
+<td>Parse them, or store ISO 8601</td>
+</tr>
+<tr>
+<td>Subtracting an aware datetime from a naive one</td>
+<td><code>TypeError</code></td>
+<td>Keep everything in one style, ideally UTC</td>
+</tr>
+</tbody>
+</table></div>
+<p>Notice how many of these say "no error". Those are the dangerous ones: the code runs, the output looks reasonable, and the answer is quietly wrong. Knowing these traps in advance is the best protection.</p>
+<hr />
+<h2 id="quick-reference-summary"><span class="h-icon"><svg class="icon"><use href="#icon-table"></use></svg></span>Quick Reference Summary</h2>
+<p><strong><code>collections</code></strong></p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">namedtuple</span><span class="p">,</span> <span class="n">deque</span>
+
+<span class="n">totals</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>         <span class="c1"># missing key becomes float() == 0.0</span>
+<span class="n">groups</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>          <span class="c1"># missing key becomes []</span>
+<span class="n">counts</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">items</span><span class="p">)</span>             <span class="c1"># counts anything iterable</span>
+<span class="n">counts</span><span class="o">.</span><span class="n">most_common</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>               <span class="c1"># the top three, already sorted</span>
+<span class="n">Row</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">"Row"</span><span class="p">,</span> <span class="s2">"a b c"</span><span class="p">)</span>    <span class="c1"># a tuple with field names</span>
+<span class="n">window</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">maxlen</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>          <span class="c1"># keeps only the last 100 items</span>
+</code></pre></div>
+
+<p><strong><code>itertools</code></strong> (everything is lazy)</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Gives you</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>chain(a, b)</code> / <code>chain.from_iterable(seqs)</code></td>
+<td>several sequences as one stream</td>
+</tr>
+<tr>
+<td><code>islice(it, stop)</code> / <code>islice(it, start, stop)</code></td>
+<td>slicing for iterators</td>
+</tr>
+<tr>
+<td><code>groupby(sorted_data, key=f)</code></td>
+<td>consecutive runs sharing a key</td>
+</tr>
+<tr>
+<td><code>product(a, b)</code></td>
+<td>every combination across sequences</td>
+</tr>
+<tr>
+<td><code>combinations(seq, n)</code></td>
+<td>every group of n, order ignored</td>
+</tr>
+<tr>
+<td><code>permutations(seq, n)</code></td>
+<td>every group of n, order counted</td>
+</tr>
+<tr>
+<td><code>count(start, step)</code></td>
+<td>an endless counter</td>
+</tr>
+<tr>
+<td><code>cycle(seq)</code></td>
+<td>an endless repeat</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong><code>functools</code></strong></p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span><span class="p">,</span> <span class="n">lru_cache</span><span class="p">,</span> <span class="n">reduce</span><span class="p">,</span> <span class="n">wraps</span>
+
+<span class="n">warn</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="s2">"WARNING"</span><span class="p">)</span>      <span class="c1"># fill in the first argument ahead of time</span>
+<span class="nd">@lru_cache</span>                          <span class="c1"># remember results (hashable args, pure function)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">fib</span><span class="p">(</span><span class="n">n</span><span class="p">):</span> <span class="o">...</span>
+<span class="n">fib</span><span class="o">.</span><span class="n">cache_info</span><span class="p">()</span>                    <span class="c1"># hits, misses, size</span>
+<span class="n">fib</span><span class="o">.</span><span class="n">cache_clear</span><span class="p">()</span>                   <span class="c1"># throw the saved answers away</span>
+</code></pre></div>
+
+<p><strong><code>datetime</code></strong></p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span><span class="p">,</span> <span class="n">timezone</span>
+
+<span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="s2">"2024-03-01"</span><span class="p">,</span> <span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2">"</span><span class="p">)</span>   <span class="c1"># string  -&gt; datetime</span>
+<span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="s2">"2024-03-01"</span><span class="p">)</span>          <span class="c1"># the same, for ISO 8601</span>
+<span class="n">moment</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"</span><span class="si">%d</span><span class="s2"> %B %Y"</span><span class="p">)</span>                   <span class="c1"># datetime -&gt; string</span>
+<span class="n">moment</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>                            <span class="c1"># the format to store</span>
+<span class="n">later</span> <span class="o">=</span> <span class="n">moment</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>           <span class="c1"># arithmetic</span>
+<span class="n">gap</span> <span class="o">=</span> <span class="n">later</span> <span class="o">-</span> <span class="n">moment</span>                          <span class="c1"># a timedelta</span>
+<span class="n">gap</span><span class="o">.</span><span class="n">days</span><span class="p">,</span> <span class="n">gap</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>                 <span class="c1"># reading it</span>
+<span class="n">datetime</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">tzinfo</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>     <span class="c1"># aware, not naive</span>
+</code></pre></div>
+
+<p><strong>Which container</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>You want</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Totals or groups by key</td>
+<td><code>defaultdict(float)</code> / <code>defaultdict(list)</code></td>
+</tr>
+<tr>
+<td>How many of each, ranked</td>
+<td><code>Counter</code></td>
+</tr>
+<tr>
+<td>A readable fixed record</td>
+<td><code>namedtuple</code></td>
+</tr>
+<tr>
+<td>A record with methods or edits</td>
+<td><code>@dataclass</code>, or a class</td>
+</tr>
+<tr>
+<td>Fast adds and removes at the front</td>
+<td><code>deque</code></td>
+</tr>
+<tr>
+<td>The last N items only</td>
+<td><code>deque(maxlen=N)</code></td>
+</tr>
+</tbody>
+</table></div>
+
+      <div class="article-end">
+        <p><strong>The standard library is the toolbox you already own: <code>collections</code> gives you smarter containers, <code>itertools</code> gives you ready-made lazy loops, <code>functools</code> helps you reshape and speed up functions, and <code>datetime</code> turns date strings into real dates you can sort, compare and do maths with.</strong> Most of the traps in this guide fail silently, so the habits matter: pass <code>list</code> not <code>[]</code>, read with <code>.get()</code>, sort before <code>groupby</code>, cache only pure functions, and store dates as ISO 8601 in UTC. Next up, in chapter 16, we look at regular expressions, a powerful way to search for and pull patterns out of text.</p>
+      </div>
+    </main>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="f-left">Python Programming Series &nbsp;/&nbsp; Article 15 of the course</div>
+  <div class="f-right"><a href="#top">Back to top ↑</a></div>
+</footer>
+<script>
+(function(){
+  var t=document.getElementById('navToggle'),s=document.getElementById('sidebar');
+  if(t&&s){t.addEventListener('click',function(){s.classList.toggle('open');var o=s.classList.contains('open');t.innerHTML=o?'<svg class="icon"><use href="#icon-close"></use></svg>':'<svg class="icon"><use href="#icon-menu"></use></svg>';});s.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){s.classList.remove('open');t.innerHTML='<svg class="icon"><use href="#icon-menu"></use></svg>';});});}
+  var tl=Array.prototype.slice.call(document.querySelectorAll('.toc a')),sc=tl.map(function(a){return document.getElementById(a.getAttribute('href').slice(1));}).filter(Boolean);
+  if('IntersectionObserver' in window&&sc.length){var bi={};tl.forEach(function(a){bi[a.getAttribute('href').slice(1)]=a;});var obs=new IntersectionObserver(function(es){es.forEach(function(e){var l=bi[e.target.id];if(!l)return;if(e.isIntersecting){tl.forEach(function(a){a.classList.remove('active');});l.classList.add('active');}});},{rootMargin:'-15% 0px -70% 0px',threshold:0});sc.forEach(function(s){obs.observe(s);});}
+  document.querySelectorAll('.code-card').forEach(function(c){var b=c.querySelector('.copy-btn'),e=c.querySelector('code');if(!b||!e)return;b.addEventListener('click',function(){var tx=e.innerText,done=function(){var o=b.innerHTML;b.innerHTML='<svg class="icon"><use href="#icon-check"></use></svg> Copied';setTimeout(function(){b.innerHTML=o;},1600);};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(tx).then(done,done);else{var ta=document.createElement('textarea');ta.value=tx;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(x){}document.body.removeChild(ta);done();}});});
+})();
+</script>
+</body>
+</html>

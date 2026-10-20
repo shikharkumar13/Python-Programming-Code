@@ -1,0 +1,1726 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Context Managers · Python Programming Series</title>
+<meta name="description" content="A beginner-friendly guide to Python context managers: what with really does, __enter__ and __exit__, handling errors, @contextmanager, contextlib tools, rollbacks, safe file writes and ExitStack.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+
+:root{
+  --paper:#F3F8FC;--surface:#FFFFFF;--tint:#E8F2FB;
+  --ink:#0E2238;--ink-soft:#3D5570;--ink-faint:#7F95AB;
+  --violet:#0B6FCC;--violet-deep:#0A4F9E;--violet-soft:#E2EFFB;
+  --pink:#3FA34D;--pink-text:#0A7466;--pink-soft:#E0F5F2;
+  --mint:#0FA3A3;--mint-text:#08787A;--mint-soft:#DDF4F4;
+  --sun:#FFB627;--sun-soft:#FFF4D9;
+  --orange:#E89B00;--orange-text:#9A6400;--orange-soft:#FFF0D1;
+  --sky:#013243;--sky-text:#013243;--sky-soft:#E1ECF0;
+  --line:#D6E4F0;--line-strong:#B9CFE3;
+  --code-bg:#0B1E33;--code-head:#08172A;--code-line:#17304D;--out-bg:#071425;
+  --r-s:8px;--r-m:14px;--r-l:22px;
+  --font-d:'Bricolage Grotesque','Arial Rounded MT Bold',sans-serif;
+  --font-b:'Figtree',-apple-system,'Segoe UI',sans-serif;
+  --font-m:'JetBrains Mono','SFMono-Regular',Consolas,monospace;
+}
+*,*::before,*::after{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-b);font-size:17px;line-height:1.68;-webkit-font-smoothing:antialiased;}
+a{color:var(--violet-deep);text-decoration-color:rgba(11,111,204,.35);text-underline-offset:3px;text-decoration-thickness:2px;}
+a:hover{text-decoration-color:currentColor;}
+::selection{background:var(--pink);color:#fff;}
+:focus-visible{outline:3px solid var(--pink);outline-offset:2px;border-radius:4px;}
+.icon{width:1em;height:1em;display:inline-block;vertical-align:-.15em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+
+.shell{max-width:1300px;margin:0 auto;padding:0 clamp(16px,4vw,44px);}
+.topbar{display:none;position:sticky;top:0;z-index:40;align-items:center;justify-content:space-between;padding:12px clamp(16px,4vw,44px);background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-bottom:2px solid var(--violet-soft);}
+.topbar .brand{font-family:var(--font-d);font-weight:800;font-size:.98rem;color:var(--ink);}
+.topbar .brand span{color:var(--violet);}
+.topbar button{border:2px solid var(--violet-soft);background:var(--surface);border-radius:var(--r-s);width:40px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--violet);}
+
+/* ---------- Hero: the one loud moment ---------- */
+.hero{position:relative;margin:clamp(16px,2.5vw,28px) 0 clamp(36px,5vw,56px);padding:clamp(36px,5.5vw,68px) clamp(22px,4.5vw,60px);background:var(--violet);color:#fff;border-radius:var(--r-l);overflow:hidden;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:clamp(28px,4vw,56px);align-items:center;}
+.hero::before{content:"";position:absolute;width:420px;height:420px;border-radius:50%;background:var(--violet-deep);right:-120px;top:-160px;}
+.hero::after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;background:var(--pink);left:-70px;bottom:-90px;opacity:.9;}
+.hero-copy,.hero-art{position:relative;z-index:1;}
+.hero-eyebrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-weight:600;font-size:.95rem;color:rgba(255,255,255,.86);margin-bottom:20px;}
+.hero-eyebrow .badge{background:var(--sun);color:var(--ink);font-family:var(--font-d);font-weight:800;padding:4px 13px;border-radius:999px;font-size:.92rem;}
+h1.title{font-family:var(--font-d);font-weight:800;font-size:clamp(2.15rem,4.6vw,3.7rem);line-height:1.02;letter-spacing:-.025em;margin:0 0 20px;max-width:16ch;color:#fff;}
+.hero-sub{font-size:clamp(1rem,1.5vw,1.12rem);color:rgba(255,255,255,.9);max-width:58ch;margin:0 0 28px;}
+.hero-sub strong{color:#fff;font-weight:700;}
+.hero-chips{display:flex;flex-wrap:wrap;gap:10px;}
+.chip{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.13);border:1.5px solid rgba(255,255,255,.28);padding:7px 14px 7px 10px;border-radius:999px;font-size:.88rem;font-weight:600;color:#fff;}
+.chip .icon{width:1.15em;height:1.15em;}
+.chip:nth-child(1) .icon{color:var(--sun);}
+.chip:nth-child(2) .icon{color:#7FF0D2;}
+.chip:nth-child(3) .icon{color:#C5F27A;}
+.chip:nth-child(4) .icon{color:#9FD6FF;}
+
+.hero-art{display:flex;flex-direction:column;align-items:center;}
+.blueprint{width:min(250px,100%);border:2.5px dashed rgba(255,255,255,.75);border-radius:var(--r-m);padding:14px 16px 12px;font-family:var(--font-m);font-size:.8rem;color:#fff;background:rgba(255,255,255,.06);}
+.bp-title{font-weight:700;margin-bottom:8px;}
+.bp-title .kw{color:#C5F27A;}
+.bp-title .cn{color:var(--sun);}
+.bp-line{padding:2px 0 2px 14px;color:rgba(255,255,255,.82);}
+.bp-line.m{color:#7FF0D2;}
+.fan{width:min(330px,100%);height:44px;display:block;}
+.fan path{stroke:rgba(255,255,255,.7);stroke-width:2;fill:none;stroke-dasharray:4 4;vector-effect:non-scaling-stroke;}
+.objs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:min(360px,100%);}
+.obj{border-radius:12px;padding:10px 10px 9px;font-family:var(--font-m);font-size:.72rem;line-height:1.5;color:var(--ink);box-shadow:0 6px 0 rgba(14,34,56,.28);animation:stamp .5s cubic-bezier(.3,1.5,.6,1) both;}
+.obj b{display:block;font-family:var(--font-d);font-size:1rem;font-weight:800;margin-bottom:3px;}
+.obj span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.o1{background:var(--sun);transform:rotate(-4deg);animation-delay:.25s;}
+.o2{background:#7FF0D2;transform:rotate(2deg);animation-delay:.45s;}
+.o3{background:#C5F27A;transform:rotate(-1.5deg);animation-delay:.65s;}
+@keyframes stamp{from{opacity:0;translate:0 -26px;scale:.85;}to{opacity:1;translate:0 0;scale:1;}}
+.art-cap{margin:18px 0 0;font-family:var(--font-d);font-weight:700;font-size:.95rem;color:rgba(255,255,255,.9);}
+
+/* ---------- Layout + sidebar ---------- */
+.layout{display:grid;grid-template-columns:265px minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:start;padding-bottom:90px;}
+.sidebar{position:sticky;top:24px;max-height:calc(100vh - 48px);overflow-y:auto;padding:16px 10px 16px 0;}
+.sidebar::-webkit-scrollbar{width:5px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:3px;}
+.toc-label{font-family:var(--font-d);font-weight:800;font-size:1rem;color:var(--ink);margin:0 0 10px;padding-left:12px;}
+.toc{list-style:none;margin:0;padding:0;}
+.toc li{margin:0 0 2px;}
+.toc a{display:flex;align-items:center;gap:10px;padding:7px 12px;font-size:.88rem;font-weight:500;color:var(--ink-soft);text-decoration:none;border-radius:10px;transition:background .15s,color .15s;}
+.toc a .icon{width:1.05em;height:1.05em;flex:none;color:var(--violet);}
+.toc a:hover{background:var(--violet-soft);color:var(--ink);}
+.toc a.active{background:var(--violet);color:#fff;font-weight:600;}
+.toc a.active .icon{color:var(--sun);}
+
+/* ---------- Article ---------- */
+.article{min-width:0;padding-top:8px;max-width:820px;}
+.article h2{--acc:var(--violet);font-family:var(--font-d);font-weight:800;font-size:clamp(1.55rem,2.6vw,2rem);line-height:1.15;letter-spacing:-.015em;margin:64px 0 18px;scroll-margin-top:24px;display:flex;align-items:center;gap:14px;}
+.article h2:nth-of-type(5n+2){--acc:var(--pink);}
+.article h2:nth-of-type(5n+3){--acc:var(--mint);}
+.article h2:nth-of-type(5n+4){--acc:var(--orange);}
+.article h2:nth-of-type(5n+5){--acc:var(--sky);}
+.article>h2:first-of-type{margin-top:4px;}
+.article>hr:first-child{display:none;}
+.article h2 .h-icon{width:2.6rem;height:2.6rem;flex:none;display:grid;place-items:center;background:var(--acc);color:#fff;border-radius:12px;transform:rotate(-4deg);box-shadow:0 4px 0 rgba(14,34,56,.18);}
+.article h2 .h-icon .icon{width:1.35rem;height:1.35rem;stroke-width:2;}
+.article h3{font-family:var(--font-d);font-weight:700;font-size:1.2rem;margin:34px 0 10px;scroll-margin-top:24px;color:var(--ink);}
+.article p{margin:0 0 17px;}
+.article ul,.article ol{margin:0 0 20px;padding-left:1.35em;}
+.article li{margin-bottom:8px;padding-left:.2em;}
+.article ul li::marker{color:var(--pink);font-size:1.15em;}
+.article ol li::marker{color:var(--violet);font-family:var(--font-d);font-weight:800;}
+.article strong{font-weight:700;}
+.article hr{border:0;height:6px;width:110px;margin:52px auto;border-radius:6px;background:linear-gradient(90deg,var(--violet) 0 20%,var(--pink) 20% 40%,var(--mint) 40% 60%,var(--sun) 60% 80%,var(--sky) 80% 100%);}
+.article code{font-family:var(--font-m);font-size:.84em;background:var(--pink-soft);padding:.12em .4em;border-radius:6px;color:var(--pink-text);}
+.article blockquote{margin:22px 0;padding:16px 20px;border-left:5px solid var(--sun);background:var(--sun-soft);border-radius:0 var(--r-m) var(--r-m) 0;color:var(--ink);}
+.article blockquote p{margin:0;color:inherit;}
+
+.table-wrap{overflow-x:auto;margin:22px 0 28px;border-radius:var(--r-m);border:2px solid var(--violet-soft);background:var(--surface);}
+.article table{width:100%;border-collapse:collapse;font-size:.9rem;}
+.article thead th{background:var(--violet);color:#fff;font-family:var(--font-d);font-weight:700;text-align:left;padding:12px 16px;white-space:nowrap;font-size:.9rem;}
+.article tbody td{padding:11px 16px;border-bottom:1px solid var(--line);vertical-align:top;}
+.article tbody tr:last-child td{border-bottom:none;}
+.article tbody tr:nth-child(even){background:#F5F9FD;}
+.article tbody td code{white-space:nowrap;}
+
+/* ---------- Code ---------- */
+.code-card{margin:22px 0 26px;border-radius:var(--r-m);overflow:hidden;background:var(--code-bg);box-shadow:0 6px 0 var(--violet-soft);}
+.code-card .code-head{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:var(--code-head);border-bottom:1px solid var(--code-line);}
+.code-card .dots{display:flex;gap:6px;}
+.code-card .dots span{width:10px;height:10px;border-radius:50%;display:block;}
+.code-card .dots span:nth-child(1){background:var(--pink);}
+.code-card .dots span:nth-child(2){background:var(--sun);}
+.code-card .dots span:nth-child(3){background:var(--mint);}
+.code-card .lang{font-family:var(--font-m);font-size:.72rem;color:#7E9CC0;}
+.code-card .copy-btn{font-family:var(--font-b);font-weight:600;font-size:.76rem;color:#DCEBFA;background:rgba(255,255,255,.06);border:1px solid #23456B;border-radius:7px;padding:4px 10px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .15s,border-color .15s;}
+.code-card .copy-btn:hover{background:var(--violet);border-color:var(--violet);color:#fff;}
+.code-card .copy-btn .icon{width:.95em;height:.95em;}
+.code-card pre{margin:0;padding:16px 20px;overflow-x:auto;font-size:.85rem;line-height:1.6;}
+.code-card code{font-family:var(--font-m);font-size:1em;line-height:inherit;color:#E6F1FF;background:none;padding:0;border-radius:0;}
+.code-card .k,.code-card .kn,.code-card .kd,.code-card .kc,.code-card .ow{color:#5CC8FF;}
+.code-card .nb,.code-card .bp{color:#9FD6FF;}
+.code-card .nf,.code-card .fm{color:#A6E36B;}
+.code-card .s,.code-card .s1,.code-card .s2,.code-card .sa,.code-card .sd,.code-card .se{color:#FFD166;}
+.code-card .si{color:#6EE7D8;}
+.code-card .mi,.code-card .mf{color:#6EE7D8;}
+.code-card .o,.code-card .p{color:#9FB6CF;}
+.code-card .c,.code-card .c1,.code-card .cm{color:#6F8BA8;font-style:italic;}
+.code-card .n{color:#E6F1FF;}
+.code-card .nc,.code-card .ne{color:#FFB86B;font-weight:600;}
+
+.output-card{margin:-26px 0 26px;border-radius:0 0 var(--r-m) var(--r-m);overflow:hidden;background:var(--out-bg);border-top:2px dashed #23456B;box-shadow:0 6px 0 var(--violet-soft);position:relative;z-index:1;}
+.output-card::before{content:"Output";display:block;font-family:var(--font-b);font-weight:700;font-size:.74rem;color:#A6E36B;padding:9px 20px 0;}
+.output-card pre{margin:0;padding:4px 20px 16px;overflow-x:auto;font-size:.82rem;line-height:1.6;}
+.output-card code{font-family:var(--font-m);font-size:1em;line-height:inherit;color:#BFD6EE;background:none;padding:0;border-radius:0;}
+
+.diagram-card{margin:22px 0 26px;border-radius:var(--r-m);overflow:hidden;position:relative;border:2.5px dashed var(--line-strong);background:var(--surface);}
+.diagram-card::before{content:"diagram";position:absolute;top:10px;right:14px;font-family:var(--font-b);font-weight:700;font-size:.74rem;color:var(--violet);}
+.diagram-card pre{margin:0;padding:26px 22px 20px;overflow-x:auto;}
+.diagram-card pre{line-height:1.3;font-size:.84rem;}
+.diagram-card code{font-family:var(--font-m);font-size:1em;line-height:inherit;color:var(--violet-deep);font-weight:500;background:none;padding:0;white-space:pre;}
+
+.svg-diagram{margin:24px 0 28px;padding:22px 20px 18px;background:var(--surface);border:2px solid var(--violet-soft);border-radius:var(--r-m);}
+.svg-diagram{overflow-x:auto;}
+.svg-diagram svg{width:100%;min-width:560px;height:auto;display:block;}
+.svg-diagram .cap{font-size:.86rem;font-weight:500;color:var(--ink-faint);text-align:center;margin-top:12px;}
+
+.article-end{margin-top:56px;padding:30px 30px;border-radius:var(--r-l);background:var(--violet);color:#fff;position:relative;overflow:hidden;}
+.article-end::after{content:"";position:absolute;width:140px;height:140px;border-radius:50%;background:var(--sun);right:-50px;bottom:-60px;}
+.article-end p{margin:0;font-size:1.06rem;color:rgba(255,255,255,.92);position:relative;z-index:1;max-width:62ch;}
+.article-end p strong{color:#fff;}
+
+footer.site-footer{border-top:2px solid var(--violet-soft);margin-top:30px;padding:22px clamp(16px,4vw,44px) 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+footer.site-footer .f-left{font-size:.88rem;font-weight:500;color:var(--ink-faint);}
+footer.site-footer a{font-size:.9rem;font-weight:600;}
+
+@media(max-width:960px){
+  .topbar{display:flex;}
+  .layout{grid-template-columns:1fr;}
+  .article{max-width:none;}
+  .sidebar{position:fixed;inset:60px 0 0 0;z-index:35;background:var(--paper);padding:18px clamp(16px,4vw,44px) 24px;transform:translateX(-100%);transition:transform .2s;max-height:none;height:calc(100vh - 60px);}
+  .sidebar.open{transform:translateX(0);}
+  .hero{grid-template-columns:1fr;}
+}
+@media(max-width:520px){
+  .article h2 .h-icon{width:2.2rem;height:2.2rem;}
+  .obj{font-size:.66rem;padding:9px 8px;}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}.sidebar{transition:none;}.obj{animation:none;}}
+
+/* NumPy hero illustration */
+.cells{display:grid;grid-template-columns:repeat(4,1fr);border:2px solid rgba(255,255,255,.8);border-radius:8px;overflow:hidden;margin-top:4px;}
+.cells span{text-align:center;padding:7px 0;font-weight:700;color:#fff;}
+.cells span+span{border-left:2px solid rgba(255,255,255,.8);}
+.objs.four{grid-template-columns:repeat(4,1fr);width:min(380px,100%);gap:9px;}
+.objs.four .obj{text-align:center;padding:10px 4px 9px;}
+.o4{background:#9FD6FF;transform:rotate(3deg);animation-delay:.85s;}
+
+/* Article 11 extras */
+.cells.three{grid-template-columns:repeat(3,1fr);}
+.cells.three span{font-size:.72rem;padding:6px 0;}
+.objs .obj{min-width:0;}
+.obj.seq{text-align:center;padding:10px 6px 9px;}
+.obj.seq code{display:block;font-family:var(--font-m);font-size:.74rem;font-weight:700;margin:2px 0 4px;color:var(--ink);background:none;padding:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.obj.seq span{font-size:.68rem;white-space:normal;}
+.code-card.term .code-head{background:#06121F;}
+.code-card .lang{text-transform:none;}
+.diagram-card.textfile::before{content:"text";}
+@media(max-width:520px){.obj.seq code{font-size:.62rem;}}
+
+.article h2 code,.article h3 code,.article p code,.article li code{overflow-wrap:anywhere;}
+</style>
+</head>
+<body>
+<svg style="display:none" aria-hidden="true"><defs>
+<symbol id="icon-leak" viewBox="0 0 24 24"><path d="M12 2s6 7 6 12a6 6 0 0 1-12 0c0-5 6-12 6-12z"/><path d="M9.5 15a2.5 2.5 0 0 0 2.5 2.5"/></symbol>
+<symbol id="icon-door" viewBox="0 0 24 24"><path d="M4 21V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v17"/><path d="M2 21h20"/><circle cx="12.5" cy="12" r="1" fill="currentColor"/><path d="M19 8l3 3-3 3M16 11h6"/></symbol>
+<symbol id="icon-build" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></symbol>
+<symbol id="icon-key" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3L21 2M17 6l3 3M14.5 8.5l2 2"/></symbol>
+<symbol id="icon-shield" viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z"/><path d="M9 12l2 2 4-4"/></symbol>
+<symbol id="icon-stopwatch" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M10 2h4M12 2v3"/></symbol>
+<symbol id="icon-layers" viewBox="0 0 24 24"><path d="M3 7c0-2 4-3 9-3s9 1 9 3"/><path d="M3 7h18"/><path d="M4 12h16" stroke-dasharray="2 2"/><path d="M3 17h18c0 2-4 3-9 3s-9-1-9-3z"/></symbol>
+<symbol id="icon-scale" viewBox="0 0 24 24"><path d="M12 3v18M7 21h10M5 7h14"/><path d="M5 7l-3 7a3 3 0 0 0 6 0zM19 7l-3 7a3 3 0 0 0 6 0z"/></symbol>
+<symbol id="icon-toolbox" viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="12" rx="1.5"/><path d="M8 8V5h8v3M2 13h20M10 13v2h4v-2"/></symbol>
+<symbol id="icon-stack" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="5" rx="1"/><rect x="4" y="10" width="16" height="5" rx="1"/><rect x="4" y="17" width="16" height="4" rx="1"/></symbol>
+<symbol id="icon-undo" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></symbol>
+<symbol id="icon-exitstack" viewBox="0 0 24 24"><rect x="3" y="12" width="7" height="9" rx="1"/><rect x="8.5" y="7" width="7" height="9" rx="1"/><rect x="14" y="2" width="7" height="9" rx="1"/></symbol>
+<symbol id="icon-warn" viewBox="0 0 24 24"><path d="M12 3l10 18H2z"/><path d="M12 10v5"/><circle cx="12" cy="18" r=".8" fill="currentColor"/></symbol>
+<symbol id="icon-table" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="1.5"/><line x1="2" y1="9" x2="22" y2="9"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15.5" y1="3" x2="15.5" y2="21"/></symbol>
+<symbol id="icon-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="13" rx="1.6"/><path d="M5 16H4.5A1.5 1.5 0 0 1 3 14.5v-10A1.5 1.5 0 0 1 4.5 3h10A1.5 1.5 0 0 1 16 4.5V5"/></symbol>
+<symbol id="icon-check" viewBox="0 0 24 24"><path d="M4 12.5 L9.5 18 L20 5"/></symbol>
+<symbol id="icon-menu" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
+<symbol id="icon-close" viewBox="0 0 24 24"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></symbol>
+</defs></svg>
+
+
+<div class="topbar">
+  <span class="brand">§14 &nbsp;<span>Context Managers</span></span>
+  <button id="navToggle" aria-label="Toggle navigation">
+    <svg class="icon"><use href="#icon-menu"></use></svg>
+  </button>
+</div>
+
+<div class="shell" id="top">
+  <section class="hero">
+  <div class="hero-copy">
+    <div class="hero-eyebrow"><span class="badge">Article 14</span> Python Programming Series</div>
+    <h1 class="title">Context Managers in Python: A Complete Beginner&#x27;s Guide</h1>
+    <p class="hero-sub">You've been writing <code>with open(...) as f:</code> for a while now. It's the "professional way" to work with files, and it closes the file for you. But what does <code>with</code> actually do? It looks like special syntax just for files, but it isn't. This guide opens it up and shows you, in plain English and one small step at a time, how <code>with</code> works and how to build your own.</p>
+    <div class="hero-chips">
+      <div class="chip"><svg class="icon"><use href="#icon-door"></use></svg> What with really does</div>
+      <div class="chip"><svg class="icon"><use href="#icon-shield"></use></svg> __exit__ and errors</div>
+      <div class="chip"><svg class="icon"><use href="#icon-layers"></use></svg> @contextmanager made simple</div>
+      <div class="chip"><svg class="icon"><use href="#icon-undo"></use></svg> Rollbacks and safe file writes</div>
+    </div>
+  </div>
+  <div class="hero-art" aria-hidden="true">
+    <div class="blueprint">
+      <div class="bp-title"><span class="kw">with</span> <span class="cn">open(...)</span> <span class="kw">as</span> f:</div>
+      <div class="cells three"><span>__enter__</span><span>body</span><span>__exit__</span></div>
+    </div>
+    <svg class="fan" viewBox="0 0 330 44" preserveAspectRatio="none"><path d="M165 0 C165 24 55 18 55 44"/><path d="M165 0 L165 44"/><path d="M165 0 C165 24 275 18 275 44"/></svg>
+    <div class="objs">
+      <div class="obj seq o1"><b>file</b><code>open()</code><span>closes itself</span></div>
+      <div class="obj seq o2"><b>timer</b><code>Timer()</code><span>times a block</span></div>
+      <div class="obj seq o3"><b>transaction</b><code>Transaction()</code><span>rolls back</span></div>
+    </div>
+    <p class="art-cap">Setup, work, cleanup guaranteed</p>
+  </div>
+</section>
+
+  <div class="layout">
+    <nav class="sidebar" id="sidebar">
+      <div class="toc-label">On this page</div>
+      <ul class="toc">
+<li><a href="#part-1-the-problem-cleanup-that-has-to-happen"><svg class="icon"><use href="#icon-leak"></use></svg><span>Part 1: The Problem, Cleanup That Has to Happen</span></a></li>
+<li><a href="#part-2-what-with-actually-does"><svg class="icon"><use href="#icon-door"></use></svg><span>Part 2: What with Actually Does</span></a></li>
+<li><a href="#part-3-writing-your-own-context-manager"><svg class="icon"><use href="#icon-build"></use></svg><span>Part 3: Writing Your Own Context Manager</span></a></li>
+<li><a href="#part-4-what-as-gives-you"><svg class="icon"><use href="#icon-key"></use></svg><span>Part 4: What as Gives You</span></a></li>
+<li><a href="#part-5-__exit__-and-errors"><svg class="icon"><use href="#icon-shield"></use></svg><span>Part 5: __exit__ and Errors</span></a></li>
+<li><a href="#part-6-a-timer-for-blocks-of-code"><svg class="icon"><use href="#icon-stopwatch"></use></svg><span>Part 6: A Timer for Blocks of Code</span></a></li>
+<li><a href="#part-7-contextlibcontextmanager-generators-plus-decorators"><svg class="icon"><use href="#icon-layers"></use></svg><span>Part 7: @contextlib.contextmanager, Generators Plus Decorators</span></a></li>
+<li><a href="#part-8-class-or-generator"><svg class="icon"><use href="#icon-scale"></use></svg><span>Part 8: Class or Generator?</span></a></li>
+<li><a href="#part-9-the-contextlib-toolkit"><svg class="icon"><use href="#icon-toolbox"></use></svg><span>Part 9: The contextlib Toolkit</span></a></li>
+<li><a href="#part-10-several-managers-in-one-with"><svg class="icon"><use href="#icon-stack"></use></svg><span>Part 10: Several Managers in One with</span></a></li>
+<li><a href="#part-11-real-world-examples"><svg class="icon"><use href="#icon-undo"></use></svg><span>Part 11: Real-World Examples</span></a></li>
+<li><a href="#part-12-going-further-exitstack"><svg class="icon"><use href="#icon-exitstack"></use></svg><span>Part 12: Going Further, ExitStack</span></a></li>
+<li><a href="#part-13-common-mistakes"><svg class="icon"><use href="#icon-warn"></use></svg><span>Part 13: Common Mistakes</span></a></li>
+<li><a href="#quick-reference-summary"><svg class="icon"><use href="#icon-table"></use></svg><span>Quick Reference Summary</span></a></li>
+      </ul>
+    </nav>
+
+    <main class="article">
+<p>Here are the three ways to close a file that you may have seen before:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"data.txt"</span><span class="p">)</span>      <span class="c1"># 1. remember to call f.close()</span>
+<span class="o">...</span>
+
+<span class="k">try</span><span class="p">:</span>                      <span class="c1"># 2. try/finally</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"data.txt"</span><span class="p">)</span>
+<span class="k">finally</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"data.txt"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>   <span class="c1"># 3. the professional way</span>
+    <span class="o">...</span>
+</code></pre></div>
+
+<p>The third one is what everyone uses. The secret is that <code>with</code> works with <strong>any object that follows a small set of rules</strong>, not just files. A file just happens to be the first such object you met. Objects that follow these rules are called <strong>context managers</strong>, and once you understand them you can use the same clean pattern for database connections, timers, temporary settings, safe file writing and much more.</p>
+<p>This is also where generators and decorators come together: the shortest way to write your own <code>with</code> helper is a generator with a decorator on top.</p>
+<p>Here is what we will cover:</p>
+<ul>
+<li>Why cleanup is harder than it looks</li>
+<li>The two methods behind <code>with</code>: <code>__enter__</code> and <code>__exit__</code></li>
+<li>How to write your own context manager as a class</li>
+<li>What <code>as</code> gives you, and what <code>__exit__</code> sees when the block crashes</li>
+<li>A timer for any block of code</li>
+<li><code>@contextlib.contextmanager</code>, the short way to write one</li>
+<li>The <code>contextlib</code> tools you'll use: <code>suppress</code>, <code>closing</code>, <code>redirect_stdout</code></li>
+<li>Using several managers in one <code>with</code></li>
+<li>Real patterns: rollbacks, a temporary working directory, safe file writes</li>
+<li><code>ExitStack</code>, for when you don't know in advance how many managers you need</li>
+</ul>
+<h3 id="setting-up">Setting Up</h3>
+<p>We'll keep our practice files in their own folder, so they don't clutter your working directory. This cell creates a small sales file with four regions:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s2">"context_demo"</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"context_demo/sales.csv"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"region,units</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"north,120</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"south,95</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"east,140</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"west,88</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Sample files ready."</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Sample files ready.
+</code></pre></div>
+
+<hr />
+<h2 id="part-1-the-problem-cleanup-that-has-to-happen"><span class="h-icon"><svg class="icon"><use href="#icon-leak"></use></svg></span>Part 1: The Problem, Cleanup That Has to Happen</h2>
+<p>When you open a file, the operating system gives your program a <strong>file handle</strong> (also called a <strong>file descriptor</strong>). Think of it as a numbered ticket that says "this program is currently using this file". A program can only hold a <strong>limited number</strong> of these tickets at once, which is why you must give each one back with <code>close()</code>.</p>
+<p><strong>Analogy:</strong> a coat-check counter has a limited number of hooks. Every time you check in a coat, you get a ticket. If people keep checking in coats and never collect them, the counter eventually runs out of hooks and has to turn new people away.</p>
+<p>Here's what happens when something goes wrong <strong>before</strong> you get the chance to close the file:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"context_demo/sales.csv"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>                    <span class="c1"># skip the header row</span>
+    <span class="n">units</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="s2">"not a number"</span><span class="p">)</span>     <span class="c1"># a bad row in the data, so this raises</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>                       <span class="c1"># never reached</span>
+<span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Error:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Is the file still open?"</span><span class="p">,</span> <span class="ow">not</span> <span class="n">f</span><span class="o">.</span><span class="n">closed</span><span class="p">)</span>
+<span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>                           <span class="c1"># clean up so the rest of the notebook is tidy</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Error: invalid literal for int() with base 10: 'not a number'
+Is the file still open? True
+</code></pre></div>
+
+<p>The <code>close()</code> call was right there in the code. It just never ran, because the error <strong>jumped straight past it</strong> to the <code>except</code> block. The file stayed open.</p>
+<p>One file left open on your laptop does no harm. But a web server that leaves one open for <strong>every request</strong> eventually runs out of handles and stops accepting connections. That's how small cleanup mistakes turn into real outages.</p>
+<h3 id="the-finally-fix">The <code>finally</code> Fix</h3>
+<p>A <code>finally</code> block <strong>always runs</strong>, whether the code above it succeeded or crashed:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"context_demo/sales.csv"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+    <span class="n">units</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="s2">"not a number"</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Error:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+<span class="k">finally</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>                       <span class="c1"># runs no matter what</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Is the file still open?"</span><span class="p">,</span> <span class="ow">not</span> <span class="n">f</span><span class="o">.</span><span class="n">closed</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Error: invalid literal for int() with base 10: 'not a number'
+Is the file still open? False
+</code></pre></div>
+
+<p>That works, but it's a lot of extra lines around one line of real work. You also have to remember it <strong>every single time</strong>. And the <code>f.close()</code> you must remember sits far away from the <code>open()</code> that made it necessary.</p>
+<p><strong>Analogy:</strong> it's like leaving yourself a sticky note saying "turn off the stove" on the front door. It might work, but the reminder is far from the stove, and one day you'll forget to write the note.</p>
+<h3 id="the-with-fix">The <code>with</code> Fix</h3>
+<p><code>with</code> moves the cleanup <strong>into the file object itself</strong>. Here's the same crash inside a <code>with</code> block:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">try</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"context_demo/sales.csv"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="n">units</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="s2">"not a number"</span><span class="p">)</span>     <span class="c1"># the same crash as before</span>
+<span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Error:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Is the file still open?"</span><span class="p">,</span> <span class="ow">not</span> <span class="n">f</span><span class="o">.</span><span class="n">closed</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Error: invalid literal for int() with base 10: 'not a number'
+Is the file still open? False
+</code></pre></div>
+
+<p>The file closed on its own, even though the block crashed. You didn't have to remember anything.</p>
+<p><strong>Analogy:</strong> <code>with</code> is like a hotel room with an <strong>automatic check-out</strong>. However you leave (calmly at the end of your stay, or in a rush because the fire alarm went off), the hotel checks you out and takes back the key card. You can't forget, because it isn't your job anymore.</p>
+<h3 id="this-pattern-is-everywhere">This Pattern Is Everywhere</h3>
+<p>Nothing about this pattern is specific to files. It shows up anywhere you <strong>take</strong> something and have to <strong>give it back</strong>:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>You acquire</th>
+<th>You must release</th>
+<th>If you forget</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>An open file</td>
+<td><code>close()</code></td>
+<td>Leaked descriptors; unflushed writes</td>
+</tr>
+<tr>
+<td>A database connection</td>
+<td><code>close()</code></td>
+<td>The connection pool drains and the app stalls</td>
+</tr>
+<tr>
+<td>A lock</td>
+<td><code>release()</code></td>
+<td>Every other thread waits forever</td>
+</tr>
+<tr>
+<td>A changed setting</td>
+<td>Restore the old value</td>
+<td>The rest of the program silently misbehaves</td>
+</tr>
+<tr>
+<td>A started transaction</td>
+<td><code>commit()</code> or <code>rollback()</code></td>
+<td>Half-written data</td>
+</tr>
+<tr>
+<td>A temporary directory</td>
+<td>Delete it</td>
+<td>Disk fills up</td>
+</tr>
+</tbody>
+</table></div>
+<p>Every row has a <strong>setup step</strong> and a <strong>cleanup step</strong>, where the cleanup has to happen <strong>even if the part in the middle crashes</strong>. That's the job of a <strong>context manager</strong>.</p>
+<hr />
+<h2 id="part-2-what-with-actually-does"><span class="h-icon"><svg class="icon"><use href="#icon-door"></use></svg></span>Part 2: What <code>with</code> Actually Does</h2>
+<p><code>with</code> isn't file syntax. <strong>Any object that has two special methods, <code>__enter__</code> and <code>__exit__</code>, can be used in a <code>with</code> statement.</strong> Python calls a set of methods like this a <strong>protocol</strong>, and these two make up the <strong>context manager protocol</strong>.</p>
+<p><strong>Analogy:</strong> a protocol is like the shape of a <strong>power socket</strong>. The socket doesn't care what brand of device you plug in. As long as the plug has the right shape (here: an <code>__enter__</code> and an <code>__exit__</code> method), it fits.</p>
+<p>These are <strong>dunder methods</strong> (short for "double underscore") that Python calls for you, just like <code>__init__</code>, <code>__iter__</code> and <code>__next__</code>.</p>
+<p>This:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"data.txt"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">body</span>
+</code></pre></div>
+
+<p>is roughly a shorter way to write this:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">manager</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"data.txt"</span><span class="p">)</span>
+<span class="n">f</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">()</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">body</span>
+<span class="k">finally</span><span class="p">:</span>
+    <span class="n">manager</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="n">exception_type</span><span class="p">,</span> <span class="n">exception_value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">)</span>
+</code></pre></div>
+
+<p>(<code>exception_type</code>, <code>exception_value</code> and <code>traceback</code> describe the error, if there was one. Part 5 looks at them.)</p>
+<div class="diagram-card"><pre><code>   with open("data.txt") as f:          what Python does
+       body
+                                         1. manager = open("data.txt")
+                                         2. f = manager.__enter__()      ← SETUP   ("check in")
+                                         3. run the body                 ← your code
+                                         4. manager.__exit__(...)        ← CLEANUP ("check out")
+                                            ALWAYS runs, even if step 3 crashed
+</code></pre></div>
+
+<p>So the <code>try/finally</code> we wrote by hand didn't disappear. <strong>Python writes it for you</strong>, and the object supplies the cleanup.</p>
+<p>First, let's check that a file object really has those two methods:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"context_demo/sales.csv"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"has __enter__:"</span><span class="p">,</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s2">"__enter__"</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"has __exit__ :"</span><span class="p">,</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s2">"__exit__"</span><span class="p">))</span>
+
+<span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>has __enter__: True
+has __exit__ : True
+</code></pre></div>
+
+<p>We can even call the two methods ourselves, with no <code>with</code> statement at all:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"context_demo/sales.csv"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+
+<span class="n">same_file</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">()</span>                       <span class="c1"># what 'as' would have bound</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"__enter__ returned the file itself:"</span><span class="p">,</span> <span class="n">same_file</span> <span class="ow">is</span> <span class="n">f</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"first line:"</span><span class="p">,</span> <span class="n">same_file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+
+<span class="n">f</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>                    <span class="c1"># the three arguments come later</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"closed:"</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">closed</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>__enter__ returned the file itself: True
+first line: region,units
+closed: True
+</code></pre></div>
+
+<p><code>__enter__</code> returned the file itself (so <code>same_file is f</code> is <code>True</code>), and <code>__exit__</code> closed it. Never write that in real code. It's only here to prove that <code>with</code> is nothing more than ordinary method calls.</p>
+<p>If an object <strong>doesn't</strong> have those methods, <code>with</code> tells you plainly:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">try</span><span class="p">:</span>
+    <span class="k">with</span> <span class="mi">42</span> <span class="k">as</span> <span class="n">number</span><span class="p">:</span>              <span class="c1"># deliberately wrong: 42 is not a context manager</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"TypeError:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>TypeError: 'int' object does not support the context manager protocol
+</code></pre></div>
+
+<p>This error means the object has no <code>__enter__</code>/<code>__exit__</code>, which usually means you passed the wrong thing. A common cause is giving <code>with</code> a <strong>file path</strong> (a string) when you meant <code>open(path)</code>.</p>
+<hr />
+<h2 id="part-3-writing-your-own-context-manager"><span class="h-icon"><svg class="icon"><use href="#icon-build"></use></svg></span>Part 3: Writing Your Own Context Manager</h2>
+<p>You only need two methods. The simplest useful one announces when a block starts and ends:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">class</span><span class="w"> </span><span class="nc">Section</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[start] </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>                     <span class="c1"># this is what 'as' binds</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[end]   </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+
+<span class="k">with</span> <span class="n">Section</span><span class="p">(</span><span class="s2">"loading data"</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"   ...reading rows..."</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"   ...cleaning rows..."</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"back outside the block"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>[start] loading data
+   ...reading rows...
+   ...cleaning rows...
+[end]   loading data
+back outside the block
+</code></pre></div>
+
+<p>Read the output from top to bottom and you can see the order:</p>
+<ol>
+<li><code>__enter__</code> runs (<code>[start] loading data</code>).</li>
+<li>The body of the <code>with</code> block runs (the two <code>...</code> lines).</li>
+<li><code>__exit__</code> runs (<code>[end] loading data</code>).</li>
+<li>The code after the block runs.</li>
+</ol>
+<p><strong>Analogy:</strong> like the curtain at a theatre. The curtain opens (<code>__enter__</code>), the play happens (the body), and the curtain closes (<code>__exit__</code>). You never have to remind the curtain to close.</p>
+<h3 id="a-database-connection-that-always-closes">A Database Connection That Always Closes</h3>
+<p>Real programs often talk to a <strong>database</strong>. You connect, run some queries, and then must close the connection. Here's a pretend database class with that guarantee built in:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">class</span><span class="w"> </span><span class="nc">Database</span><span class="p">:</span>
+    <span class="c1"># A stand-in for a real driver such as sqlite3 or psycopg2.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queries</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[DB] running: </span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[DB] connected to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[DB] closed after </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">queries</span><span class="p">)</span><span class="si">}</span><span class="s2"> queries"</span><span class="p">)</span>
+
+
+<span class="k">with</span> <span class="n">Database</span><span class="p">(</span><span class="s2">"analytics"</span><span class="p">)</span> <span class="k">as</span> <span class="n">db</span><span class="p">:</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">"SELECT count(*) FROM users"</span><span class="p">)</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">"SELECT * FROM orders LIMIT 10"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>[DB] connected to 'analytics'
+[DB] running: SELECT count(*) FROM users
+[DB] running: SELECT * FROM orders LIMIT 10
+[DB] closed after 2 queries
+</code></pre></div>
+
+<p>The caller writes <strong>one <code>with</code> line</strong> and can't get the cleanup wrong. They don't even need to know how closing works.</p>
+<p><strong>Analogy:</strong> a phone that automatically hangs up when you put it down. You just talk; the hanging up takes care of itself.</p>
+<h3 id="the-real-test-what-happens-when-the-block-crashes">The Real Test: What Happens When the Block Crashes?</h3>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">try</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">Database</span><span class="p">(</span><span class="s2">"analytics"</span><span class="p">)</span> <span class="k">as</span> <span class="n">db</span><span class="p">:</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">"SELECT * FROM users"</span><span class="p">)</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">"UPDATE users SET last_seen = now()"</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"network dropped mid-query"</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"caught outside the block:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>[DB] connected to 'analytics'
+[DB] running: SELECT * FROM users
+[DB] running: UPDATE users SET last_seen = now()
+[DB] closed after 2 queries
+caught outside the block: network dropped mid-query
+</code></pre></div>
+
+<p>Look at the <strong>order</strong>. <code>[DB] closed</code> printed <strong>first</strong>, then our <code>except</code> ran. The connection closed on the way out, <strong>and</strong> the error still reached the caller, so nothing was hidden.</p>
+<p>That's the default, and it's the right one. A context manager's job is to <strong>clean up</strong>. It doesn't get to decide that your error didn't matter.</p>
+<hr />
+<h2 id="part-4-what-as-gives-you"><span class="h-icon"><svg class="icon"><use href="#icon-key"></use></svg></span>Part 4: What <code>as</code> Gives You</h2>
+<p><code>as name</code> gives you <strong>whatever <code>__enter__</code> returns</strong>. Not the manager, and not the object you passed in. Most managers <code>return self</code>, which is why it usually looks like the same object.</p>
+<p><strong>Analogy:</strong> when you check in at a hotel, the receptionist hands you a <strong>key card</strong>. What you get "as" a result of checking in is whatever the receptionist chooses to hand you: usually the key card, but it could be a welcome pack, or nothing at all.</p>
+<p>Forget that <code>return</code> and you get a confusing bug:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">class</span><span class="w"> </span><span class="nc">Broken</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"opening"</span><span class="p">)</span>
+        <span class="c1"># oops: no return statement</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"closing"</span><span class="p">)</span>
+
+
+<span class="k">with</span> <span class="n">Broken</span><span class="p">()</span> <span class="k">as</span> <span class="n">thing</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"thing is:"</span><span class="p">,</span> <span class="n">thing</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>opening
+thing is: None
+closing
+</code></pre></div>
+
+<p><code>__enter__</code> returned <code>None</code>, as every function without a <code>return</code> does, so <code>thing</code> is <code>None</code>. Nothing has gone wrong <em>yet</em>. The error shows up at the next line that tries to use it:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">try</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">Broken</span><span class="p">()</span> <span class="k">as</span> <span class="n">thing</span><span class="p">:</span>
+        <span class="n">thing</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">"SELECT 1"</span><span class="p">)</span>       <span class="c1"># thing is None, so this fails</span>
+<span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"AttributeError:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>opening
+closing
+AttributeError: 'NoneType' object has no attribute 'run'
+</code></pre></div>
+
+<p>If you see <code>'NoneType' object has no attribute ...</code> inside a <code>with</code> block, <strong>check for a missing <code>return self</code> first</strong>.</p>
+<h3 id="__enter__-can-return-anything-useful"><code>__enter__</code> Can Return Anything Useful</h3>
+<p>Returning <code>self</code> is a habit, not a rule. <code>__enter__</code> can hand the block <strong>anything useful</strong>. This one hands over an empty list to collect things into, then reports on it afterwards:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">class</span><span class="w"> </span><span class="nc">Collected</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">items</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span>               <span class="c1"># the block gets the list, not the manager</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"collected </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">)</span><span class="si">}</span><span class="s2"> items: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+
+<span class="k">with</span> <span class="n">Collected</span><span class="p">()</span> <span class="k">as</span> <span class="n">bucket</span><span class="p">:</span>
+    <span class="n">bucket</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"north"</span><span class="p">)</span>
+    <span class="n">bucket</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"south"</span><span class="p">)</span>
+    <span class="n">bucket</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"east"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>collected 3 items: ['north', 'south', 'east']
+</code></pre></div>
+
+<p>The block worked directly with the list (<code>bucket</code>), and when the block ended, <code>__exit__</code> reported what was collected.</p>
+<hr />
+<h2 id="part-5-__exit__-and-errors"><span class="h-icon"><svg class="icon"><use href="#icon-shield"></use></svg></span>Part 5: <code>__exit__</code> and Errors</h2>
+<p>We've been writing <code>__exit__(self, exc_type, exc_value, traceback)</code> and ignoring the three arguments. Here's what they hold:</p>
+<ul>
+<li>When the block finishes <strong>without an error</strong>, all three are <code>None</code>.</li>
+<li>When the block <strong>raises an error</strong>, they are the <strong>error's class</strong> (like <code>ZeroDivisionError</code>), the <strong>error object itself</strong> (which holds the message), and its <strong>traceback</strong> (the record of where it happened). Python's <code>sys.exc_info()</code> gives you the same three things.</li>
+</ul>
+<p><strong>Analogy:</strong> think of a lifeguard at the exit of a pool. When each swimmer leaves, the lifeguard notes either "swim went fine" (three <code>None</code>s) or "this swimmer got a cramp, here's what happened and where" (the three error details).</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">class</span><span class="w"> </span><span class="nc">Watcher</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">exc_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">"__exit__: block finished cleanly"</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"__exit__: block raised </span><span class="si">{</span><span class="n">exc_type</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">exc_value</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+
+<span class="k">with</span> <span class="n">Watcher</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"doing fine"</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">()</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">Watcher</span><span class="p">():</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">/</span> <span class="mi">0</span>
+<span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"...and it still reached us out here"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>doing fine
+__exit__: block finished cleanly
+
+__exit__: block raised ZeroDivisionError -&gt; division by zero
+...and it still reached us out here
+</code></pre></div>
+
+<p>So <code>__exit__</code> gets to <strong>see</strong> the error. That's what makes <strong>rollbacks</strong> possible: the manager can tell "the block worked, keep the changes" apart from "the block failed, undo everything". We'll build exactly that in Part 11.</p>
+<h3 id="returning-true-swallows-the-error">Returning <code>True</code> Swallows the Error</h3>
+<p><code>__exit__</code> has one more power. If it <strong>returns <code>True</code></strong>, Python treats the error as <strong>handled</strong>, and the error never leaves the <code>with</code> block:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">class</span><span class="w"> </span><span class="nc">Swallow</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"__exit__ saw:"</span><span class="p">,</span> <span class="n">exc_type</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span>                     <span class="c1"># "I handled it"</span>
+
+
+<span class="k">with</span> <span class="n">Swallow</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"about to fail"</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">/</span> <span class="mi">0</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"this line never runs"</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"we get here: the exception never escaped the block"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>about to fail
+__exit__ saw: ZeroDivisionError
+we get here: the exception never escaped the block
+</code></pre></div>
+
+<p>Notice that <code>"this line never runs"</code> didn't print. The error still <strong>ended the block</strong> at the line that failed. Returning <code>True</code> only stopped the error from travelling any further.</p>
+<div class="diagram-card"><pre><code>   the with block raises an error
+          │
+          ▼
+   __exit__(exc_type, exc_value, traceback) runs
+          │
+          ├── returns True (or anything truthy)  →  error is SWALLOWED, program carries on after the block
+          │
+          └── returns False / None / nothing     →  error CONTINUES to the caller (the normal, safe default)
+</code></pre></div>
+
+<p>Be careful with this. <code>Swallow</code> doesn't only swallow the error you had in mind. It swallows <strong>every</strong> error, including ones you never thought about:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">with</span> <span class="n">Swallow</span><span class="p">():</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="s2">"120"</span><span class="p">)</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="s2">"nrth"</span><span class="p">)</span>    <span class="c1"># a typo in a region name</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"total:"</span><span class="p">,</span> <span class="n">total</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"no crash, no total, no clue anything went wrong"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>__exit__ saw: ValueError
+no crash, no total, no clue anything went wrong
+</code></pre></div>
+
+<p>A typo quietly produced <strong>nothing at all</strong>. If that block had been working out a monthly revenue figure, the report would be missing a number and nobody would know why.</p>
+<p><strong>Analogy:</strong> a manager who hides <strong>every</strong> complaint from the boss, not just the trivial ones. Things seem calm, until something serious goes unnoticed.</p>
+<h3 id="swallowing-only-one-kind-of-error">Swallowing Only One Kind of Error</h3>
+<p>A safer version swallows <strong>one kind</strong> of error and lets the rest through. Its <code>__exit__</code> returns <code>True</code> for "stop this error here" and <code>False</code> for "let it continue".</p>
+<p><code>issubclass(exc_type, FileNotFoundError)</code> asks "is this error a <code>FileNotFoundError</code>, or one of its child error types?":</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">class</span><span class="w"> </span><span class="nc">IgnoreMissingFile</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">exc_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">exc_type</span><span class="p">,</span> <span class="ne">FileNotFoundError</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"ignoring: </span><span class="si">{</span><span class="n">exc_value</span><span class="o">.</span><span class="n">filename</span><span class="si">}</span><span class="s2"> was already gone"</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>                 <span class="c1"># handled</span>
+        <span class="k">return</span> <span class="kc">False</span>                    <span class="c1"># anything else goes through</span>
+
+
+<span class="k">with</span> <span class="n">IgnoreMissingFile</span><span class="p">():</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">"context_demo/never_existed.txt"</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"cleanup finished</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">IgnoreMissingFile</span><span class="p">():</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="mi">12345</span><span class="p">)</span>                <span class="c1"># a bug: 12345 is not a filename</span>
+<span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"TypeError got through, as it should:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>ignoring: context_demo/never_existed.txt was already gone
+cleanup finished
+
+TypeError got through, as it should: remove: path should be string, bytes or os.PathLike, not int
+</code></pre></div>
+
+<ul>
+<li>The first block tried to delete a file that doesn't exist. That's a <code>FileNotFoundError</code>, so it was quietly ignored. (For a cleanup task, "the file was already gone" is perfectly fine.)</li>
+<li>The second block had a real bug (passing a number instead of a filename). That's a <code>TypeError</code>, so <code>__exit__</code> returned <code>False</code> and the error got through, as it should.</li>
+</ul>
+<h3 id="the-accidental-swallow-truthy-and-falsy-values">The Accidental Swallow: Truthy and Falsy Values</h3>
+<p>Here's the catch: Python doesn't only check for the exact value <code>True</code>. It treats lots of values as true or false, the same way an <code>if</code> does:</p>
+<ul>
+<li>Non-zero numbers and non-empty strings count as <strong>true</strong>.</li>
+<li><code>0</code>, <code>None</code> and empty things (like <code>""</code> or <code>[]</code>) count as <strong>false</strong>.</li>
+</ul>
+<p>People call these <strong>truthy</strong> and <strong>falsy</strong> values. <code>bool()</code> shows how Python sees each one:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">"done"</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">""</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">value</span><span class="si">!r:</span><span class="s2">8</span><span class="si">}</span><span class="s2"> counts as </span><span class="si">{</span><span class="nb">bool</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>True     counts as True
+2        counts as True
+'done'   counts as True
+False    counts as False
+0        counts as False
+None     counts as False
+''       counts as False
+</code></pre></div>
+
+<p>So <strong>any truthy value</strong> returned from <code>__exit__</code> swallows the error. That makes this bug easy to write without noticing. The <code>__exit__</code> below ends with a <code>return</code> that was only meant to report a count:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">class</span><span class="w"> </span><span class="nc">Cleanup</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+        <span class="n">removed</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"batch_1.tmp"</span><span class="p">,</span> <span class="s2">"batch_2.tmp"</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"cleaned up </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">removed</span><span class="p">)</span><span class="si">}</span><span class="s2"> temp files"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">removed</span><span class="p">)</span>             <span class="c1"># meant as a count, but 2 is truthy!</span>
+
+
+<span class="k">with</span> <span class="n">Cleanup</span><span class="p">():</span>
+    <span class="mi">1</span> <span class="o">/</span> <span class="mi">0</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"the ZeroDivisionError vanished, and nothing said so"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>cleaned up 2 temp files
+the ZeroDivisionError vanished, and nothing said so
+</code></pre></div>
+
+<p><code>return len(removed)</code> returned <code>2</code>, and <code>2</code> is truthy, so Python decided the error was handled. A <code>ZeroDivisionError</code> vanished without a trace.</p>
+<p><strong>The rule:</strong> end an <code>__exit__</code> with <code>return True</code>, <code>return False</code>, or <strong>no <code>return</code> at all</strong>. Anything else risks swallowing errors by accident. If you don't want to suppress anything, just don't return a value: you get <code>None</code>, which is falsy.</p>
+<hr />
+<h2 id="part-6-a-timer-for-blocks-of-code"><span class="h-icon"><svg class="icon"><use href="#icon-stopwatch"></use></svg></span>Part 6: A Timer for Blocks of Code</h2>
+<p>A decorator like <code>@execution_timer</code> can time a <strong>whole function</strong>. But if a function does three things and only one of them is slow, the decorator can't tell you which.</p>
+<p>A context manager times a <strong>block</strong>, and a block can be as big or as small as you like:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Timer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elapsed</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">elapsed</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">s"</span><span class="p">)</span>
+
+
+<span class="k">with</span> <span class="n">Timer</span><span class="p">(</span><span class="s2">"loading sales data"</span><span class="p">):</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>                     <span class="c1"># stand-in for the real work</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>loading sales data: 0.5s
+</code></pre></div>
+
+<p><code>time.perf_counter()</code> is a stopwatch made for measuring short durations accurately. <code>__enter__</code> starts it, and <code>__exit__</code> stops it and prints the time.</p>
+<p>Here's what the decorator couldn't do: time the <strong>separate parts</strong> of one function:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">build_report</span><span class="p">(</span><span class="n">rows</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">Timer</span><span class="p">(</span><span class="s2">"  parse    "</span><span class="p">):</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+        <span class="n">parsed</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">","</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">]</span>
+
+    <span class="k">with</span> <span class="n">Timer</span><span class="p">(</span><span class="s2">"  aggregate"</span><span class="p">):</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>                 <span class="c1"># the slow step</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">cells</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">cells</span> <span class="ow">in</span> <span class="n">parsed</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">total</span>
+
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"context_demo/sales.csv"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="nb">next</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>                             <span class="c1"># skip the header row</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">]</span>
+
+<span class="k">with</span> <span class="n">Timer</span><span class="p">(</span><span class="s2">"build_report"</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"total units:"</span><span class="p">,</span> <span class="n">build_report</span><span class="p">(</span><span class="n">rows</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>  parse    : 0.2s
+  aggregate: 0.5s
+total units: 443
+build_report: 0.7s
+</code></pre></div>
+
+<p>The output works like a small <strong>profiler</strong> (a tool that shows where time is spent), and it shows straight away that <code>aggregate</code> is the slow step. Notice that the timers can even be <strong>nested</strong>: the outer <code>build_report</code> timer includes both inner timers (0.2 + 0.5 = 0.7 seconds).</p>
+<p><strong>Analogy:</strong> a decorator is like timing a whole race. A context manager is like a <strong>stopwatch with a lap button</strong>: you can time each lap separately and see exactly which one was slow.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th><code>@execution_timer</code> (decorator)</th>
+<th><code>with Timer(...)</code> (context manager)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Times</td>
+<td>a whole function</td>
+<td>any block of code</td>
+</tr>
+<tr>
+<td>Applied</td>
+<td>once, at the definition</td>
+<td>anywhere, as often as you like</td>
+</tr>
+<tr>
+<td>Needs the code to be</td>
+<td>a function</td>
+<td>anything</td>
+</tr>
+<tr>
+<td>Answers</td>
+<td>"which function is slow?"</td>
+<td>"which part of this function is slow?"</td>
+</tr>
+</tbody>
+</table></div>
+<p>You'll use both, because they answer different questions.</p>
+<h3 id="a-class-based-manager-can-be-reused">A Class-Based Manager Can Be Reused</h3>
+<p>A class-based manager can be used again and again. You can enter the same <code>Timer</code> object several times, and it keeps <code>self.elapsed</code> afterwards for you to read:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">stage</span> <span class="o">=</span> <span class="n">Timer</span><span class="p">(</span><span class="s2">"reusable"</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">stage</span><span class="p">:</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">stage</span><span class="p">:</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"the instance still remembers the last run: </span><span class="si">{</span><span class="n">stage</span><span class="o">.</span><span class="n">elapsed</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">s"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>reusable: 0.2s
+reusable: 0.5s
+the instance still remembers the last run: 0.5s
+</code></pre></div>
+
+<hr />
+<h2 id="part-7-contextlibcontextmanager-generators-plus-decorators"><span class="h-icon"><svg class="icon"><use href="#icon-layers"></use></svg></span>Part 7: <code>@contextlib.contextmanager</code>, Generators Plus Decorators</h2>
+<p>Writing a whole class for every setup-and-cleanup pair is a lot of typing. The standard library has a shortcut, and it's built from two ideas you already know:</p>
+<ul>
+<li><strong>Generators:</strong> a generator runs up to <code>yield</code>, <strong>pauses</strong>, and later carries on from where it stopped.</li>
+<li><strong>Decorators:</strong> a decorator wraps a function to give it new behaviour.</li>
+</ul>
+<p><code>contextlib.contextmanager</code> is a <strong>decorator</strong> that turns a <strong>generator function</strong> into a context manager:</p>
+<ul>
+<li>Everything <strong>before</strong> the <code>yield</code> does the job of <code>__enter__</code>.</li>
+<li>The <code>with</code> block runs <strong>at</strong> the <code>yield</code>, while the generator is paused.</li>
+<li>Everything <strong>after</strong> the <code>yield</code> does the job of <code>__exit__</code>.</li>
+</ul>
+<p><strong>Analogy:</strong> a <strong>sandwich</strong>. The top slice of bread is the setup, the filling is your <code>with</code> block, and the bottom slice is the cleanup. <code>yield</code> marks where the filling goes.</p>
+<div class="diagram-card"><pre><code>   @contextmanager
+   def section(name):
+       print("[start]")     ← top bread:    runs when the with block is entered  (__enter__)
+       yield                ← the filling:  the with block runs HERE, generator paused
+       print("[end]")       ← bottom bread: runs when the with block ends        (__exit__)
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">contextmanager</span>
+
+
+<span class="nd">@contextmanager</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">section</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[start] </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>            <span class="c1"># __enter__</span>
+    <span class="k">yield</span>                               <span class="c1"># the with-block runs right here</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[end]   </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>            <span class="c1"># __exit__</span>
+
+
+<span class="k">with</span> <span class="n">section</span><span class="p">(</span><span class="s2">"loading data"</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"   ...reading rows..."</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"back outside the block"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>[start] loading data
+   ...reading rows...
+[end]   loading data
+back outside the block
+</code></pre></div>
+
+<p>Same output as the <code>Section</code> class from Part 3, in about half the code.</p>
+<p>Whatever you <code>yield</code> is what <code>as</code> gives you. It's the generator's version of <code>return self</code>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nd">@contextmanager</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">collected</span><span class="p">():</span>
+    <span class="n">items</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">yield</span> <span class="n">items</span>                         <span class="c1"># handed to 'as'</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"collected </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">)</span><span class="si">}</span><span class="s2"> items: </span><span class="si">{</span><span class="n">items</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+
+<span class="k">with</span> <span class="n">collected</span><span class="p">()</span> <span class="k">as</span> <span class="n">bucket</span><span class="p">:</span>
+    <span class="n">bucket</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"north"</span><span class="p">)</span>
+    <span class="n">bucket</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"south"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>collected 2 items: ['north', 'south']
+</code></pre></div>
+
+<h3 id="the-bug-cleanup-that-never-runs">The Bug: Cleanup That Never Runs</h3>
+<p>There's a trap here that's easy to fall into. Look at this timer, which has no <code>try</code> anywhere:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nd">@contextmanager</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">timer</span><span class="p">(</span><span class="n">label</span><span class="p">):</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+    <span class="k">yield</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">s"</span><span class="p">)</span>   <span class="c1"># after the yield</span>
+
+
+<span class="k">with</span> <span class="n">timer</span><span class="p">(</span><span class="s2">"happy path"</span><span class="p">):</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>happy path: 0.2s
+</code></pre></div>
+
+<p>That works. Now make the block fail:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">try</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">timer</span><span class="p">(</span><span class="s2">"crashing block"</span><span class="p">):</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"boom"</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"caught:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"...and notice there is no timing line above"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>caught: boom
+...and notice there is no timing line above
+</code></pre></div>
+
+<p>The cleanup <strong>never ran</strong>. There's no timing line at all.</p>
+<p>Here's why. When the <code>with</code> block raises an error, Python <strong>sends that error into the generator at the <code>yield</code></strong>, as if the <code>yield</code> line itself had raised it. (A paused generator can be woken up in more than one way: for example, by asking for the next value, or by having an error sent into it.) The error then flies straight out of the generator, so the lines after <code>yield</code> are skipped.</p>
+<p><strong>Analogy:</strong> it's like a shop where the "remember to lock up" step is written at the end of the closing checklist. If the fire alarm goes off halfway through the checklist, everyone runs out and nobody reaches the last line.</p>
+<p>The class version never had this problem, because Python <strong>always</strong> calls <code>__exit__</code>. To get the same guarantee from a generator, put the <code>yield</code> inside a <code>try/finally</code> yourself:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nd">@contextmanager</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">timer</span><span class="p">(</span><span class="n">label</span><span class="p">):</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">yield</span>
+    <span class="k">finally</span><span class="p">:</span>                            <span class="c1"># runs on the way out, always</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">s"</span><span class="p">)</span>
+
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">timer</span><span class="p">(</span><span class="s2">"crashing block"</span><span class="p">):</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"boom"</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"caught:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>crashing block: 0.2s
+caught: boom
+</code></pre></div>
+
+<p>Now the timing line printed even though the block crashed, and the error still reached our <code>except</code>.</p>
+<p><strong>If the cleanup has to happen, put the <code>yield</code> inside a <code>try/finally</code>.</strong> Make that your default way of writing these.</p>
+<h3 id="handling-the-error-inside-a-generator-manager">Handling the Error Inside a Generator Manager</h3>
+<p>A <code>try/except</code> around the <code>yield</code> is the generator's version of "<code>__exit__</code> returned <code>True</code>". Catch the error, don't raise it again, and it stops there:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nd">@contextmanager</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">ignore_missing_file</span><span class="p">():</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">yield</span>
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"ignoring: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">filename</span><span class="si">}</span><span class="s2"> was already gone"</span><span class="p">)</span>
+
+
+<span class="k">with</span> <span class="n">ignore_missing_file</span><span class="p">():</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">"context_demo/never_existed.txt"</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"cleanup finished"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>ignoring: context_demo/never_existed.txt was already gone
+cleanup finished
+</code></pre></div>
+
+<h3 id="a-contextmanager-object-only-works-once">A <code>@contextmanager</code> Object Only Works Once</h3>
+<p>One more thing: an object made by a <code>@contextmanager</code> function <strong>only works once</strong>. Entering it runs the generator up to the <code>yield</code>. A generator can't be restarted, so there's nothing left to run a second time:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">cm</span> <span class="o">=</span> <span class="n">section</span><span class="p">(</span><span class="s2">"used once"</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">cm</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"   first use is fine"</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">cm</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"   second use"</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"second use failed:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>[start] used once
+   first use is fine
+[end]   used once
+second use failed: '_GeneratorContextManager' object has no attribute 'args'
+</code></pre></div>
+
+<p>The message is hard to understand. It just means this manager has already used up its generator. The fix is to <strong>call the function again each time</strong>: write <code>with section("..."):</code> instead of saving it as <code>cm = section("...")</code> and reusing <code>with cm:</code>.</p>
+<p><strong>Analogy:</strong> a generator-based manager is like a <strong>single-use ticket</strong>. A class-based manager like <code>Timer</code> is like a <strong>season pass</strong>.</p>
+<hr />
+<h2 id="part-8-class-or-generator"><span class="h-icon"><svg class="icon"><use href="#icon-scale"></use></svg></span>Part 8: Class or Generator?</h2>
+<p>Both give you a context manager. Pick based on what the block needs.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Use a <strong>class</strong> when</th>
+<th>Use <code>@contextmanager</code> when</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The block needs methods on the object (<code>db.run(...)</code>)</td>
+<td>The block just needs setup and teardown</td>
+</tr>
+<tr>
+<td>You want to reuse one instance repeatedly</td>
+<td>A fresh one per <code>with</code> is fine</td>
+</tr>
+<tr>
+<td>You want state readable afterwards (<code>stage.elapsed</code>)</td>
+<td>Nothing survives the block</td>
+</tr>
+<tr>
+<td>You want to subclass or extend it</td>
+<td>It is a one-off helper</td>
+</tr>
+<tr>
+<td>The teardown logic is long</td>
+<td>It fits in a few lines</td>
+</tr>
+</tbody>
+</table></div>
+<p>Most context managers you write yourself will be short helpers, so you'll mostly use <code>@contextmanager</code>. Most of the ones you <strong>use</strong> from libraries (files, database connections, locks) are classes, because they come with methods.</p>
+<hr />
+<h2 id="part-9-the-contextlib-toolkit"><span class="h-icon"><svg class="icon"><use href="#icon-toolbox"></use></svg></span>Part 9: The <code>contextlib</code> Toolkit</h2>
+<p><code>contextlib</code> (a module in Python's standard library) has more in it than the decorator. Three of its tools are useful right now.</p>
+<h3 id="suppress-a-shorter-tryexceptpass"><code>suppress</code>: A Shorter <code>try/except/pass</code></h3>
+<p><code>contextlib.suppress</code> is a short way to ignore one kind of error, and now you can see what it really is: a context manager. This:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">try</span><span class="p">:</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+    <span class="k">pass</span>
+</code></pre></div>
+
+<p>becomes:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">suppress</span>
+
+<span class="k">with</span> <span class="n">suppress</span><span class="p">(</span><span class="ne">FileNotFoundError</span><span class="p">):</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">"context_demo/does_not_exist.txt"</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"no crash: the file was already gone, which is fine"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>no crash: the file was already gone, which is fine
+</code></pre></div>
+
+<p>It's shorter, and unlike a bare <code>except: pass</code>, it <strong>names exactly which error</strong> you're happy to ignore. You can list more than one: <code>suppress(FileNotFoundError, PermissionError)</code>.</p>
+<p><strong>Keep the block to one statement.</strong> <code>suppress</code> doesn't skip the failing line and carry on. It <strong>ends the whole block</strong>, just like any other error would:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"temp_a.txt"</span><span class="p">,</span> <span class="s2">"temp_b.txt"</span><span class="p">]:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">"context_demo/</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"scratch</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">suppress</span><span class="p">(</span><span class="ne">FileNotFoundError</span><span class="p">):</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">"context_demo/temp_a.txt"</span><span class="p">)</span>        <span class="c1"># exists, so it is removed</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">"context_demo/gone.txt"</span><span class="p">)</span>          <span class="c1"># missing, so the block ends HERE</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">"context_demo/temp_b.txt"</span><span class="p">)</span>        <span class="c1"># never runs</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"temp_a.txt still there?"</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s2">"context_demo/temp_a.txt"</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"temp_b.txt still there?"</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s2">"context_demo/temp_b.txt"</span><span class="p">))</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">"context_demo/temp_b.txt"</span><span class="p">)</span>            <span class="c1"># clean up properly</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>temp_a.txt still there? False
+temp_b.txt still there? True
+</code></pre></div>
+
+<p><code>temp_b.txt</code> survived, because the line that would have deleted it never ran. It's easy to assume <code>suppress</code> works line by line, but it doesn't.</p>
+<p><strong>Analogy:</strong> a fire drill doesn't just skip one sentence of a meeting; it ends the whole meeting. Everything after the alarm is cancelled.</p>
+<p>So use <strong>one statement per <code>with suppress(...)</code></strong>, or put the <code>with</code> inside a loop.</p>
+<h3 id="closing-for-objects-with-close-but-no-with-support"><code>closing</code>: For Objects with <code>close()</code> but No <code>with</code> Support</h3>
+<p>Lots of older libraries give you an object that has a <code>close()</code> method but doesn't support <code>with</code>. <code>closing</code> wraps it so it works with <code>with</code> anyway:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">closing</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">LegacyCursor</span><span class="p">:</span>
+    <span class="c1"># An old-style object: it has close(), but no __enter__/__exit__.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[(</span><span class="s2">"north"</span><span class="p">,</span> <span class="mi">120</span><span class="p">),</span> <span class="p">(</span><span class="s2">"south"</span><span class="p">,</span> <span class="mi">95</span><span class="p">)]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"[cursor] closed"</span><span class="p">)</span>
+
+
+<span class="k">with</span> <span class="n">closing</span><span class="p">(</span><span class="n">LegacyCursor</span><span class="p">())</span> <span class="k">as</span> <span class="n">cursor</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"rows:"</span><span class="p">,</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetch</span><span class="p">())</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>rows: [('north', 120), ('south', 95)]
+[cursor] closed
+</code></pre></div>
+
+<p><code>closing(obj)</code> is a context manager whose <code>__exit__</code> calls <code>obj.close()</code>. That's all it does.</p>
+<p><strong>Analogy:</strong> a <strong>travel adapter</strong>. Your old device has the wrong plug for this socket; the adapter makes it fit.</p>
+<h3 id="redirect_stdout-catching-what-a-function-prints"><code>redirect_stdout</code>: Catching What a Function Prints</h3>
+<p>Sometimes a library prints things you'd rather capture: to save in a log, to hide from the user, or to check in a test. <code>redirect_stdout</code> sends everything <code>print()</code> writes <strong>somewhere else</strong> while the block runs. Here it goes into <code>io.StringIO()</code>, which acts like a <strong>text file that lives in memory</strong>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">redirect_stdout</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">noisy_model_training</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"epoch 1/3  loss=0.412"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"epoch 2/3  loss=0.233"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"epoch 3/3  loss=0.187"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="mf">0.187</span>
+
+
+<span class="n">buffer</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>                  <span class="c1"># an in-memory text file</span>
+
+<span class="k">with</span> <span class="n">redirect_stdout</span><span class="p">(</span><span class="n">buffer</span><span class="p">):</span>
+    <span class="n">final_loss</span> <span class="o">=</span> <span class="n">noisy_model_training</span><span class="p">()</span>  <span class="c1"># its prints go into the buffer</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"nothing was printed by the call above"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"final loss:"</span><span class="p">,</span> <span class="n">final_loss</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"captured lines:"</span><span class="p">,</span> <span class="n">buffer</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">())</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>nothing was printed by the call above
+final loss: 0.187
+captured lines: ['epoch 1/3  loss=0.412', 'epoch 2/3  loss=0.233', 'epoch 3/3  loss=0.187']
+</code></pre></div>
+
+<p><code>buffer.getvalue()</code> gives back everything written into the buffer as one string. This is handy in tests, when you want to check what a function printed. When the block ends, <code>print()</code> goes back to the screen automatically.</p>
+<p><strong>Analogy:</strong> plugging a microphone into a <strong>recorder</strong> instead of the speakers. The person still talks normally, but nobody in the room hears it; it's all saved on the recording instead.</p>
+<hr />
+<h2 id="part-10-several-managers-in-one-with"><span class="h-icon"><svg class="icon"><use href="#icon-stack"></use></svg></span>Part 10: Several Managers in One <code>with</code></h2>
+<p>You often need two at once, like reading from one file while writing to another. <strong>Nesting</strong> one <code>with</code> inside another works:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"in.csv"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fin</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"out.csv"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fout</span><span class="p">:</span>
+        <span class="o">...</span>
+</code></pre></div>
+
+<p>A single <code>with</code> can also take several managers <strong>separated by commas</strong>, and it closes them <strong>in reverse order</strong>. The <code>\</code> at the end of the first line tells Python the statement carries on onto the next line:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"context_demo/sales.csv"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fin</span><span class="p">,</span> \
+     <span class="nb">open</span><span class="p">(</span><span class="s2">"context_demo/big_regions.csv"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fout</span><span class="p">:</span>
+
+    <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">fin</span><span class="p">))</span>               <span class="c1"># copy the header across</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">fin</span><span class="p">:</span>
+        <span class="n">region</span><span class="p">,</span> <span class="n">units</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">","</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">units</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">100</span><span class="p">:</span>
+            <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s2">"context_demo/big_regions.csv"</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>region,units
+north,120
+east,140
+</code></pre></div>
+
+<p>This copied the header and only the regions with 100 or more units into a new file.</p>
+<p><strong>Why reverse order?</strong> Think of putting on <strong>socks, then shoes</strong>. When you take them off, you remove the <strong>shoes first</strong>, then the socks. The last thing set up is the first thing cleaned up, because later setups may depend on earlier ones.</p>
+<div class="diagram-card"><pre><code>   with A as a, B as b:          enter A  →  enter B  →  run body  →  exit B  →  exit A
+                                  (first in)                         (last in, first out)
+</code></pre></div>
+
+<p>From Python 3.10, you can wrap the list in <strong>parentheses</strong> instead, which is easier to read once there are three or more:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">with</span> <span class="p">(</span>
+    <span class="nb">open</span><span class="p">(</span><span class="s2">"sales.csv"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fin</span><span class="p">,</span>
+    <span class="nb">open</span><span class="p">(</span><span class="s2">"clean.csv"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fout</span><span class="p">,</span>
+    <span class="n">Timer</span><span class="p">(</span><span class="s2">"copy"</span><span class="p">),</span>
+<span class="p">):</span>
+    <span class="o">...</span>
+</code></pre></div>
+
+<p>The last one has no <code>as</code>. You only write <code>as</code> when you need the value.</p>
+<hr />
+<h2 id="part-11-real-world-examples"><span class="h-icon"><svg class="icon"><use href="#icon-undo"></use></svg></span>Part 11: Real-World Examples</h2>
+<h3 id="netflix-a-transaction-that-rolls-back">Netflix: A Transaction That Rolls Back</h3>
+<p>This is what <code>__exit__</code>'s three arguments are really for. When a streaming service charges your card, either everything should happen, or nothing should. Either the block finishes and we <strong>keep</strong> the changes (that's called a <strong>commit</strong>), or it raises an error and we <strong>put everything back</strong> the way it was (a <strong>rollback</strong>).</p>
+<p><strong>Analogy:</strong> a <strong>save point in a video game</strong>. Before a difficult level, the game saves your progress. If you fail the level, it reloads the save as if the failed attempt never happened.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">class</span><span class="w"> </span><span class="nc">InsufficientFunds</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Transaction</span><span class="p">:</span>
+    <span class="c1"># Snapshot on the way in; restore the snapshot if the block fails.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">account</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">account</span> <span class="o">=</span> <span class="n">account</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">snapshot</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">account</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">account</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">exc_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">"  committed:"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">account</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">account</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">account</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">snapshot</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  rolled back after </span><span class="si">{</span><span class="n">exc_type</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">:"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">account</span><span class="p">)</span>
+        <span class="c1"># no return: the exception is not ours to swallow</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">charge</span><span class="p">(</span><span class="n">account</span><span class="p">,</span> <span class="n">amount</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">Transaction</span><span class="p">(</span><span class="n">account</span><span class="p">)</span> <span class="k">as</span> <span class="n">acct</span><span class="p">:</span>
+        <span class="n">acct</span><span class="p">[</span><span class="s2">"balance"</span><span class="p">]</span> <span class="o">-=</span> <span class="n">amount</span>
+        <span class="n">acct</span><span class="p">[</span><span class="s2">"charges"</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">acct</span><span class="p">[</span><span class="s2">"balance"</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InsufficientFunds</span><span class="p">(</span><span class="sa">f</span><span class="s2">"balance would be </span><span class="si">{</span><span class="n">acct</span><span class="p">[</span><span class="s1">'balance'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+
+<span class="n">wallet</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"balance"</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">"charges"</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"charging 30:"</span><span class="p">)</span>
+<span class="n">charge</span><span class="p">(</span><span class="n">wallet</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">charging 500:"</span><span class="p">)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">charge</span><span class="p">(</span><span class="n">wallet</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+<span class="k">except</span> <span class="n">InsufficientFunds</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"  refused:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">final state:"</span><span class="p">,</span> <span class="n">wallet</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>charging 30:
+  committed: {'balance': 70, 'charges': 1}
+
+charging 500:
+  rolled back after InsufficientFunds: {'balance': 70, 'charges': 1}
+  refused: balance would be -430
+
+final state: {'balance': 70, 'charges': 1}
+</code></pre></div>
+
+<p>How <code>Transaction</code> works:</p>
+<ul>
+<li><code>__enter__</code> takes a <strong>snapshot</strong> (a copy) of the account before anything changes, and hands the real account to the block.</li>
+<li>If the block finishes cleanly, <code>__exit__</code> prints "committed" and keeps the changes.</li>
+<li>If the block raises an error, <code>__exit__</code> <strong>restores</strong> the account from the snapshot, and (because it returns nothing) lets the error continue to the caller.</li>
+</ul>
+<p>The failed charge left <strong>no trace</strong>: neither the balance nor the charge counter changed.</p>
+<p><strong>Why <code>clear()</code> and <code>update()</code>?</strong> <code>__exit__</code> restores the dictionary with <code>clear()</code> and <code>update()</code> instead of writing <code>self.account = self.snapshot</code>. That's because the caller's <code>wallet</code> <strong>itself</strong> has to change. The assignment would only point <code>self.account</code> at a different dictionary and leave <code>wallet</code> as it was.</p>
+<p>Here's the same charge <strong>without</strong> a <code>Transaction</code>. The balance and the counter both change before the check fails, and nothing puts them back:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">charge_unprotected</span><span class="p">(</span><span class="n">account</span><span class="p">,</span> <span class="n">amount</span><span class="p">):</span>
+    <span class="n">account</span><span class="p">[</span><span class="s2">"balance"</span><span class="p">]</span> <span class="o">-=</span> <span class="n">amount</span>
+    <span class="n">account</span><span class="p">[</span><span class="s2">"charges"</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">account</span><span class="p">[</span><span class="s2">"balance"</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">InsufficientFunds</span><span class="p">(</span><span class="sa">f</span><span class="s2">"balance would be </span><span class="si">{</span><span class="n">account</span><span class="p">[</span><span class="s1">'balance'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+
+<span class="n">wallet</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"balance"</span><span class="p">:</span> <span class="mi">70</span><span class="p">,</span> <span class="s2">"charges"</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">charge_unprotected</span><span class="p">(</span><span class="n">wallet</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+<span class="k">except</span> <span class="n">InsufficientFunds</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"refused:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"wallet now:"</span><span class="p">,</span> <span class="n">wallet</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>refused: balance would be -430
+wallet now: {'balance': -430, 'charges': 2}
+</code></pre></div>
+
+<p>The charge was refused, but the wallet now sits at -430 with an extra charge counted. That's exactly the mess the context manager prevents.</p>
+<h3 id="any-script-a-temporary-working-directory">Any Script: A Temporary Working Directory</h3>
+<p><code>os.chdir()</code> changes the <strong>working directory</strong> (the folder that relative paths start from) for the <strong>whole program</strong>. Forget to change it back and every relative path used afterwards breaks, in ways that are painful to track down.</p>
+<p><strong>Analogy:</strong> borrowing a colleague's desk for an hour. You'd better move back to your own desk afterwards, or you'll spend the afternoon looking for your stapler in the wrong drawer.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nd">@contextmanager</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">working_directory</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="n">previous</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">yield</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">previous</span><span class="p">)</span>              <span class="c1"># even if the block explodes</span>
+
+
+<span class="n">start</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+
+<span class="k">with</span> <span class="n">working_directory</span><span class="p">(</span><span class="s2">"context_demo"</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"inside:"</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"sales.csv visible without a path?"</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s2">"sales.csv"</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"back where we started?"</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span> <span class="o">==</span> <span class="n">start</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>inside: context_demo
+sales.csv visible without a path? True
+back where we started? True
+</code></pre></div>
+
+<p>Inside the block, <code>sales.csv</code> could be found without writing <code>context_demo/</code> in front of it. After the block, we were back where we started. And the <code>finally</code> makes sure the directory is put back <strong>even when the block fails</strong>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">try</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">working_directory</span><span class="p">(</span><span class="s2">"context_demo"</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"something went wrong in here"</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"caught:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"still back where we started?"</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span> <span class="o">==</span> <span class="n">start</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>caught: something went wrong in here
+still back where we started? True
+</code></pre></div>
+
+<h3 id="any-data-pipeline-writing-a-file-safely">Any Data Pipeline: Writing a File Safely</h3>
+<p>Writing a file directly has a hidden risk. Opening a file with <code>"w"</code> <strong>empties it straight away</strong>. So if the program crashes halfway through writing, the old contents are already gone and the new ones are only half written. Here's that happening:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">plain</span> <span class="o">=</span> <span class="s2">"context_demo/plain_report.txt"</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">plain</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"Regional report</span><span class="se">\n</span><span class="s2">north: 120</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>       <span class="c1"># a good file to start with</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">plain</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>   <span class="c1"># "w" empties the file right here</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"Regional report</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"north: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="s2">"nrth"</span><span class="p">)))</span>       <span class="c1"># crashes mid-write</span>
+<span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"write failed:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"what's left:"</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">plain</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>write failed: invalid literal for int() with base 10: 'nrth'
+what's left: 'Regional report\n'
+</code></pre></div>
+
+<p>The <code>north: 120</code> line from the good version is gone, and only half of the new report made it in.</p>
+<p>The fix is to write to a <strong>temporary file</strong> first, and only swap it into place once the writing has finished. This is called an <strong>atomic</strong> write: it either happens completely or not at all. <code>os.replace()</code> does the swap in one step, replacing the old file.</p>
+<p><strong>Analogy:</strong> a stage crew changes the scenery <strong>behind a closed curtain</strong>, then opens the curtain on the finished set. The audience never sees a half-built stage. If something goes wrong backstage, they just keep looking at the old scene.</p>
+<div class="diagram-card"><pre><code>   atomic_write("report.txt")
+        │
+        ▼
+   write everything into  report.txt.tmp   (the real report.txt is untouched)
+        │
+        ├── block succeeded → close the temp file, os.replace(tmp → report.txt)   ✔ new report in place
+        │
+        └── block crashed   → close and DELETE the temp file, re-raise the error  ✔ old report untouched
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nd">@contextmanager</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">atomic_write</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">):</span>
+    <span class="n">temp_path</span> <span class="o">=</span> <span class="n">path</span> <span class="o">+</span> <span class="s2">".tmp"</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">temp_path</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">f</span>                         <span class="c1"># the block writes into the temp file</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">temp_path</span><span class="p">)</span>            <span class="c1"># failed, so throw the partial file away</span>
+        <span class="k">raise</span>                           <span class="c1"># and let the caller know</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">temp_path</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>     <span class="c1"># succeeded, so swap it into place</span>
+</code></pre></div>
+
+<p>Here, <code>atomic_write</code> uses <code>try/except/else</code> instead of <code>try/finally</code>, because success and failure need <strong>different</strong> cleanup:</p>
+<ul>
+<li><code>except Exception:</code> runs only if the block failed. It throws away the half-written temp file, then uses a bare <code>raise</code> to send the same error on to the caller.</li>
+<li><code>else:</code> runs only if the block <strong>succeeded</strong>. It swaps the finished temp file into place.</li>
+</ul>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">report</span> <span class="o">=</span> <span class="s2">"context_demo/report.txt"</span>
+
+<span class="k">with</span> <span class="n">atomic_write</span><span class="p">(</span><span class="n">report</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"Regional report</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"north: 120</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"first write:"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">report</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>first write:
+Regional report
+north: 120
+</code></pre></div>
+
+<p>Now let's crash halfway through a second write:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">try</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">atomic_write</span><span class="p">(</span><span class="n">report</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"Regional report</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"north: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="s2">"nrth"</span><span class="p">)))</span>   <span class="c1"># crashes mid-write</span>
+<span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"write failed:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">the good file is untouched:"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">report</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"no leftover .tmp file:"</span><span class="p">,</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">report</span> <span class="o">+</span> <span class="s2">".tmp"</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>write failed: invalid literal for int() with base 10: 'nrth'
+
+the good file is untouched:
+Regional report
+north: 120
+
+no leftover .tmp file: True
+</code></pre></div>
+
+<p>Two things to notice. The old report <strong>survived</strong> a crash that happened after writing had already started. And no leftover <code>.tmp</code> file was left lying around.</p>
+<p>(One small detail: <code>os.replace()</code> is only guaranteed to swap in a single step when the temporary file and the real file are on the same drive. Keeping the <code>.tmp</code> file right next to the real one, as <code>atomic_write</code> does, takes care of that.)</p>
+<hr />
+<h2 id="part-12-going-further-exitstack"><span class="h-icon"><svg class="icon"><use href="#icon-exitstack"></use></svg></span>Part 12: Going Further, <code>ExitStack</code></h2>
+<p><em>Feel free to skip this part on a first read. You'll know when you need it.</em></p>
+<p>A comma-separated <code>with</code> handles a <strong>fixed</strong> number of managers. <code>ExitStack</code> handles a number you only find out <strong>while the program runs</strong> (for example, "open every file in this list", where the list could have 3 files or 300). It closes every one of them, even if opening, say, the fourth one fails.</p>
+<p><strong>Analogy:</strong> a coat-check counter that accepts <strong>any number</strong> of coats as people arrive, and guarantees to hand every single one back at closing time, in reverse order.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExitStack</span>
+
+<span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"sales.csv"</span><span class="p">,</span> <span class="s2">"report.txt"</span><span class="p">,</span> <span class="s2">"big_regions.csv"</span><span class="p">]</span>
+
+<span class="k">with</span> <span class="n">ExitStack</span><span class="p">()</span> <span class="k">as</span> <span class="n">stack</span><span class="p">:</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">stack</span><span class="o">.</span><span class="n">enter_context</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">"context_demo/</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">))</span>
+             <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">names</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"opened"</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">),</span> <span class="s2">"files at once"</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">files</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">name</span><span class="si">:</span><span class="s2">18</span><span class="si">}</span><span class="s2"> first line: </span><span class="si">{</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"all closed:"</span><span class="p">,</span> <span class="nb">all</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">closed</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>opened 3 files at once
+  sales.csv          first line: region,units
+  report.txt         first line: Regional report
+  big_regions.csv    first line: region,units
+all closed: True
+</code></pre></div>
+
+<p><code>stack.enter_context(cm)</code> enters a manager straight away and remembers to exit it later. When the <code>with</code> block ends, everything it remembered is exited <strong>in reverse order</strong>.</p>
+<hr />
+<h2 id="part-13-common-mistakes"><span class="h-icon"><svg class="icon"><use href="#icon-warn"></use></svg></span>Part 13: Common Mistakes</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>Symptom</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>__enter__</code> with no <code>return self</code></td>
+<td><code>'NoneType' object has no attribute ...</code></td>
+<td>Return something</td>
+</tr>
+<tr>
+<td>Cleanup after <code>yield</code>, no <code>try/finally</code></td>
+<td>Teardown silently skipped when the block raises</td>
+<td>Wrap the <code>yield</code></td>
+</tr>
+<tr>
+<td><code>__exit__</code> returning a truthy non-boolean</td>
+<td>Exceptions vanish for no visible reason</td>
+<td>Return <code>True</code>, <code>False</code>, or nothing</td>
+</tr>
+<tr>
+<td>Reusing a <code>@contextmanager</code> object</td>
+<td>Cryptic <code>AttributeError</code> on the second <code>with</code></td>
+<td>Call the function again each time</td>
+</tr>
+<tr>
+<td>Several statements inside <code>with suppress(...)</code></td>
+<td>Later statements silently skipped</td>
+<td>One statement per block</td>
+</tr>
+<tr>
+<td><code>with</code> on a plain value</td>
+<td><code>object does not support the context manager protocol</code></td>
+<td>Pass the manager, not the path or number</td>
+</tr>
+</tbody>
+</table></div>
+<p>One more: <strong>don't open a file without <code>with</code></strong>. The plain <code>open()</code>/<code>close()</code> style is useful for understanding what a file object is, but from here on there's no reason to write it that way.</p>
+<hr />
+<h2 id="quick-reference-summary"><span class="h-icon"><svg class="icon"><use href="#icon-table"></use></svg></span>Quick Reference Summary</h2>
+<p><strong>What <code>with</code> expands to</strong></p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">manager</span> <span class="o">=</span> <span class="n">EXPR</span>
+<span class="n">value</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">()</span>       <span class="c1"># 'as value'</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">body</span>
+<span class="k">finally</span><span class="p">:</span>
+    <span class="n">manager</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">)</span>
+</code></pre></div>
+
+<p><strong>The class form</strong></p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">class</span><span class="w"> </span><span class="nc">Resource</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># acquire</span>
+        <span class="k">return</span> <span class="bp">self</span>               <span class="c1"># what 'as' binds</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+        <span class="c1"># release: always called</span>
+        <span class="k">return</span> <span class="kc">False</span>              <span class="c1"># True would swallow the exception</span>
+</code></pre></div>
+
+<p><strong>The generator form</strong></p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">contextmanager</span>
+
+<span class="nd">@contextmanager</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">resource</span><span class="p">():</span>
+    <span class="c1"># acquire</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">value</span>               <span class="c1"># what 'as' binds</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">pass</span>                      <span class="c1"># release</span>
+</code></pre></div>
+
+<p><strong><code>__exit__</code>'s arguments</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Block finished</th>
+<th><code>exc_type</code></th>
+<th><code>exc_value</code></th>
+<th><code>traceback</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cleanly</td>
+<td><code>None</code></td>
+<td><code>None</code></td>
+<td><code>None</code></td>
+</tr>
+<tr>
+<td>By raising</td>
+<td>the exception class</td>
+<td>the exception object</td>
+<td>its traceback</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong><code>contextlib</code> essentials</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@contextmanager</code></td>
+<td>Generator function to context manager</td>
+</tr>
+<tr>
+<td><code>suppress(SomeError)</code></td>
+<td>Ignore one kind of error (one statement per block)</td>
+</tr>
+<tr>
+<td><code>closing(obj)</code></td>
+<td>Call <code>obj.close()</code> on the way out</td>
+</tr>
+<tr>
+<td><code>redirect_stdout(buf)</code></td>
+<td>Capture what a block prints</td>
+</tr>
+<tr>
+<td><code>ExitStack()</code></td>
+<td>A number of managers known only at runtime</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Several at once</strong></p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"in.csv"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fin</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"out.csv"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fout</span><span class="p">:</span>
+    <span class="o">...</span>
+</code></pre></div>
+
+<p><strong>Key words</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Context manager</td>
+<td>An object with <code>__enter__</code> and <code>__exit__</code>, usable in <code>with</code></td>
+</tr>
+<tr>
+<td>Protocol</td>
+<td>A set of methods an object must have to work with a feature</td>
+</tr>
+<tr>
+<td>Commit / rollback</td>
+<td>Keep the changes / undo them</td>
+</tr>
+<tr>
+<td>Atomic</td>
+<td>Happens completely or not at all</td>
+</tr>
+<tr>
+<td>Truthy / falsy</td>
+<td>Values that <code>if</code> treats as true / false</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>When to use one:</strong> any time you'd otherwise write "and then remember to put it back". Files, connections, locks, settings, directories, transactions, timers.</p>
+
+      <div class="article-end">
+        <p><strong>A context manager is a pair of steps, setup and cleanup, packaged so that the cleanup always happens, even when the code in the middle crashes.</strong> <code>with</code> simply calls <code>__enter__</code> on the way in and <code>__exit__</code> on the way out, and <code>@contextmanager</code> lets a generator do both with a single <code>yield</code> in the middle. Everything in this guide follows from that: why the file closes after a crash, why a missing <code>return self</code> gives you <code>None</code>, why a stray <code>return 2</code> can hide an error, and how a few lines can give you rollbacks and safe file writes. Next up, in chapter 15, we tour the standard library modules you'll reach for most: <code>collections</code>, <code>itertools</code>, <code>functools</code> and <code>datetime</code>.</p>
+      </div>
+    </main>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="f-left">Python Programming Series &nbsp;/&nbsp; Article 14 of the course</div>
+  <div class="f-right"><a href="#top">Back to top ↑</a></div>
+</footer>
+<script>
+(function(){
+  var t=document.getElementById('navToggle'),s=document.getElementById('sidebar');
+  if(t&&s){t.addEventListener('click',function(){s.classList.toggle('open');var o=s.classList.contains('open');t.innerHTML=o?'<svg class="icon"><use href="#icon-close"></use></svg>':'<svg class="icon"><use href="#icon-menu"></use></svg>';});s.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){s.classList.remove('open');t.innerHTML='<svg class="icon"><use href="#icon-menu"></use></svg>';});});}
+  var tl=Array.prototype.slice.call(document.querySelectorAll('.toc a')),sc=tl.map(function(a){return document.getElementById(a.getAttribute('href').slice(1));}).filter(Boolean);
+  if('IntersectionObserver' in window&&sc.length){var bi={};tl.forEach(function(a){bi[a.getAttribute('href').slice(1)]=a;});var obs=new IntersectionObserver(function(es){es.forEach(function(e){var l=bi[e.target.id];if(!l)return;if(e.isIntersecting){tl.forEach(function(a){a.classList.remove('active');});l.classList.add('active');}});},{rootMargin:'-15% 0px -70% 0px',threshold:0});sc.forEach(function(s){obs.observe(s);});}
+  document.querySelectorAll('.code-card').forEach(function(c){var b=c.querySelector('.copy-btn'),e=c.querySelector('code');if(!b||!e)return;b.addEventListener('click',function(){var tx=e.innerText,done=function(){var o=b.innerHTML;b.innerHTML='<svg class="icon"><use href="#icon-check"></use></svg> Copied';setTimeout(function(){b.innerHTML=o;},1600);};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(tx).then(done,done);else{var ta=document.createElement('textarea');ta.value=tx;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(x){}document.body.removeChild(ta);done();}});});
+})();
+</script>
+</body>
+</html>

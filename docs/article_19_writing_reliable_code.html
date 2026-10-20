@@ -1,0 +1,1492 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Writing Reliable Code · Python Programming Series</title>
+<meta name="description" content="A beginner-friendly guide to writing reliable Python: type hints and mypy, docstrings, logging, assert versus raise, testing with pytest, reading tracebacks, breakpoint() and PEP 8.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+
+:root{
+  --paper:#F3F8FC;--surface:#FFFFFF;--tint:#E8F2FB;
+  --ink:#0E2238;--ink-soft:#3D5570;--ink-faint:#7F95AB;
+  --violet:#0B6FCC;--violet-deep:#0A4F9E;--violet-soft:#E2EFFB;
+  --pink:#3FA34D;--pink-text:#0A7466;--pink-soft:#E0F5F2;
+  --mint:#0FA3A3;--mint-text:#08787A;--mint-soft:#DDF4F4;
+  --sun:#FFB627;--sun-soft:#FFF4D9;
+  --orange:#E89B00;--orange-text:#9A6400;--orange-soft:#FFF0D1;
+  --sky:#013243;--sky-text:#013243;--sky-soft:#E1ECF0;
+  --line:#D6E4F0;--line-strong:#B9CFE3;
+  --code-bg:#0B1E33;--code-head:#08172A;--code-line:#17304D;--out-bg:#071425;
+  --r-s:8px;--r-m:14px;--r-l:22px;
+  --font-d:'Bricolage Grotesque','Arial Rounded MT Bold',sans-serif;
+  --font-b:'Figtree',-apple-system,'Segoe UI',sans-serif;
+  --font-m:'JetBrains Mono','SFMono-Regular',Consolas,monospace;
+}
+*,*::before,*::after{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-b);font-size:17px;line-height:1.68;-webkit-font-smoothing:antialiased;}
+a{color:var(--violet-deep);text-decoration-color:rgba(11,111,204,.35);text-underline-offset:3px;text-decoration-thickness:2px;}
+a:hover{text-decoration-color:currentColor;}
+::selection{background:var(--pink);color:#fff;}
+:focus-visible{outline:3px solid var(--pink);outline-offset:2px;border-radius:4px;}
+.icon{width:1em;height:1em;display:inline-block;vertical-align:-.15em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+
+.shell{max-width:1300px;margin:0 auto;padding:0 clamp(16px,4vw,44px);}
+.topbar{display:none;position:sticky;top:0;z-index:40;align-items:center;justify-content:space-between;padding:12px clamp(16px,4vw,44px);background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-bottom:2px solid var(--violet-soft);}
+.topbar .brand{font-family:var(--font-d);font-weight:800;font-size:.98rem;color:var(--ink);}
+.topbar .brand span{color:var(--violet);}
+.topbar button{border:2px solid var(--violet-soft);background:var(--surface);border-radius:var(--r-s);width:40px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--violet);}
+
+/* ---------- Hero: the one loud moment ---------- */
+.hero{position:relative;margin:clamp(16px,2.5vw,28px) 0 clamp(36px,5vw,56px);padding:clamp(36px,5.5vw,68px) clamp(22px,4.5vw,60px);background:var(--violet);color:#fff;border-radius:var(--r-l);overflow:hidden;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:clamp(28px,4vw,56px);align-items:center;}
+.hero::before{content:"";position:absolute;width:420px;height:420px;border-radius:50%;background:var(--violet-deep);right:-120px;top:-160px;}
+.hero::after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;background:var(--pink);left:-70px;bottom:-90px;opacity:.9;}
+.hero-copy,.hero-art{position:relative;z-index:1;}
+.hero-eyebrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-weight:600;font-size:.95rem;color:rgba(255,255,255,.86);margin-bottom:20px;}
+.hero-eyebrow .badge{background:var(--sun);color:var(--ink);font-family:var(--font-d);font-weight:800;padding:4px 13px;border-radius:999px;font-size:.92rem;}
+h1.title{font-family:var(--font-d);font-weight:800;font-size:clamp(2.15rem,4.6vw,3.7rem);line-height:1.02;letter-spacing:-.025em;margin:0 0 20px;max-width:16ch;color:#fff;}
+.hero-sub{font-size:clamp(1rem,1.5vw,1.12rem);color:rgba(255,255,255,.9);max-width:58ch;margin:0 0 28px;}
+.hero-sub strong{color:#fff;font-weight:700;}
+.hero-chips{display:flex;flex-wrap:wrap;gap:10px;}
+.chip{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.13);border:1.5px solid rgba(255,255,255,.28);padding:7px 14px 7px 10px;border-radius:999px;font-size:.88rem;font-weight:600;color:#fff;}
+.chip .icon{width:1.15em;height:1.15em;}
+.chip:nth-child(1) .icon{color:var(--sun);}
+.chip:nth-child(2) .icon{color:#7FF0D2;}
+.chip:nth-child(3) .icon{color:#C5F27A;}
+.chip:nth-child(4) .icon{color:#9FD6FF;}
+
+.hero-art{display:flex;flex-direction:column;align-items:center;}
+.blueprint{width:min(250px,100%);border:2.5px dashed rgba(255,255,255,.75);border-radius:var(--r-m);padding:14px 16px 12px;font-family:var(--font-m);font-size:.8rem;color:#fff;background:rgba(255,255,255,.06);}
+.bp-title{font-weight:700;margin-bottom:8px;}
+.bp-title .kw{color:#C5F27A;}
+.bp-title .cn{color:var(--sun);}
+.bp-line{padding:2px 0 2px 14px;color:rgba(255,255,255,.82);}
+.bp-line.m{color:#7FF0D2;}
+.fan{width:min(330px,100%);height:44px;display:block;}
+.fan path{stroke:rgba(255,255,255,.7);stroke-width:2;fill:none;stroke-dasharray:4 4;vector-effect:non-scaling-stroke;}
+.objs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:min(360px,100%);}
+.obj{border-radius:12px;padding:10px 10px 9px;font-family:var(--font-m);font-size:.72rem;line-height:1.5;color:var(--ink);box-shadow:0 6px 0 rgba(14,34,56,.28);animation:stamp .5s cubic-bezier(.3,1.5,.6,1) both;}
+.obj b{display:block;font-family:var(--font-d);font-size:1rem;font-weight:800;margin-bottom:3px;}
+.obj span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.o1{background:var(--sun);transform:rotate(-4deg);animation-delay:.25s;}
+.o2{background:#7FF0D2;transform:rotate(2deg);animation-delay:.45s;}
+.o3{background:#C5F27A;transform:rotate(-1.5deg);animation-delay:.65s;}
+@keyframes stamp{from{opacity:0;translate:0 -26px;scale:.85;}to{opacity:1;translate:0 0;scale:1;}}
+.art-cap{margin:18px 0 0;font-family:var(--font-d);font-weight:700;font-size:.95rem;color:rgba(255,255,255,.9);}
+
+/* ---------- Layout + sidebar ---------- */
+.layout{display:grid;grid-template-columns:265px minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:start;padding-bottom:90px;}
+.sidebar{position:sticky;top:24px;max-height:calc(100vh - 48px);overflow-y:auto;padding:16px 10px 16px 0;}
+.sidebar::-webkit-scrollbar{width:5px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:3px;}
+.toc-label{font-family:var(--font-d);font-weight:800;font-size:1rem;color:var(--ink);margin:0 0 10px;padding-left:12px;}
+.toc{list-style:none;margin:0;padding:0;}
+.toc li{margin:0 0 2px;}
+.toc a{display:flex;align-items:center;gap:10px;padding:7px 12px;font-size:.88rem;font-weight:500;color:var(--ink-soft);text-decoration:none;border-radius:10px;transition:background .15s,color .15s;}
+.toc a .icon{width:1.05em;height:1.05em;flex:none;color:var(--violet);}
+.toc a:hover{background:var(--violet-soft);color:var(--ink);}
+.toc a.active{background:var(--violet);color:#fff;font-weight:600;}
+.toc a.active .icon{color:var(--sun);}
+
+/* ---------- Article ---------- */
+.article{min-width:0;padding-top:8px;max-width:820px;}
+.article h2{--acc:var(--violet);font-family:var(--font-d);font-weight:800;font-size:clamp(1.55rem,2.6vw,2rem);line-height:1.15;letter-spacing:-.015em;margin:64px 0 18px;scroll-margin-top:24px;display:flex;align-items:center;gap:14px;}
+.article h2:nth-of-type(5n+2){--acc:var(--pink);}
+.article h2:nth-of-type(5n+3){--acc:var(--mint);}
+.article h2:nth-of-type(5n+4){--acc:var(--orange);}
+.article h2:nth-of-type(5n+5){--acc:var(--sky);}
+.article>h2:first-of-type{margin-top:4px;}
+.article>hr:first-child{display:none;}
+.article h2 .h-icon{width:2.6rem;height:2.6rem;flex:none;display:grid;place-items:center;background:var(--acc);color:#fff;border-radius:12px;transform:rotate(-4deg);box-shadow:0 4px 0 rgba(14,34,56,.18);}
+.article h2 .h-icon .icon{width:1.35rem;height:1.35rem;stroke-width:2;}
+.article h3{font-family:var(--font-d);font-weight:700;font-size:1.2rem;margin:34px 0 10px;scroll-margin-top:24px;color:var(--ink);}
+.article p{margin:0 0 17px;}
+.article ul,.article ol{margin:0 0 20px;padding-left:1.35em;}
+.article li{margin-bottom:8px;padding-left:.2em;}
+.article ul li::marker{color:var(--pink);font-size:1.15em;}
+.article ol li::marker{color:var(--violet);font-family:var(--font-d);font-weight:800;}
+.article strong{font-weight:700;}
+.article hr{border:0;height:6px;width:110px;margin:52px auto;border-radius:6px;background:linear-gradient(90deg,var(--violet) 0 20%,var(--pink) 20% 40%,var(--mint) 40% 60%,var(--sun) 60% 80%,var(--sky) 80% 100%);}
+.article code{font-family:var(--font-m);font-size:.84em;background:var(--pink-soft);padding:.12em .4em;border-radius:6px;color:var(--pink-text);}
+.article blockquote{margin:22px 0;padding:16px 20px;border-left:5px solid var(--sun);background:var(--sun-soft);border-radius:0 var(--r-m) var(--r-m) 0;color:var(--ink);}
+.article blockquote p{margin:0;color:inherit;}
+
+.table-wrap{overflow-x:auto;margin:22px 0 28px;border-radius:var(--r-m);border:2px solid var(--violet-soft);background:var(--surface);}
+.article table{width:100%;border-collapse:collapse;font-size:.9rem;}
+.article thead th{background:var(--violet);color:#fff;font-family:var(--font-d);font-weight:700;text-align:left;padding:12px 16px;white-space:nowrap;font-size:.9rem;}
+.article tbody td{padding:11px 16px;border-bottom:1px solid var(--line);vertical-align:top;}
+.article tbody tr:last-child td{border-bottom:none;}
+.article tbody tr:nth-child(even){background:#F5F9FD;}
+.article tbody td code{white-space:nowrap;}
+
+/* ---------- Code ---------- */
+.code-card{margin:22px 0 26px;border-radius:var(--r-m);overflow:hidden;background:var(--code-bg);box-shadow:0 6px 0 var(--violet-soft);}
+.code-card .code-head{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:var(--code-head);border-bottom:1px solid var(--code-line);}
+.code-card .dots{display:flex;gap:6px;}
+.code-card .dots span{width:10px;height:10px;border-radius:50%;display:block;}
+.code-card .dots span:nth-child(1){background:var(--pink);}
+.code-card .dots span:nth-child(2){background:var(--sun);}
+.code-card .dots span:nth-child(3){background:var(--mint);}
+.code-card .lang{font-family:var(--font-m);font-size:.72rem;color:#7E9CC0;}
+.code-card .copy-btn{font-family:var(--font-b);font-weight:600;font-size:.76rem;color:#DCEBFA;background:rgba(255,255,255,.06);border:1px solid #23456B;border-radius:7px;padding:4px 10px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .15s,border-color .15s;}
+.code-card .copy-btn:hover{background:var(--violet);border-color:var(--violet);color:#fff;}
+.code-card .copy-btn .icon{width:.95em;height:.95em;}
+.code-card pre{margin:0;padding:16px 20px;overflow-x:auto;font-size:.85rem;line-height:1.6;}
+.code-card code{font-family:var(--font-m);font-size:1em;line-height:inherit;color:#E6F1FF;background:none;padding:0;border-radius:0;}
+.code-card .k,.code-card .kn,.code-card .kd,.code-card .kc,.code-card .ow{color:#5CC8FF;}
+.code-card .nb,.code-card .bp{color:#9FD6FF;}
+.code-card .nf,.code-card .fm{color:#A6E36B;}
+.code-card .s,.code-card .s1,.code-card .s2,.code-card .sa,.code-card .sd,.code-card .se{color:#FFD166;}
+.code-card .si{color:#6EE7D8;}
+.code-card .mi,.code-card .mf{color:#6EE7D8;}
+.code-card .o,.code-card .p{color:#9FB6CF;}
+.code-card .c,.code-card .c1,.code-card .cm{color:#6F8BA8;font-style:italic;}
+.code-card .n{color:#E6F1FF;}
+.code-card .nc,.code-card .ne{color:#FFB86B;font-weight:600;}
+
+.output-card{margin:-26px 0 26px;border-radius:0 0 var(--r-m) var(--r-m);overflow:hidden;background:var(--out-bg);border-top:2px dashed #23456B;box-shadow:0 6px 0 var(--violet-soft);position:relative;z-index:1;}
+.output-card::before{content:"Output";display:block;font-family:var(--font-b);font-weight:700;font-size:.74rem;color:#A6E36B;padding:9px 20px 0;}
+.output-card pre{margin:0;padding:4px 20px 16px;overflow-x:auto;font-size:.82rem;line-height:1.6;}
+.output-card code{font-family:var(--font-m);font-size:1em;line-height:inherit;color:#BFD6EE;background:none;padding:0;border-radius:0;}
+
+.diagram-card{margin:22px 0 26px;border-radius:var(--r-m);overflow:hidden;position:relative;border:2.5px dashed var(--line-strong);background:var(--surface);}
+.diagram-card::before{content:"diagram";position:absolute;top:10px;right:14px;font-family:var(--font-b);font-weight:700;font-size:.74rem;color:var(--violet);}
+.diagram-card pre{margin:0;padding:26px 22px 20px;overflow-x:auto;}
+.diagram-card pre{line-height:1.3;font-size:.84rem;}
+.diagram-card code{font-family:var(--font-m);font-size:1em;line-height:inherit;color:var(--violet-deep);font-weight:500;background:none;padding:0;white-space:pre;}
+
+.svg-diagram{margin:24px 0 28px;padding:22px 20px 18px;background:var(--surface);border:2px solid var(--violet-soft);border-radius:var(--r-m);}
+.svg-diagram{overflow-x:auto;}
+.svg-diagram svg{width:100%;min-width:560px;height:auto;display:block;}
+.svg-diagram .cap{font-size:.86rem;font-weight:500;color:var(--ink-faint);text-align:center;margin-top:12px;}
+
+.article-end{margin-top:56px;padding:30px 30px;border-radius:var(--r-l);background:var(--violet);color:#fff;position:relative;overflow:hidden;}
+.article-end::after{content:"";position:absolute;width:140px;height:140px;border-radius:50%;background:var(--sun);right:-50px;bottom:-60px;}
+.article-end p{margin:0;font-size:1.06rem;color:rgba(255,255,255,.92);position:relative;z-index:1;max-width:62ch;}
+.article-end p strong{color:#fff;}
+
+footer.site-footer{border-top:2px solid var(--violet-soft);margin-top:30px;padding:22px clamp(16px,4vw,44px) 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+footer.site-footer .f-left{font-size:.88rem;font-weight:500;color:var(--ink-faint);}
+footer.site-footer a{font-size:.9rem;font-weight:600;}
+
+@media(max-width:960px){
+  .topbar{display:flex;}
+  .layout{grid-template-columns:1fr;}
+  .article{max-width:none;}
+  .sidebar{position:fixed;inset:60px 0 0 0;z-index:35;background:var(--paper);padding:18px clamp(16px,4vw,44px) 24px;transform:translateX(-100%);transition:transform .2s;max-height:none;height:calc(100vh - 60px);}
+  .sidebar.open{transform:translateX(0);}
+  .hero{grid-template-columns:1fr;}
+}
+@media(max-width:520px){
+  .article h2 .h-icon{width:2.2rem;height:2.2rem;}
+  .obj{font-size:.66rem;padding:9px 8px;}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}.sidebar{transition:none;}.obj{animation:none;}}
+
+/* NumPy hero illustration */
+.cells{display:grid;grid-template-columns:repeat(4,1fr);border:2px solid rgba(255,255,255,.8);border-radius:8px;overflow:hidden;margin-top:4px;}
+.cells span{text-align:center;padding:7px 0;font-weight:700;color:#fff;}
+.cells span+span{border-left:2px solid rgba(255,255,255,.8);}
+.objs.four{grid-template-columns:repeat(4,1fr);width:min(380px,100%);gap:9px;}
+.objs.four .obj{text-align:center;padding:10px 4px 9px;}
+.o4{background:#9FD6FF;transform:rotate(3deg);animation-delay:.85s;}
+
+/* Article 11 extras */
+.cells.three{grid-template-columns:repeat(3,1fr);}
+.cells.three span{font-size:.72rem;padding:6px 0;}
+.objs .obj{min-width:0;}
+.obj.seq{text-align:center;padding:10px 6px 9px;}
+.obj.seq code{display:block;font-family:var(--font-m);font-size:.74rem;font-weight:700;margin:2px 0 4px;color:var(--ink);background:none;padding:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.obj.seq span{font-size:.68rem;white-space:normal;}
+.code-card.term .code-head{background:#06121F;}
+.code-card .lang{text-transform:none;}
+.diagram-card.textfile::before{content:"text";}
+@media(max-width:520px){.obj.seq code{font-size:.62rem;}}
+
+.article h2 code,.article h3 code,.article p code,.article li code{overflow-wrap:anywhere;}
+</style>
+</head>
+<body>
+<svg style="display:none" aria-hidden="true"><defs>
+<symbol id="icon-leak" viewBox="0 0 24 24"><path d="M12 2s6 7 6 12a6 6 0 0 1-12 0c0-5 6-12 6-12z"/><path d="M9.5 15a2.5 2.5 0 0 0 2.5 2.5"/></symbol>
+<symbol id="icon-door" viewBox="0 0 24 24"><path d="M4 21V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v17"/><path d="M2 21h20"/><circle cx="12.5" cy="12" r="1" fill="currentColor"/><path d="M19 8l3 3-3 3M16 11h6"/></symbol>
+<symbol id="icon-build" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></symbol>
+<symbol id="icon-key" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3L21 2M17 6l3 3M14.5 8.5l2 2"/></symbol>
+<symbol id="icon-shield" viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z"/><path d="M9 12l2 2 4-4"/></symbol>
+<symbol id="icon-stopwatch" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M10 2h4M12 2v3"/></symbol>
+<symbol id="icon-layers" viewBox="0 0 24 24"><path d="M3 7c0-2 4-3 9-3s9 1 9 3"/><path d="M3 7h18"/><path d="M4 12h16" stroke-dasharray="2 2"/><path d="M3 17h18c0 2-4 3-9 3s-9-1-9-3z"/></symbol>
+<symbol id="icon-scale" viewBox="0 0 24 24"><path d="M12 3v18M7 21h10M5 7h14"/><path d="M5 7l-3 7a3 3 0 0 0 6 0zM19 7l-3 7a3 3 0 0 0 6 0z"/></symbol>
+<symbol id="icon-toolbox" viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="12" rx="1.5"/><path d="M8 8V5h8v3M2 13h20M10 13v2h4v-2"/></symbol>
+<symbol id="icon-stack" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="5" rx="1"/><rect x="4" y="10" width="16" height="5" rx="1"/><rect x="4" y="17" width="16" height="4" rx="1"/></symbol>
+<symbol id="icon-undo" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></symbol>
+<symbol id="icon-exitstack" viewBox="0 0 24 24"><rect x="3" y="12" width="7" height="9" rx="1"/><rect x="8.5" y="7" width="7" height="9" rx="1"/><rect x="14" y="2" width="7" height="9" rx="1"/></symbol>
+<symbol id="icon-loop" viewBox="0 0 24 24"><path d="M17 2l3 3-3 3"/><path d="M4 11V9a4 4 0 0 1 4-4h12"/><path d="M7 22l-3-3 3-3"/><path d="M20 13v2a4 4 0 0 1-4 4H4"/></symbol>
+<symbol id="icon-func" viewBox="0 0 24 24"><path d="M15 4h-2a3 3 0 0 0-3 3v10a3 3 0 0 1-3 3H5"/><path d="M7 11h8"/><path d="M16 14l4 5M20 14l-4 5"/></symbol>
+<symbol id="icon-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8 14h2M14 14h2M8 17h2"/></symbol>
+<symbol id="icon-puzzle" viewBox="0 0 24 24"><path d="M4 7h4a2 2 0 1 1 4 0h4v4a2 2 0 1 1 0 4v4h-4a2 2 0 1 0-4 0H4v-4a2 2 0 1 0 0-4z"/></symbol>
+<symbol id="icon-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/><path d="M8 10.5h5"/></symbol>
+<symbol id="icon-brackets" viewBox="0 0 24 24"><path d="M8 3C4 6 4 18 8 21"/><path d="M16 3c4 3 4 15 0 18"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></symbol>
+<symbol id="icon-ban" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></symbol>
+<symbol id="icon-plug" viewBox="0 0 24 24"><path d="M9 2v5M15 2v5"/><path d="M6 7h12v4a6 6 0 0 1-12 0z"/><path d="M12 17v5"/></symbol>
+<symbol id="icon-send" viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-8z"/><path d="M11 13l10-10"/></symbol>
+<symbol id="icon-download" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 19h16"/></symbol>
+<symbol id="icon-gauge" viewBox="0 0 24 24"><path d="M3 16a9 9 0 0 1 18 0"/><path d="M12 16l4-5"/><circle cx="12" cy="16" r="1.2" fill="currentColor"/><path d="M3 20h18"/></symbol>
+<symbol id="icon-brain" viewBox="0 0 24 24"><circle cx="6" cy="7" r="2"/><circle cx="6" cy="17" r="2"/><circle cx="18" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><path d="M8 7.8l2.3 3M8 16.2l2.3-3M14 12h2"/></symbol>
+<symbol id="icon-handshake" viewBox="0 0 24 24"><path d="M2 12l4-4 4 2 3-2 3 1 6 3"/><path d="M6 8v6l5 4 2-1 2 1 3-3"/><path d="M11 13l2 2"/></symbol>
+<symbol id="icon-tag" viewBox="0 0 24 24"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.3"/></symbol>
+<symbol id="icon-doc" viewBox="0 0 24 24"><path d="M6 2h9l4 4v16H6z"/><path d="M15 2v4h4M9 11h7M9 15h7M9 19h4"/></symbol>
+<symbol id="icon-log" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M8 8h1M11 8h5M8 12h1M11 12h5M8 16h1M11 16h5"/></symbol>
+<symbol id="icon-test" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3"/><path d="M7.5 15h9"/></symbol>
+<symbol id="icon-bug" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="13" rx="5"/><path d="M12 7v13M9 4l1.5 3M15 4l-1.5 3M3 11h4M17 11h4M3 17h4M17 17h4"/></symbol>
+<symbol id="icon-style" viewBox="0 0 24 24"><path d="M4 6h16M4 10h10M4 14h16M4 18h8"/></symbol>
+<symbol id="icon-warn" viewBox="0 0 24 24"><path d="M12 3l10 18H2z"/><path d="M12 10v5"/><circle cx="12" cy="18" r=".8" fill="currentColor"/></symbol>
+<symbol id="icon-table" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="1.5"/><line x1="2" y1="9" x2="22" y2="9"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15.5" y1="3" x2="15.5" y2="21"/></symbol>
+<symbol id="icon-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="13" rx="1.6"/><path d="M5 16H4.5A1.5 1.5 0 0 1 3 14.5v-10A1.5 1.5 0 0 1 4.5 3h10A1.5 1.5 0 0 1 16 4.5V5"/></symbol>
+<symbol id="icon-check" viewBox="0 0 24 24"><path d="M4 12.5 L9.5 18 L20 5"/></symbol>
+<symbol id="icon-menu" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
+<symbol id="icon-close" viewBox="0 0 24 24"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></symbol>
+</defs></svg>
+
+
+<div class="topbar">
+  <span class="brand">§19 &nbsp;<span>Reliable Code</span></span>
+  <button id="navToggle" aria-label="Toggle navigation">
+    <svg class="icon"><use href="#icon-menu"></use></svg>
+  </button>
+</div>
+
+<div class="shell" id="top">
+  <section class="hero">
+  <div class="hero-copy">
+    <div class="hero-eyebrow"><span class="badge">Article 19</span> Python Programming Series</div>
+    <h1 class="title">Writing Reliable Code: Type Hints, Logging, Testing and Debugging</h1>
+    <p class="hero-sub">Chapters 17 and 18 wrote code that depends on <strong>someone else's server</strong> being up, sending back what it sent last week, and keeping its HTML the way it was. That's exactly the kind of code that breaks while you're asleep, and that you'll least enjoy debugging six months from now.</p>
+    <div class="hero-chips">
+      <div class="chip"><svg class="icon"><use href="#icon-tag"></use></svg> Type hints and mypy</div>
+      <div class="chip"><svg class="icon"><use href="#icon-log"></use></svg> logging instead of print</div>
+      <div class="chip"><svg class="icon"><use href="#icon-test"></use></svg> Tests with pytest</div>
+      <div class="chip"><svg class="icon"><use href="#icon-bug"></use></svg> Tracebacks and breakpoint()</div>
+    </div>
+  </div>
+  <div class="hero-art" aria-hidden="true">
+    <div class="blueprint">
+      <div class="bp-title"><span class="kw">def</span> <span class="cn">to_price</span>(text: str) -&gt; float | None</div>
+      <div class="cells three"><span>hints</span><span>logs</span><span>tests</span></div>
+    </div>
+    <svg class="fan" viewBox="0 0 330 44" preserveAspectRatio="none"><path d="M165 0 C165 24 55 18 55 44"/><path d="M165 0 L165 44"/><path d="M165 0 C165 24 275 18 275 44"/></svg>
+    <div class="objs">
+      <div class="obj seq o1"><b>check</b><code>mypy</code><span>before it runs</span></div>
+      <div class="obj seq o2"><b>record</b><code>logging</code><span>evidence left</span></div>
+      <div class="obj seq o3"><b>prove</b><code>pytest</code><span>4 passed</span></div>
+    </div>
+    <p class="art-cap">It already works. Now make it trustworthy.</p>
+  </div>
+</section>
+
+  <div class="layout">
+    <nav class="sidebar" id="sidebar">
+      <div class="toc-label">On this page</div>
+      <ul class="toc">
+<li><a href="#part-1-type-hints"><svg class="icon"><use href="#icon-tag"></use></svg><span>Part 1: Type Hints</span></a></li>
+<li><a href="#part-2-a-tool-that-does-check"><svg class="icon"><use href="#icon-check"></use></svg><span>Part 2: A Tool That Does Check</span></a></li>
+<li><a href="#part-3-docstrings"><svg class="icon"><use href="#icon-doc"></use></svg><span>Part 3: Docstrings</span></a></li>
+<li><a href="#part-4-logging"><svg class="icon"><use href="#icon-log"></use></svg><span>Part 4: Logging</span></a></li>
+<li><a href="#part-5-assert-and-the-flag-that-deletes-it"><svg class="icon"><use href="#icon-shield"></use></svg><span>Part 5: assert, and the Flag That Deletes It</span></a></li>
+<li><a href="#part-6-testing-with-pytest"><svg class="icon"><use href="#icon-test"></use></svg><span>Part 6: Testing with pytest</span></a></li>
+<li><a href="#part-7-when-it-breaks-anyway"><svg class="icon"><use href="#icon-bug"></use></svg><span>Part 7: When It Breaks Anyway</span></a></li>
+<li><a href="#part-8-pep-8-briefly"><svg class="icon"><use href="#icon-style"></use></svg><span>Part 8: PEP 8, Briefly</span></a></li>
+<li><a href="#part-9-common-mistakes"><svg class="icon"><use href="#icon-warn"></use></svg><span>Part 9: Common Mistakes</span></a></li>
+<li><a href="#quick-reference-summary"><svg class="icon"><use href="#icon-table"></use></svg><span>Quick Reference Summary</span></a></li>
+      </ul>
+    </nav>
+
+    <main class="article">
+<p>This guide covers four things that help, and <strong>none of them are about making the program work</strong>. It already works. They're about <strong>what happens next</strong>:</p>
+<ul>
+<li><strong>Saying what you mean</strong>, with <strong>type hints</strong> and <strong>docstrings</strong>, so the next person reading your code doesn't have to guess. That person is usually you.</li>
+<li><strong>Saying what happened</strong>, with <strong><code>logging</code></strong> instead of <code>print</code>, so a failure in the middle of the night leaves evidence behind.</li>
+<li><strong>Proving it works</strong>, with <strong>tests</strong>, so a change you make in March doesn't quietly break something you wrote in January.</li>
+<li><strong>Finding out why</strong>, by reading <strong>tracebacks</strong> properly and using a <strong>debugger</strong>.</li>
+</ul>
+<p><strong>Analogy:</strong> think of a car. Getting it to start is "making the program work". But a car you can rely on also has a <strong>manual</strong> (type hints and docstrings), a <strong>dashboard with warning lights</strong> (logging), an <strong>inspection</strong> that checks the brakes before every long trip (tests), and a <strong>mechanic's diagnostic tool</strong> for when something goes wrong anyway (tracebacks and the debugger). None of those make the engine run. All of them make the car trustworthy.</p>
+<p>Chapter 9 introduced <code>assert</code> and <code>logging</code> and said this chapter would cover them properly. Here's the rest of the story.</p>
+<p>Here is what we will cover:</p>
+<ol>
+<li>Type hints, and the fact that Python ignores them</li>
+<li>Running a type checker, which doesn't</li>
+<li>Docstrings, and what belongs in one</li>
+<li><code>logging</code>: levels, loggers, and why <code>print</code> isn't enough</li>
+<li><code>assert</code> versus real validation, and the flag that deletes your asserts</li>
+<li><code>pytest</code>: writing tests, running them, reading a failure</li>
+<li>Reading a traceback, and <code>breakpoint()</code></li>
+<li>PEP 8, briefly</li>
+</ol>
+<h3 id="setting-up">Setting Up</h3>
+<p>This chapter writes a few small files and tests them, so it needs a folder to work in. <code>shutil.rmtree</code> deletes anything left over from a previous run (and <code>ignore_errors=True</code> means "don't complain if there's nothing to delete"), which keeps the output the same every time:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="s2">"reliable_demo"</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s2">"reliable_demo"</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"working in"</span><span class="p">,</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"reliable_demo"</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>working in reliable_demo
+</code></pre></div>
+
+<p><code>Path(...).resolve().name</code> turns the folder into its full path and then takes just the last part, so the output doesn't show your computer's folder structure.</p>
+<hr />
+<h2 id="part-1-type-hints"><span class="h-icon"><svg class="icon"><use href="#icon-tag"></use></svg></span>Part 1: Type Hints</h2>
+<p>A <strong>type hint</strong> says what <strong>kind of value</strong> a function expects and what kind it gives back. It goes after a <strong>colon</strong> for each argument, and after an <strong>arrow</strong> (<code>-&gt;</code>) for the return value:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">average</span><span class="p">(</span><span class="n">numbers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">numbers</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">numbers</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Read it as: "<code>average</code> takes <code>numbers</code>, which should be a <strong>list of floats</strong>, and returns a <strong>float</strong>."</p>
+<p>Apart from the fields of chapter 15's dataclass, everything in this course has been written without them, and it all ran fine. So what are they for?</p>
+<h3 id="python-doesnt-check-them">Python Doesn't Check Them</h3>
+<p>This is the first thing to understand, and it surprises a lot of people:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">average</span><span class="p">(</span><span class="n">numbers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">numbers</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">numbers</span><span class="p">)</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="n">average</span><span class="p">([</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">]))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">average</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]))</span>                   <span class="c1"># ints, not floats. Fine.</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">average</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">)))</span>                   <span class="c1"># a tuple, not a list. Also fine.</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>20.0
+2.0
+5.0
+</code></pre></div>
+
+<p>None of those calls match the hint exactly:</p>
+<ul>
+<li><code>[1, 2, 3]</code> is a list of <strong>integers</strong>, not floats.</li>
+<li><code>(4, 5, 6)</code> is a <strong>tuple</strong>, not a list.</li>
+</ul>
+<p>And Python didn't care. Type hints are <strong>not checked when the code runs</strong>. Python stores them on the function and otherwise ignores them:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">print</span><span class="p">(</span><span class="n">average</span><span class="o">.</span><span class="vm">__annotations__</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>{'numbers': list[float], 'return': &lt;class 'float'&gt;}
+</code></pre></div>
+
+<p><code>__annotations__</code> is where Python keeps the hints, as a dictionary: argument name to hint, plus <code>'return'</code> for the return value. That's all Python does with them.</p>
+<p><strong>Analogy:</strong> a type hint is like the <strong>"Fragile: this way up" label</strong> on a parcel. The label doesn't stop anyone from turning the box upside down. It tells people what the box expects, and a careful inspector at the depot (the type checker in Part 2) can spot when the instructions are being ignored.</p>
+<p>So a type hint isn't a safety net. It's <strong>two other things</strong>.</p>
+<p><strong>It's documentation that stays up to date.</strong> A comment saying "pass a list of floats" goes stale the moment someone changes the function. A hint sits right in the function's first line, where the change happens.</p>
+<p><strong>It can be checked by a tool.</strong> That's the next section, and the main reason hints are worth writing.</p>
+<p>(There's a third, everyday benefit too: code editors like VS Code and PyCharm read hints to give you better <strong>autocomplete</strong> and to underline mistakes as you type.)</p>
+<h3 id="the-hints-youll-actually-see">The Hints You'll Actually See</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Hint</th>
+<th>Means</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>x: int</code></td>
+<td>an integer</td>
+</tr>
+<tr>
+<td><code>x: str</code></td>
+<td>a string</td>
+</tr>
+<tr>
+<td><code>x: list[int]</code></td>
+<td>a list of integers</td>
+</tr>
+<tr>
+<td><code>x: dict[str, float]</code></td>
+<td>a dict with string keys and float values</td>
+</tr>
+<tr>
+<td><code>x: tuple[str, int]</code></td>
+<td>a tuple of exactly those two</td>
+</tr>
+<tr>
+<td><code>x: str</code> or <code>None</code>, written with a vertical bar between them</td>
+<td>a string, or <code>None</code></td>
+</tr>
+<tr>
+<td><code>x: list[dict[str, str]]</code></td>
+<td>nesting works</td>
+</tr>
+<tr>
+<td><code>-&gt; None</code></td>
+<td>returns nothing useful</td>
+</tr>
+</tbody>
+</table></div>
+<p>That "or" hint is written <code>str | None</code>, with the <code>|</code> character meaning "or". (It's the same symbol you met for sets and regex alternation, given a new job.)</p>
+<p><code>str | None</code> (Python 3.10 and later) is the one you'll see most, because it describes <strong>every function that might not find what it was looking for</strong>. Chapter 18's <code>text_of</code> is exactly that kind of function, so here it is with hints:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">from</span><span class="w"> </span><span class="nn">bs4</span><span class="w"> </span><span class="kn">import</span> <span class="n">BeautifulSoup</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">text_of</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">selector</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">found</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">select_one</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">found</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">strip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">if</span> <span class="n">found</span> <span class="k">else</span> <span class="n">default</span>
+
+
+<span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s2">"sample_data/shop_page_2.html"</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">),</span>
+                     <span class="s2">"html.parser"</span><span class="p">)</span>
+<span class="n">article</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">"article.product"</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">text_of</span><span class="p">(</span><span class="n">article</span><span class="p">,</span> <span class="s2">"h3 a"</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">text_of</span><span class="p">(</span><span class="n">article</span><span class="p">,</span> <span class="s2">"p.price"</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">text_of</span><span class="p">(</span><span class="n">article</span><span class="p">,</span> <span class="s2">"p.price"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">""</span><span class="p">)))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>'Effective Pandas'
+None
+''
+</code></pre></div>
+
+<p>The three calls show the three possibilities:</p>
+<ul>
+<li>the title exists, so you get a <strong>string</strong>: <code>'Effective Pandas'</code>,</li>
+<li>the price is missing, so you get <strong><code>None</code></strong>,</li>
+<li>the price is missing but we passed <code>default=""</code>, so you get an <strong>empty string</strong>.</li>
+</ul>
+<p>The first line of the function now tells you what the output already showed: <strong>this function can give you <code>None</code>, so check for it.</strong> That's the whole point.</p>
+<p><code>parent</code> has <strong>no hint</strong>, on purpose. Its type is a BeautifulSoup <code>Tag</code>, and naming it would mean importing a class just for the hint. Hints are <strong>optional</strong>, and you can add them to some arguments and not others. Add them where they help.</p>
+<p>In older code you'll often see <code>Optional[float]</code> (imported from the <code>typing</code> module), which is the older way of writing <code>float | None</code>. Likewise <code>List[int]</code> and <code>Dict[str, float]</code> (with capital letters, from <code>typing</code>) are the older spellings of <code>list[int]</code> and <code>dict[str, float]</code>.</p>
+<hr />
+<h2 id="part-2-a-tool-that-does-check"><span class="h-icon"><svg class="icon"><use href="#icon-check"></use></svg></span>Part 2: A Tool That Does Check</h2>
+<p><strong><code>mypy</code></strong> is a <strong>type checker</strong>: it reads the hints and reports the places where they don't add up, <strong>without running anything</strong>.</p>
+<p><strong>Analogy:</strong> <code>mypy</code> is like a <strong>spell checker for types</strong>. It reads your writing and underlines the places where the words don't fit together, before anyone else reads it. It doesn't run your program, just as a spell checker doesn't post your letter.</p>
+<p>To try it we need real files. <code>%%writefile</code> at the top of a notebook cell <strong>saves the cell's contents to a file</strong> instead of running it, as in chapter 11. Here's a small module with two functions, both with hints:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">notebook cell</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="o">%%</span><span class="n">writefile</span> <span class="n">reliable_demo</span><span class="o">/</span><span class="n">prices</span><span class="o">.</span><span class="n">py</span>
+<span class="sd">"""Turning scraped price text into numbers."""</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">to_price</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Return the number in a price string, or None if there is not one."""</span>
+    <span class="n">digits</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">"[^\d.]"</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="n">text</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">digits</span><span class="p">)</span> <span class="k">if</span> <span class="n">digits</span> <span class="k">else</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">total</span><span class="p">(</span><span class="n">prices</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Add up a list of prices."""</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">prices</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Writing reliable_demo/prices.py
+</code></pre></div>
+
+<p>And here's a file that <strong>uses</strong> it, with two real mistakes in it:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">notebook cell</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="o">%%</span><span class="n">writefile</span> <span class="n">reliable_demo</span><span class="o">/</span><span class="n">uses_prices</span><span class="o">.</span><span class="n">py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">prices</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_price</span><span class="p">,</span> <span class="n">total</span>
+
+<span class="n">total</span><span class="p">([</span><span class="s2">"12.50"</span><span class="p">,</span> <span class="s2">"8.00"</span><span class="p">])</span>                <span class="c1"># strings, not floats</span>
+<span class="n">count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">to_price</span><span class="p">(</span><span class="s2">"£12.50"</span><span class="p">)</span>         <span class="c1"># to_price can return None, and a float</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Writing reliable_demo/uses_prices.py
+</code></pre></div>
+
+<ul>
+<li><code>total</code> expects a list of <strong>floats</strong>, but we're passing a list of <strong>strings</strong>.</li>
+<li><code>to_price</code> can return a float <strong>or <code>None</code></strong>, but we're storing the result in a variable we've declared as <code>int</code> (<code>count: int = ...</code> is a type hint on a variable).</li>
+</ul>
+<p><code>mypy</code> is a command-line tool, so the next cell runs it with <strong><code>subprocess.run</code></strong>, which runs a terminal command from Python and captures what it prints. <code>sys.executable</code> (chapter 11) makes sure it uses the same Python as this notebook:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="s2">"-m"</span><span class="p">,</span> <span class="s2">"mypy"</span><span class="p">,</span> <span class="s2">"uses_prices.py"</span><span class="p">,</span>
+     <span class="s2">"--no-color-output"</span><span class="p">,</span> <span class="s2">"--no-error-summary"</span><span class="p">],</span>
+    <span class="n">cwd</span><span class="o">=</span><span class="s2">"reliable_demo"</span><span class="p">,</span> <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">stdout</span> <span class="ow">or</span> <span class="s2">"(mypy found nothing)"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>uses_prices.py:3: error: List item 0 has incompatible type "str"; expected "float"  [list-item]
+uses_prices.py:3: error: List item 1 has incompatible type "str"; expected "float"  [list-item]
+uses_prices.py:4: error: Incompatible types in assignment (expression has type "float | None", variable has type "int")  [assignment]
+</code></pre></div>
+
+<p>The arguments say: run <code>mypy</code> on <code>uses_prices.py</code>, without colours (<code>--no-color-output</code>) and without the summary line at the end (<code>--no-error-summary</code>), inside the <code>reliable_demo</code> folder. <code>capture_output=True, text=True</code> collects what it prints as a string in <code>result.stdout</code>.</p>
+<p>Each error tells you the <strong>file</strong>, the <strong>line number</strong>, what's wrong, and a <strong>code</strong> in square brackets (like <code>[list-item]</code>) naming the kind of error.</p>
+<p>Two mistakes, reported as <strong>three</strong> errors, because the first bad call has two bad items in its list. <code>mypy</code> found both mistakes <strong>without running the file</strong>.</p>
+<p>If you did run it, the first one would crash inside <code>sum</code> when it tried to add up strings. The second wouldn't crash at all: <code>count</code> would quietly hold a float, or <code>None</code> if the price were missing, until something later tried to do maths with it. That's exactly the bug chapter 18's missing price would cause.</p>
+<div class="diagram-card"><pre><code>   your code ──► mypy reads the hints ──► reports mismatches ──► you fix them ──► then run the code
+                 (nothing is executed)
+</code></pre></div>
+
+<p>You run <code>mypy</code> the same way you run tests: from the terminal, or automatically before every commit. It's already in this course's <code>requirements.txt</code>:</p>
+<div class="code-card term"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">terminal</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code>python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>mypy<span class="w">         </span><span class="c1"># if you haven't installed requirements.txt</span>
+mypy<span class="w"> </span>your_package/
+</code></pre></div>
+
+<p>Hints are optional, and you can add as many or as few as you like. Add them to the functions other code calls, skip them in a three-line script, and don't let anyone tell you it's all or nothing.</p>
+<p>One thing to know about that "add as few as you like" freedom: by default, <code>mypy</code> <strong>doesn't check the inside of a function that has no hints at all</strong>. It assumes an unhinted function is code you haven't opted in yet. You'll see this in action in Part 6.</p>
+<hr />
+<h2 id="part-3-docstrings"><span class="h-icon"><svg class="icon"><use href="#icon-doc"></use></svg></span>Part 3: Docstrings</h2>
+<p>You met <strong>docstrings</strong> in chapter 13: a string written as the <strong>first statement</strong> of a function, class or module. Python stores it, <code>help()</code> prints it, and code editors show it when you hover over the name.</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">to_price</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Return the number in a price string, or None if there is not one.</span>
+
+<span class="sd">    Strips currency symbols, spaces and thousands separators, so</span>
+<span class="sd">    "£1,299.00" becomes 1299.0 and "free" becomes None.</span>
+<span class="sd">    """</span>
+    <span class="n">digits</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">"[^\d.]"</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="n">text</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">digits</span><span class="p">)</span> <span class="k">if</span> <span class="n">digits</span> <span class="k">else</span> <span class="kc">None</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="n">to_price</span><span class="o">.</span><span class="vm">__doc__</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="n">help</span><span class="p">(</span><span class="n">to_price</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Return the number in a price string, or None if there is not one.
+
+Help on function to_price in module __main__:
+
+to_price(text: str) -&gt; float | None
+    Return the number in a price string, or None if there is not one.
+
+    Strips currency symbols, spaces and thousands separators, so
+    "£1,299.00" becomes 1299.0 and "free" becomes None.
+</code></pre></div>
+
+<ul>
+<li><code>to_price.__doc__</code> is where Python keeps the docstring. <code>.splitlines()[0]</code> takes just the first line.</li>
+<li><code>help(to_price)</code> prints the function's signature (including the type hints) and its whole docstring, the same way <code>help()</code> works on any built-in function.</li>
+</ul>
+<h3 id="how-to-write-a-good-one">How to Write a Good One</h3>
+<p>The <strong>first line</strong> is a one-sentence summary, written as a <strong>command</strong>: "Return the number", not "This function returns the number". Then a <strong>blank line</strong>, then anything a caller needs to know that the function's first line doesn't already say.</p>
+<p><strong>Analogy:</strong> a docstring is like the <strong>label on a medicine bottle</strong>. The first line says what it's for. The rest covers what you need to know to use it safely: the dose, the side effects, when not to take it. It doesn't explain the chemistry of how it was made.</p>
+<p>What belongs in one, and what doesn't:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Put in</th>
+<th>Leave out</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>What it returns, including the surprising cases</td>
+<td>The types, if you have written hints</td>
+</tr>
+<tr>
+<td>What it raises, and when</td>
+<td>A restatement of the function name</td>
+</tr>
+<tr>
+<td>Units, formats, assumptions</td>
+<td>How it works internally</td>
+</tr>
+<tr>
+<td>An example, if the call is not obvious</td>
+<td>Change history, which git already has</td>
+</tr>
+</tbody>
+</table></div>
+<p>A docstring that says <code>"""Converts text to price."""</code> above <code>def to_price(text)</code> adds nothing; the name already said that. <code>"""...or None if there is not one."""</code> tells the caller something they <strong>really needed to know</strong>.</p>
+<hr />
+<h2 id="part-4-logging"><span class="h-icon"><svg class="icon"><use href="#icon-log"></use></svg></span>Part 4: Logging</h2>
+<p>Chapter 9 introduced the <code>logging</code> module and <code>logger.exception()</code>. Here's the fuller picture, starting with why <code>print</code> isn't enough. <code>print</code> is fine in a notebook, but wrong for anything that <strong>runs without you watching</strong>:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th><code>print</code></th>
+<th><code>logging</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Turn it off without editing code</td>
+<td>No</td>
+<td>Yes, by level</td>
+</tr>
+<tr>
+<td>Say how important a message is</td>
+<td>No</td>
+<td>Five levels</td>
+</tr>
+<tr>
+<td>Say where it came from</td>
+<td>No</td>
+<td>Logger name, usually the module</td>
+</tr>
+<tr>
+<td>Send it to a file as well as the screen</td>
+<td>No</td>
+<td>Yes, several places at once</td>
+</tr>
+<tr>
+<td>Timestamps</td>
+<td>You write them yourself</td>
+<td>Built in</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Analogy:</strong> <code>print</code> is like <strong>shouting</strong> a message across the room: fine if someone's there, lost if nobody is. Logging is like a ship's <strong>logbook</strong>: every entry has a time, a level of importance, and who wrote it, and it's still there to read the next morning.</p>
+<h3 id="the-five-levels">The Five Levels</h3>
+<p>They exist so you can <strong>turn the volume down</strong> without deleting anything.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Level</th>
+<th>For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DEBUG</code></td>
+<td>detail you want while developing</td>
+</tr>
+<tr>
+<td><code>INFO</code></td>
+<td>normal progress worth recording</td>
+</tr>
+<tr>
+<td><code>WARNING</code></td>
+<td>something unexpected, but it carried on</td>
+</tr>
+<tr>
+<td><code>ERROR</code></td>
+<td>it failed and gave up on this piece of work</td>
+</tr>
+<tr>
+<td><code>CRITICAL</code></td>
+<td>the program cannot continue</td>
+</tr>
+</tbody>
+</table></div>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">"shop.scraper"</span><span class="p">)</span>          <span class="c1"># a name, usually __name__</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>                             <span class="c1"># so re-running this cell is clean</span>
+
+<span class="n">handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+<span class="n">handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s2">"</span><span class="si">%(levelname)-8s</span><span class="s2"> </span><span class="si">%(name)s</span><span class="s2"> | </span><span class="si">%(message)s</span><span class="s2">"</span><span class="p">))</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">propagate</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"parsed 3 products from page 1"</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"page 1 of 3 done"</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"no price for sku 9781098139482"</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">"page 4 returned 500, giving up on it"</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s2">"no pages could be fetched at all"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>DEBUG    shop.scraper | parsed 3 products from page 1
+INFO     shop.scraper | page 1 of 3 done
+WARNING  shop.scraper | no price for sku 9781098139482
+ERROR    shop.scraper | page 4 returned 500, giving up on it
+CRITICAL shop.scraper | no pages could be fetched at all
+</code></pre></div>
+
+<h3 id="the-pieces-of-the-setup">The Pieces of the Setup</h3>
+<p>There are three objects involved, and it helps to know which does what:</p>
+<ul>
+<li>A <strong>logger</strong> is what your code talks to: <code>logger.info(...)</code>. <code>logging.getLogger("shop.scraper")</code> creates (or fetches) the logger with that name.</li>
+<li>A <strong>handler</strong> decides <strong>where</strong> the messages go. <code>StreamHandler(sys.stdout)</code> sends them to the screen. A <code>FileHandler</code> would send them to a file. One logger can have several handlers.</li>
+<li>A <strong>formatter</strong> decides <strong>what each line looks like</strong>.</li>
+</ul>
+<div class="diagram-card"><pre><code>   logger.warning("no price ...")
+          │
+          ▼
+   ┌───────────────┐  level high enough?  ┌───────────────┐   formatter   ┌───────────────┐
+   │ logger        │ ───────────────────► │ handler(s)    │ ────────────► │ screen / file │
+   │ "shop.scraper"│        (else         │ where it goes │  what it      │               │
+   └───────────────┘      dropped)        └───────────────┘  looks like   └───────────────┘
+</code></pre></div>
+
+<p>The rest of the setup, line by line:</p>
+<ul>
+<li><code>logger.setLevel(logging.DEBUG)</code> lets every level through, for now.</li>
+<li><code>logger.handlers.clear()</code> removes any handler from a previous run of the cell, so messages don't appear twice.</li>
+<li><code>%(levelname)-8s</code>, <code>%(name)s</code> and <code>%(message)s</code> are logging's own <strong>fill-in-the-blank codes</strong>. <code>-8</code> pads the level name to 8 characters so the lines line up.</li>
+<li><code>logger.propagate = False</code> stops the message also being <strong>passed up</strong> to Python's main logger (the "root" logger). If that main logger has been given a handler of its own (for example by <code>basicConfig</code>, below), the message would otherwise be printed a second time.</li>
+<li>In a real script, the format would start with <code>%(asctime)s</code> for a <strong>timestamp</strong>. This notebook leaves it out so the output is the same every time it runs.</li>
+</ul>
+<h3 id="turning-the-volume-down">Turning the Volume Down</h3>
+<p>The level works as a <strong>threshold</strong>. Raise it, and the less important messages disappear <strong>without any code changing</strong>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
+
+<span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"parsed 3 products from page 1"</span><span class="p">)</span>       <span class="c1"># gone</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"page 1 of 3 done"</span><span class="p">)</span>                     <span class="c1"># gone</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"no price for sku 9781098139482"</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">"page 4 returned 500, giving up on it"</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">only two of the four messages got through"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>WARNING  shop.scraper | no price for sku 9781098139482
+ERROR    shop.scraper | page 4 returned 500, giving up on it
+
+only two of the four messages got through
+</code></pre></div>
+
+<p>With the level at <code>WARNING</code>, <code>debug</code> and <code>info</code> messages are dropped; <code>warning</code>, <code>error</code> and <code>critical</code> still get through.</p>
+<p><strong>Analogy:</strong> it's like the <strong>volume knob</strong> on a radio. Every station is still broadcasting, but you only hear the ones above the level you've set. Turn it back up while debugging, down again in production.</p>
+<p>This is the whole argument in one example. <strong>Every <code>print</code> you've ever deleted before sharing your code could have been a <code>logger.debug</code> you left in.</strong></p>
+<h3 id="one-logger-per-module">One Logger per Module</h3>
+<p>The usual line at the top of a module is:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+</code></pre></div>
+
+<p><code>__name__</code> is the module's name, from chapter 11. In a package called <code>shop</code>, <code>shop/scraper.py</code> gets a logger called <code>shop.scraper</code>. Loggers form a <strong>family tree</strong> based on those dotted names, so you can quieten the whole package with one call on <code>shop</code>, or turn up just the scraper.</p>
+<div class="diagram-card"><pre><code>   root
+   └── shop                ← setLevel(WARNING) here quietens everything below
+       ├── shop.scraper    ← ...unless this one has its own level, e.g. DEBUG
+       └── shop.cleaner
+</code></pre></div>
+
+<h3 id="logging-an-exception">Logging an Exception</h3>
+<p>As chapter 9 showed, <strong><code>logger.exception()</code></strong> inside an <code>except</code> block records your message <strong>and</strong> the traceback. It's one of the most useful calls in the module:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_row</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">"price"</span><span class="p">])</span>
+
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">parse_row</span><span class="p">({</span><span class="s2">"price"</span><span class="p">:</span> <span class="s2">"not a number"</span><span class="p">})</span>
+<span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">"could not parse row 12"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>ERROR    shop.scraper | could not parse row 12
+Traceback (most recent call last):
+  File "/var/folders/6t/w0q7sf4n28n8p23_b3rqs2x80000gn/T/ipykernel_58214/1405366784.py", line 9, in &lt;module&gt;
+    parse_row({"price": "not a number"})
+  File "/var/folders/6t/w0q7sf4n28n8p23_b3rqs2x80000gn/T/ipykernel_58214/1405366784.py", line 5, in parse_row
+    return float(row["price"])
+           ^^^^^^^^^^^^^^^^^^^
+ValueError: could not convert string to float: 'not a number'
+</code></pre></div>
+
+<p>The traceback is in the log, and <strong>the program carried on</strong>. (The file name in it is the temporary one Jupyter gives each notebook cell, which is why this is one of the few examples whose output will look different on your machine. Newer Python versions also draw the <code>^^^^</code> markers under the code slightly differently.)</p>
+<p><code>logger.exception</code> logs at the <code>ERROR</code> level, and only makes sense <strong>inside an <code>except</code> block</strong>, where there's an exception to attach.</p>
+<p>Compare that with <code>except ValueError: pass</code>, which chapter 9 warned <strong>leaves no evidence at all</strong>, or with <code>print("error!")</code>, which tells you nothing you can act on.</p>
+<h3 id="setting-it-up-in-a-script">Setting It Up in a Script</h3>
+<p>The setup above shows each piece separately. A real script calls <strong><code>basicConfig</code></strong> once, at the start, and every module's logger then feeds into it (chapter 9 showed this too):</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+    <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
+    <span class="nb">format</span><span class="o">=</span><span class="s2">"</span><span class="si">%(asctime)s</span><span class="s2"> </span><span class="si">%(levelname)-8s</span><span class="s2"> </span><span class="si">%(name)s</span><span class="s2"> | </span><span class="si">%(message)s</span><span class="s2">"</span><span class="p">,</span>
+    <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="s2">"scraper.log"</span><span class="p">),</span>
+              <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()],</span>          <span class="c1"># file and screen</span>
+<span class="p">)</span>
+</code></pre></div>
+
+<p>This sets the level to <code>INFO</code>, adds a timestamp to every line, and sends each message to <strong>two</strong> places at once: a file called <code>scraper.log</code> and the screen.</p>
+<p>Two rules worth following from the start:</p>
+<ul>
+<li><strong>Never log a secret</strong>, because logs get copied, emailed and sent to other services. Chapter 17 said the same about API keys.</li>
+<li><strong>Log the values you'll want later</strong>, not just the fact that something failed. Logging uses <code>%s</code> as a placeholder: <code>logger.warning("no price for sku %s", sku)</code> puts the actual sku into the message. That's useful. <code>"parse failed"</code> on its own isn't.</li>
+</ul>
+<p>(Why <code>%s</code> with a separate argument, instead of an f-string? Logging only fills in the blanks if the message is actually going to be shown, so a <code>debug</code> message that's switched off costs almost nothing. Either works; the <code>%s</code> style is the convention.)</p>
+<hr />
+<h2 id="part-5-assert-and-the-flag-that-deletes-it"><span class="h-icon"><svg class="icon"><use href="#icon-shield"></use></svg></span>Part 5: <code>assert</code>, and the Flag That Deletes It</h2>
+<p>Chapter 9 explained <code>assert</code>, and its rule: use it for <strong>things you believe are true</strong>, never for <strong>checking input</strong>. Here's a quick reminder of how it works:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">average_price</span><span class="p">(</span><span class="n">prices</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="n">prices</span><span class="p">,</span> <span class="s2">"average_price got an empty list"</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">prices</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">prices</span><span class="p">)</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="n">average_price</span><span class="p">([</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">]))</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">average_price</span><span class="p">([])</span>
+<span class="k">except</span> <span class="ne">AssertionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"AssertionError:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>15.0
+AssertionError: average_price got an empty list
+</code></pre></div>
+
+<p><code>assert prices, "..."</code> means "I'm sure <code>prices</code> isn't empty; if it is, stop with this message". With an empty list, it raised <code>AssertionError</code>.</p>
+<p>That looks like a perfectly good way to check input. Chapter 9 said it isn't, because of <strong>one flag</strong>, and promised to show you. Here it is.</p>
+<p>Running Python with <strong><code>-O</code></strong> (for "optimise") <strong>removes every assert statement</strong> from the code before it runs. It doesn't skip them, it <strong>deletes</strong> them. Here's a function whose only protection is an assert:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">notebook cell</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="o">%%</span><span class="n">writefile</span> <span class="n">reliable_demo</span><span class="o">/</span><span class="n">guard</span><span class="o">.</span><span class="n">py</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">withdraw</span><span class="p">(</span><span class="n">balance</span><span class="p">,</span> <span class="n">amount</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="n">amount</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"amount must be positive"</span>
+    <span class="k">return</span> <span class="n">balance</span> <span class="o">-</span> <span class="n">amount</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"balance after withdrawing -50:"</span><span class="p">,</span> <span class="n">withdraw</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Writing reliable_demo/guard.py
+</code></pre></div>
+
+<p>Now let's run that file twice, once normally and once with <code>-O</code>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">for</span> <span class="n">flags</span> <span class="ow">in</span> <span class="p">([],</span> <span class="p">[</span><span class="s2">"-O"</span><span class="p">]):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="o">*</span><span class="n">flags</span><span class="p">,</span> <span class="s2">"guard.py"</span><span class="p">],</span>
+                            <span class="n">cwd</span><span class="o">=</span><span class="s2">"reliable_demo"</span><span class="p">,</span> <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">label</span> <span class="o">=</span> <span class="s2">"python3 "</span> <span class="o">+</span> <span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">flags</span><span class="p">)</span> <span class="k">if</span> <span class="n">flags</span> <span class="k">else</span> <span class="s2">"python3"</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">label</span><span class="si">:</span><span class="s2">&lt;12</span><span class="si">}</span><span class="s2"> -&gt;"</span><span class="p">,</span> <span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">stdout</span> <span class="ow">or</span> <span class="n">result</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>python3      -&gt; AssertionError: amount must be positive
+python3 -O   -&gt; balance after withdrawing -50: 150
+</code></pre></div>
+
+<p>The loop runs <code>python3 guard.py</code> and then <code>python3 -O guard.py</code>, and prints the last line of whatever each one printed (its normal output, or its error).</p>
+<p>Without the flag, the guard works. With it, withdrawing <strong>minus fifty increases the balance to 150</strong>, and nothing complains.</p>
+<p><strong>Analogy:</strong> an <code>assert</code> is like a <strong>safety note pinned to a machine</strong>: "never run this with the guard off". <code>-O</code> is like a cleaner who <strong>removes every note</strong> to make the room look tidier. The machine still runs, but the warning is gone, and nobody notices until someone gets hurt.</p>
+<p>You might never use <code>-O</code> yourself, but you don't always control how your code gets run, and some setups switch it on for a small speed boost (the <code>PYTHONOPTIMIZE</code> environment variable does the same thing).</p>
+<p>So the rule is:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Use</th>
+<th>For</th>
+<th>Because</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>assert</code></td>
+<td>things you believe are already true</td>
+<td>it documents an assumption, and may vanish</td>
+</tr>
+<tr>
+<td><code>raise ValueError</code></td>
+<td>checking input from a user, a file, or a network</td>
+<td>it always runs</td>
+</tr>
+</tbody>
+</table></div>
+<p>Here's the same function, written properly:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">withdraw</span><span class="p">(</span><span class="n">balance</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">amount</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">amount</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"amount must be positive, got </span><span class="si">{</span><span class="n">amount</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">balance</span> <span class="o">-</span> <span class="n">amount</span>
+
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">withdraw</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"ValueError:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>ValueError: amount must be positive, got -50
+</code></pre></div>
+
+<p>An <code>if</code> with <code>raise</code> is ordinary code, so <code>-O</code> can't remove it. And the error message now includes the <strong>actual bad value</strong> (<code>got -50</code>), which makes it much easier to track down.</p>
+<p>Where <code>assert</code> <strong>does</strong> belong is inside <strong>tests</strong>, which is the next section, and as an internal check on something you've already validated.</p>
+<hr />
+<h2 id="part-6-testing-with-pytest"><span class="h-icon"><svg class="icon"><use href="#icon-test"></use></svg></span>Part 6: Testing with <code>pytest</code></h2>
+<p>A <strong>test</strong> is a small function that runs your code and <strong>checks the answer</strong>. <strong><code>pytest</code></strong> is a tool that finds your tests and runs them for you.</p>
+<p><strong>Analogy:</strong> tests are like the <strong>answer key</strong> a teacher uses to mark homework. Every time you change your code, you hand it in again, and the answer key instantly tells you which questions it now gets wrong. Without one, you'd have to re-check every answer by hand after every change, and you'd soon stop bothering.</p>
+<p>Its naming rules are the whole setup:</p>
+<ul>
+<li>files named <code>test_*.py</code>,</li>
+<li>functions named <code>test_*</code>,</li>
+<li>and a plain <code>assert</code> for each check.</li>
+</ul>
+<p>There's no class to inherit from and nothing to register. <code>pytest</code> finds anything that follows those names.</p>
+<p>Here's a test file for the <code>prices.py</code> we wrote in Part 2:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">notebook cell</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="o">%%</span><span class="n">writefile</span> <span class="n">reliable_demo</span><span class="o">/</span><span class="n">test_prices</span><span class="o">.</span><span class="n">py</span>
+<span class="sd">"""Tests for prices.py. Run with: pytest"""</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">prices</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_price</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_plain_number</span><span class="p">():</span>
+    <span class="k">assert</span> <span class="n">to_price</span><span class="p">(</span><span class="s2">"12.50"</span><span class="p">)</span> <span class="o">==</span> <span class="mf">12.50</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_strips_currency_and_separators</span><span class="p">():</span>
+    <span class="k">assert</span> <span class="n">to_price</span><span class="p">(</span><span class="s2">"£1,299.00"</span><span class="p">)</span> <span class="o">==</span> <span class="mf">1299.0</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_missing_price_is_none</span><span class="p">():</span>
+    <span class="k">assert</span> <span class="n">to_price</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span>
+    <span class="k">assert</span> <span class="n">to_price</span><span class="p">(</span><span class="s2">"free"</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_none_input_is_none</span><span class="p">():</span>
+    <span class="k">assert</span> <span class="n">to_price</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Writing reliable_demo/test_prices.py
+</code></pre></div>
+
+<p>Each test checks <strong>one behaviour</strong>, and its name says which: a plain number, stripping currency symbols and commas, a missing price, and <code>None</code> as input. If one fails, the name alone tells you what broke.</p>
+<p>Now let's run it. The helper below runs <code>pytest</code> the same way you would in a terminal:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">run_pytest</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="s2">"-m"</span><span class="p">,</span> <span class="s2">"pytest"</span><span class="p">,</span>
+                             <span class="s2">"--no-header"</span><span class="p">,</span> <span class="s2">"--color=no"</span><span class="p">,</span>
+                             <span class="s2">"-p"</span><span class="p">,</span> <span class="s2">"no:cacheprovider"</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">],</span>
+                            <span class="n">cwd</span><span class="o">=</span><span class="s2">"reliable_demo"</span><span class="p">,</span> <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                            <span class="n">env</span><span class="o">=</span><span class="p">{</span><span class="o">**</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">,</span> <span class="s2">"COLUMNS"</span><span class="p">:</span> <span class="s2">"80"</span><span class="p">})</span>
+    <span class="c1"># the duration is different every run, so blank it out</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">"in \d+\.\d+s"</span><span class="p">,</span> <span class="s2">"in Xs"</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">stdout</span><span class="p">))</span>
+
+
+<span class="n">run_pytest</span><span class="p">(</span><span class="s2">"test_prices.py"</span><span class="p">,</span> <span class="s2">"-q"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>....                                                                     [100%]
+4 passed in Xs
+</code></pre></div>
+
+<ul>
+<li><code>--no-header</code> and <code>--color=no</code> keep the output plain.</li>
+<li><code>-p no:cacheprovider</code> stops it leaving a cache folder behind.</li>
+<li><code>COLUMNS=80</code> fixes the width of the output.</li>
+<li><code>pytest</code> also prints how long it took, which changes every run, so the helper uses chapter 16's <code>re.sub</code> to hide that one number.</li>
+<li><code>-q</code> means "quiet": one character per test.</li>
+</ul>
+<p><strong>Four dots, four passing tests.</strong> In a terminal, that's just:</p>
+<div class="code-card term"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">terminal</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code>pytest
+</code></pre></div>
+
+<h3 id="hints-versus-tests-a-small-surprise">Hints Versus Tests: a Small Surprise</h3>
+<p>Look at the last test: <code>to_price(None)</code>. But <code>to_price</code>'s hint says <code>text: str</code>, not <code>str | None</code>. So why didn't <code>mypy</code> complain about this file? Let's ask it, with and without one extra option:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">for</span> <span class="n">extra</span> <span class="ow">in</span> <span class="p">([],</span> <span class="p">[</span><span class="s2">"--check-untyped-defs"</span><span class="p">]):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="s2">"-m"</span><span class="p">,</span> <span class="s2">"mypy"</span><span class="p">,</span> <span class="s2">"test_prices.py"</span><span class="p">,</span>
+         <span class="s2">"--no-color-output"</span><span class="p">,</span> <span class="s2">"--no-error-summary"</span><span class="p">,</span> <span class="o">*</span><span class="n">extra</span><span class="p">],</span>
+        <span class="n">cwd</span><span class="o">=</span><span class="s2">"reliable_demo"</span><span class="p">,</span> <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">label</span> <span class="o">=</span> <span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">extra</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">"plain mypy"</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">label</span><span class="si">:</span><span class="s2">&lt;22</span><span class="si">}</span><span class="s2"> -&gt;"</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">or</span> <span class="s2">"no errors reported"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>plain mypy             -&gt; no errors reported
+--check-untyped-defs   -&gt; test_prices.py:19: error: Argument 1 to "to_price" has incompatible type "None"; expected "str"  [arg-type]
+</code></pre></div>
+
+<p>Plain <code>mypy</code> reported nothing, because the test functions have <strong>no hints of their own</strong>, and by default <code>mypy</code> doesn't look inside unhinted functions (Part 2). With <code>--check-untyped-defs</code>, it checks them anyway, and spots the mismatch.</p>
+<p>Both tools are telling the truth. The <strong>test</strong> proves <code>to_price</code> copes with <code>None</code> (thanks to <code>text or ""</code>), and <strong><code>mypy</code></strong> points out that the hint doesn't admit it. The honest fix would be to change the hint to <code>text: str | None</code>, so the first line of the function says what the code really accepts. Hints and tests check different things, which is why reliable code uses both.</p>
+<h3 id="reading-a-failure">Reading a Failure</h3>
+<p>A passing test doesn't tell you much. <strong>A failing one is where the useful output is</strong>, so here's a test file with a deliberately wrong expectation in it:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">notebook cell</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="o">%%</span><span class="n">writefile</span> <span class="n">reliable_demo</span><span class="o">/</span><span class="n">test_broken</span><span class="o">.</span><span class="n">py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">prices</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_price</span><span class="p">,</span> <span class="n">total</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_total_of_two_prices</span><span class="p">():</span>
+    <span class="k">assert</span> <span class="n">total</span><span class="p">([</span><span class="mf">12.50</span><span class="p">,</span> <span class="mf">8.00</span><span class="p">])</span> <span class="o">==</span> <span class="mf">20.50</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_price_keeps_the_pence</span><span class="p">():</span>
+    <span class="k">assert</span> <span class="n">to_price</span><span class="p">(</span><span class="s2">"£19.99"</span><span class="p">)</span> <span class="o">==</span> <span class="mf">19.0</span>        <span class="c1"># wrong on purpose</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Writing reliable_demo/test_broken.py
+</code></pre></div>
+
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">run_pytest</span><span class="p">(</span><span class="s2">"test_broken.py"</span><span class="p">,</span> <span class="s2">"-q"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>.F                                                                       [100%]
+=================================== FAILURES ===================================
+__________________________ test_price_keeps_the_pence __________________________
+
+    def test_price_keeps_the_pence():
+&gt;       assert to_price("£19.99") == 19.0        # wrong on purpose
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 19.99 == 19.0
+E        +  where 19.99 = to_price('£19.99')
+
+test_broken.py:9: AssertionError
+=========================== short test summary info ============================
+FAILED test_broken.py::test_price_keeps_the_pence - AssertionError: assert 19...
+1 failed, 1 passed in Xs
+</code></pre></div>
+
+<p>How to read that output:</p>
+<ul>
+<li><code>.F</code> means the first test passed (<code>.</code>) and the second <strong>failed</strong> (<code>F</code>).</li>
+<li>Under <strong>FAILURES</strong>, <code>pytest</code> shows the test function, with <code>&gt;</code> pointing at the line that failed.</li>
+<li>The <code>E</code> lines explain <strong>why</strong>: <code>assert 19.99 == 19.0</code>. The function returned <code>19.99</code>, and the test expected <code>19.0</code>.</li>
+<li><code>+  where 19.99 = to_price('£19.99')</code> even shows <strong>which call</strong> produced that value.</li>
+<li><code>test_broken.py:9</code> is the file and line number.</li>
+<li>The <strong>short test summary</strong> at the bottom lists every failure in one line each.</li>
+</ul>
+<p><code>pytest</code> showing the actual values on both sides of <code>==</code> is a big reason people use it, and all it needs is a plain <code>assert</code>.</p>
+<p>Here, the <strong>test</strong> is wrong (<code>19.99</code> is the right answer). In real life it's usually the code, but a failing test always means "<strong>the code and the expectation disagree</strong>", and you decide which one to fix.</p>
+<h3 id="testing-that-something-raises-an-error">Testing That Something Raises an Error</h3>
+<p>The other half of testing is checking that <strong>bad input gets rejected</strong>. A test file can only import functions that live in a <code>.py</code> file, so Part 5's checked <code>withdraw</code> gets a file of its own first. Notice its docstring has a <strong>Raises</strong> section, from Part 3:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">notebook cell</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="o">%%</span><span class="n">writefile</span> <span class="n">reliable_demo</span><span class="o">/</span><span class="n">banking</span><span class="o">.</span><span class="n">py</span>
+<span class="sd">"""The validated withdraw from section 5, in a module so it can be tested."""</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">withdraw</span><span class="p">(</span><span class="n">balance</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">amount</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Return the balance after withdrawing amount.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: if amount is zero or negative.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">amount</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"amount must be positive, got </span><span class="si">{</span><span class="n">amount</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">balance</span> <span class="o">-</span> <span class="n">amount</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Writing reliable_demo/banking.py
+</code></pre></div>
+
+<p>Then <strong><code>pytest.raises</code></strong> works as a context manager, from chapter 14:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">notebook cell</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="o">%%</span><span class="n">writefile</span> <span class="n">reliable_demo</span><span class="o">/</span><span class="n">test_raises</span><span class="o">.</span><span class="n">py</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">banking</span><span class="w"> </span><span class="kn">import</span> <span class="n">withdraw</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_rejects_a_negative_amount</span><span class="p">():</span>
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+        <span class="n">withdraw</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_says_what_was_wrong</span><span class="p">():</span>
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">match</span><span class="o">=</span><span class="s2">"must be positive"</span><span class="p">):</span>
+        <span class="n">withdraw</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_a_normal_withdrawal_works</span><span class="p">():</span>
+    <span class="k">assert</span> <span class="n">withdraw</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span> <span class="o">==</span> <span class="mi">70</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Writing reliable_demo/test_raises.py
+</code></pre></div>
+
+<ul>
+<li><code>with pytest.raises(ValueError):</code> means "the code inside <strong>must</strong> raise <code>ValueError</code>". If it does, the test passes. If it doesn't, the test fails.</li>
+<li><code>match="must be positive"</code> also checks the error <strong>message</strong> contains that text (it's a regex search, from chapter 16).</li>
+<li>The third test checks the normal case still works, which matters just as much.</li>
+</ul>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">run_pytest</span><span class="p">(</span><span class="s2">"test_raises.py"</span><span class="p">,</span> <span class="s2">"-q"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>...                                                                      [100%]
+3 passed in Xs
+</code></pre></div>
+
+<p>These tests <strong>pass when the error is raised</strong>, and fail when it isn't. That's the opposite of everywhere else in this course, where an exception meant something went wrong.</p>
+<h3 id="one-test-many-cases">One Test, Many Cases</h3>
+<p>Writing the same test five times with different numbers is a quick way to get bored of testing. <strong><code>@pytest.mark.parametrize</code></strong> is a decorator (chapter 13) that runs one test <strong>once for each case</strong>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">notebook cell</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="o">%%</span><span class="n">writefile</span> <span class="n">reliable_demo</span><span class="o">/</span><span class="n">test_many</span><span class="o">.</span><span class="n">py</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">prices</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_price</span>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s2">"text, expected"</span><span class="p">,</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s2">"12.50"</span><span class="p">,</span> <span class="mf">12.50</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"£12.50"</span><span class="p">,</span> <span class="mf">12.50</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"  12.50  "</span><span class="p">,</span> <span class="mf">12.50</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"£1,299.00"</span><span class="p">,</span> <span class="mf">1299.0</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"USD 45"</span><span class="p">,</span> <span class="mf">45.0</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">""</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"free"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+    <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+<span class="p">])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_to_price</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">expected</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="n">to_price</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">==</span> <span class="n">expected</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Writing reliable_demo/test_many.py
+</code></pre></div>
+
+<ul>
+<li>The first argument, <code>"text, expected"</code>, names the test's parameters.</li>
+<li>The list holds one tuple per case: the input text, and the expected result.</li>
+<li><code>pytest</code> calls <code>test_to_price</code> eight times, once with each pair.</li>
+</ul>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">run_pytest</span><span class="p">(</span><span class="s2">"test_many.py"</span><span class="p">,</span> <span class="s2">"-v"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>============================= test session starts ==============================
+collecting ... collected 8 items
+
+test_many.py::test_to_price[12.50-12.5] PASSED                           [ 12%]
+test_many.py::test_to_price[\xa312.50-12.5] PASSED                       [ 25%]
+test_many.py::test_to_price[  12.50  -12.5] PASSED                       [ 37%]
+test_many.py::test_to_price[\xa31,299.00-1299.0] PASSED                  [ 50%]
+test_many.py::test_to_price[USD 45-45.0] PASSED                          [ 62%]
+test_many.py::test_to_price[-None] PASSED                                [ 75%]
+test_many.py::test_to_price[free-None] PASSED                            [ 87%]
+test_many.py::test_to_price[None-None] PASSED                            [100%]
+
+============================== 8 passed in Xs ===============================
+</code></pre></div>
+
+<p><code>-v</code> means "verbose": one line per test. Eight cases, one test function, and <strong>each case is named in the output</strong> (in square brackets), so a failure tells you exactly which input broke. The <code>\xa3</code> in two of those names is <code>pytest</code> writing <code>£</code> in a safe, plain-text form.</p>
+<p><strong>Analogy:</strong> parametrize is like a <strong>mail merge</strong>: one letter template, many names and addresses, and a separate letter printed for each.</p>
+<h3 id="running-everything">Running Everything</h3>
+<p>With no filename, <code>pytest</code> finds and runs <strong>every</strong> <code>test_*.py</code> file in the folder. That includes the broken one, on purpose:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">run_pytest</span><span class="p">(</span><span class="s2">"-q"</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>.F...............                                                        [100%]
+=================================== FAILURES ===================================
+__________________________ test_price_keeps_the_pence __________________________
+
+    def test_price_keeps_the_pence():
+&gt;       assert to_price("£19.99") == 19.0        # wrong on purpose
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 19.99 == 19.0
+E        +  where 19.99 = to_price('£19.99')
+
+test_broken.py:9: AssertionError
+=========================== short test summary info ============================
+FAILED test_broken.py::test_price_keeps_the_pence - AssertionError: assert 19...
+1 failed, 16 passed in Xs
+</code></pre></div>
+
+<p>17 tests in total: four in <code>test_prices.py</code>, two in <code>test_broken.py</code>, three in <code>test_raises.py</code> and eight in <code>test_many.py</code>. Three files pass, one has a failure, and the summary at the bottom tells you exactly where to look.</p>
+<h3 id="whats-worth-testing">What's Worth Testing</h3>
+<p>You can't test everything, and trying to is how people give up on testing. Aim at:</p>
+<ul>
+<li><strong>The edge cases you've already thought about.</strong> Empty input, <code>None</code>, zero, a missing field. Chapter 18's missing price is a test waiting to be written.</li>
+<li><strong>Anything you've fixed once.</strong> A test written the day you fix a bug stops that bug coming back. (This is often called a <strong>regression test</strong>: it catches the code going backwards.)</li>
+<li><strong>The parts with rules in them.</strong> Parsing, validation, calculations. Not the code that just connects things together.</li>
+</ul>
+<p>What <strong>not</strong> to test: the standard library (it's already well tested), the network (fake it or use a saved response, as chapter 17 did with <code>sample_data/</code>), and things whose answer keeps changing, like the current time.</p>
+<hr />
+<h2 id="part-7-when-it-breaks-anyway"><span class="h-icon"><svg class="icon"><use href="#icon-bug"></use></svg></span>Part 7: When It Breaks Anyway</h2>
+<h3 id="reading-a-traceback">Reading a Traceback</h3>
+<p>A <strong>traceback</strong> is the report Python prints when an error stops the program. Read it <strong>from the bottom up</strong>. The bottom line is the <strong>error</strong>. Above it is the call that caused it, and above that, the call that made that call.</p>
+<p>Here's a small program with a hidden problem:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">notebook cell</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="o">%%</span><span class="n">writefile</span> <span class="n">reliable_demo</span><span class="o">/</span><span class="n">report</span><span class="o">.</span><span class="n">py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">prices</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_price</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">load_prices</span><span class="p">(</span><span class="n">rows</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">to_price</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">"price"</span><span class="p">])</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">report</span><span class="p">(</span><span class="n">rows</span><span class="p">):</span>
+    <span class="n">prices</span> <span class="o">=</span> <span class="n">load_prices</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">prices</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">prices</span><span class="p">)</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="n">report</span><span class="p">([{</span><span class="s2">"price"</span><span class="p">:</span> <span class="s2">"£12.50"</span><span class="p">},</span> <span class="p">{</span><span class="s2">"price"</span><span class="p">:</span> <span class="s2">"free"</span><span class="p">}]))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Writing reliable_demo/report.py
+</code></pre></div>
+
+<p>And here's what happens when it runs:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="n">result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="s2">"report.py"</span><span class="p">],</span>
+                        <span class="n">cwd</span><span class="o">=</span><span class="s2">"reliable_demo"</span><span class="p">,</span> <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Python reports absolute paths; shorten them so this reads like your own screen</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">())</span> <span class="o">+</span> <span class="s2">"/"</span><span class="p">,</span> <span class="s2">""</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="output-card"><pre><code>Traceback (most recent call last):
+  File "reliable_demo/report.py", line 13, in &lt;module&gt;
+    print(report([{"price": "£12.50"}, {"price": "free"}]))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "reliable_demo/report.py", line 10, in report
+    return sum(prices) / len(prices)
+           ^^^^^^^^^^^
+TypeError: unsupported operand type(s) for +: 'float' and 'NoneType'
+</code></pre></div>
+
+<p>(The cell shortens the file paths so the output looks like your own screen. Newer Python versions also show this traceback in colour and draw the markers under the code slightly differently, but the content is the same.)</p>
+<p>Read it in the order it happened:</p>
+<ol>
+<li>The <strong>last line</strong> says what went wrong: <code>unsupported operand type(s) for +: 'float' and 'NoneType'</code>. Something tried to add a float and <code>None</code>.</li>
+<li>The <strong>frame above it</strong> (each <code>File ... line ...</code> pair is called a <strong>frame</strong>) shows <code>sum(prices)</code>, so <code>prices</code> contains a <code>None</code>.</li>
+<li>The <strong>frame above that</strong> is just the call at the bottom of the file.</li>
+</ol>
+<div class="diagram-card"><pre><code>   Traceback (most recent call last):
+     File "report.py", line 13, in &lt;module&gt;   ← 3. who called report()
+     File "report.py", line 10, in report     ← 2. the line that crashed: sum(prices)
+   TypeError: ... 'float' and 'NoneType'      ← 1. START HERE: what went wrong
+
+   not shown: load_prices() ── it already finished, after putting None in the list
+</code></pre></div>
+
+<p>Now notice what's <strong>not</strong> there. <code>load_prices</code> doesn't appear in the traceback at all, and <code>load_prices</code> is where the <code>None</code> came from. <code>to_price("free")</code> returned <code>None</code>, exactly as its docstring said it would, and <code>load_prices</code> put it in the list and finished without any problem.</p>
+<p>That's worth remembering about tracebacks: <strong>they show you where the program crashed, not where the mistake was made.</strong> The frames tell you which calls were <strong>still running</strong>. The mistake is often in a function that had <strong>already finished</strong>.</p>
+<p><strong>Analogy:</strong> a traceback is like finding a <strong>flat tyre</strong>. It tells you exactly where the car stopped. It doesn't tell you where you drove over the nail, which might have been ten kilometres earlier.</p>
+<p>Two habits make tracebacks much easier:</p>
+<ul>
+<li><strong>Read the last line first</strong>, then look for the highest frame <strong>in your own code</strong>, skipping frames inside libraries (their file paths usually contain <code>site-packages</code>).</li>
+<li><strong>Don't paste the error into a search engine before reading it.</strong> It usually tells you exactly what's wrong.</li>
+</ul>
+<h3 id="breakpoint"><code>breakpoint()</code></h3>
+<p>Putting <code>print</code> everywhere works. <strong>Pausing the program and looking around</strong> works better. <code>breakpoint()</code> stops the program at that line and opens Python's debugger, called <strong>pdb</strong>:</p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">report</span><span class="p">(</span><span class="n">rows</span><span class="p">):</span>
+    <span class="n">prices</span> <span class="o">=</span> <span class="n">load_prices</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+    <span class="nb">breakpoint</span><span class="p">()</span>                  <span class="c1"># execution stops here</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">prices</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">prices</span><span class="p">)</span>
+</code></pre></div>
+
+<p>The debugger <strong>waits for you to type commands</strong>, so it isn't included as a runnable example here: an automated run would just sit there waiting. In a script run from a terminal, you get a <strong><code>(Pdb)</code> prompt</strong>, with the program paused and every local variable available to look at. (In Jupyter, the same prompt appears as an input box under the cell.)</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>p prices</code></td>
+<td>print an expression</td>
+</tr>
+<tr>
+<td><code>n</code></td>
+<td>run the next line</td>
+</tr>
+<tr>
+<td><code>s</code></td>
+<td>step into the function being called</td>
+</tr>
+<tr>
+<td><code>c</code></td>
+<td>continue until the next breakpoint or the end</td>
+</tr>
+<tr>
+<td><code>l</code></td>
+<td>list the code around where you are</td>
+</tr>
+<tr>
+<td><code>w</code></td>
+<td>show the stack, the same frames as a traceback</td>
+</tr>
+<tr>
+<td><code>q</code></td>
+<td>quit</td>
+</tr>
+</tbody>
+</table></div>
+<p>Typing <code>p prices</code> at that prompt would have shown <code>[12.5, None]</code> straight away, and that's the whole investigation done.</p>
+<p><strong>Analogy:</strong> <code>print</code> debugging is like putting <strong>security cameras</strong> around a building and watching the footage afterwards. A debugger is like <strong>pausing time</strong> and walking around the building yourself, opening any drawer you want.</p>
+<p>In VS Code or PyCharm, the same thing is a <strong>red dot you click in the margin</strong> (a breakpoint), and the variables appear in a panel. Either way, the skill is the same: <strong>stop close to the problem and look at the actual values.</strong></p>
+<p>Remember to remove <code>breakpoint()</code> calls when you're done. (Setting the environment variable <code>PYTHONBREAKPOINT=0</code> also switches them all off, which is a useful safety net.)</p>
+<hr />
+<h2 id="part-8-pep-8-briefly"><span class="h-icon"><svg class="icon"><use href="#icon-style"></use></svg></span>Part 8: PEP 8, Briefly</h2>
+<p><strong>PEP 8</strong> is Python's official <strong>style guide</strong>. ("PEP" stands for Python Enhancement Proposal: the documents in which changes and conventions for Python are written down.) Following it matters for one main reason: <strong>code that looks like every other Python project is code other people can read quickly</strong>.</p>
+<p><strong>Analogy:</strong> it's like the <strong>rules of the road</strong>. Driving on the left or the right isn't better in itself, but everyone agreeing on one makes traffic flow. Consistent style lets readers focus on what the code does, not on how it's laid out.</p>
+<p>The parts that come up all the time:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Topic</th>
+<th>Rule</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Indentation</td>
+<td>4 spaces, never tabs</td>
+</tr>
+<tr>
+<td>Line length</td>
+<td>79 characters, or whatever your team agreed</td>
+</tr>
+<tr>
+<td>Functions and variables</td>
+<td><code>lower_case_with_underscores</code></td>
+</tr>
+<tr>
+<td>Classes</td>
+<td><code>CapWords</code></td>
+</tr>
+<tr>
+<td>Constants</td>
+<td><code>ALL_CAPS</code></td>
+</tr>
+<tr>
+<td>Imports</td>
+<td>standard library, then third party, then yours, each group separated</td>
+</tr>
+<tr>
+<td>Blank lines</td>
+<td>two between top-level definitions, one between methods</td>
+</tr>
+<tr>
+<td>Spaces</td>
+<td><code>x = 1</code> and <code>f(a, b)</code>, not <code>x=1</code> or <code>f( a,b )</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Nobody applies this by hand. <strong><code>black</code></strong> reformats a file into a consistent style, and <strong><code>ruff</code></strong> finds problems (unused imports, undefined names, style issues), and both are very fast:</p>
+<div class="code-card term"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">terminal</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code>python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>black<span class="w"> </span>ruff
+black<span class="w"> </span>your_package/
+ruff<span class="w"> </span>check<span class="w"> </span>your_package/
+</code></pre></div>
+
+<p>Run them before you commit and you'll never argue about formatting again. <strong>The naming rules are the part worth memorising</strong>, because no formatter will rename anything for you.</p>
+<hr />
+<h2 id="part-9-common-mistakes"><span class="h-icon"><svg class="icon"><use href="#icon-warn"></use></svg></span>Part 9: Common Mistakes</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Mistake</th>
+<th>What happens</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Expecting hints to be enforced</td>
+<td>A wrong type runs happily</td>
+<td>Run <code>mypy</code></td>
+</tr>
+<tr>
+<td><code>assert</code> for validating input</td>
+<td><code>-O</code> deletes the check in production</td>
+<td><code>raise ValueError</code></td>
+</tr>
+<tr>
+<td><code>print</code> for diagnostics</td>
+<td>Nothing recorded, no levels, no source</td>
+<td><code>logging</code></td>
+</tr>
+<tr>
+<td><code>except: pass</code></td>
+<td>The failure leaves no trace at all</td>
+<td><code>logger.exception(...)</code></td>
+</tr>
+<tr>
+<td>Logging a key or a token</td>
+<td>Secrets end up in files and log services</td>
+<td>Log the request, never the credential</td>
+</tr>
+<tr>
+<td><code>logger.error("failed")</code></td>
+<td>True, and useless</td>
+<td>Log the values you will want</td>
+</tr>
+<tr>
+<td>Testing only the happy path</td>
+<td>The empty and <code>None</code> cases break in production</td>
+<td>Test the edges first</td>
+</tr>
+<tr>
+<td>Tests that call the network</td>
+<td>Slow, and they fail when the site is down</td>
+<td>Use a saved response</td>
+</tr>
+<tr>
+<td>Reading a traceback top down</td>
+<td>You start in library code you did not write</td>
+<td>Last line first, then your own frames</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="quick-reference-summary"><span class="h-icon"><svg class="icon"><use href="#icon-table"></use></svg></span>Quick Reference Summary</h2>
+<p><strong>Type hints</strong></p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">to_price</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse</span><span class="p">(</span><span class="n">rows</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span> <span class="o">...</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">rows</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
+</code></pre></div>
+
+<div class="code-card term"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">terminal</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code>python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>mypy
+mypy<span class="w"> </span>your_package/<span class="w">            </span><span class="c1"># hints are checked here, never when the code runs</span>
+</code></pre></div>
+
+<p><strong>Docstring</strong></p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">to_price</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Return the number in a price string, or None if there is not one.</span>
+
+<span class="sd">    Strips currency symbols and separators, so "£1,299.00" becomes 1299.0.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        TypeError: if text is neither a string nor None.</span>
+<span class="sd">    """</span>
+</code></pre></div>
+
+<p><strong>Logging</strong></p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"detail while developing"</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"normal progress"</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"odd, but carried on"</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">"this piece of work failed"</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">"same as error, plus the traceback"</span><span class="p">)</span>   <span class="c1"># inside except only</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
+                    <span class="nb">format</span><span class="o">=</span><span class="s2">"</span><span class="si">%(asctime)s</span><span class="s2"> </span><span class="si">%(levelname)-8s</span><span class="s2"> </span><span class="si">%(name)s</span><span class="s2"> | </span><span class="si">%(message)s</span><span class="s2">"</span><span class="p">)</span>
+</code></pre></div>
+
+<p><strong><code>assert</code> versus <code>raise</code></strong></p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>            <span class="c1"># an assumption. -O deletes this.</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">rows</span><span class="p">:</span>                    <span class="c1"># a check. always runs.</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"no rows"</span><span class="p">)</span>
+</code></pre></div>
+
+<p><strong>pytest</strong></p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="c1"># test_prices.py</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">prices</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_price</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">banking</span><span class="w"> </span><span class="kn">import</span> <span class="n">withdraw</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_plain_number</span><span class="p">():</span>
+    <span class="k">assert</span> <span class="n">to_price</span><span class="p">(</span><span class="s2">"12.50"</span><span class="p">)</span> <span class="o">==</span> <span class="mf">12.50</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_rejects_negatives</span><span class="p">():</span>
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">match</span><span class="o">=</span><span class="s2">"must be positive"</span><span class="p">):</span>
+        <span class="n">withdraw</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">)</span>
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s2">"text, expected"</span><span class="p">,</span> <span class="p">[(</span><span class="s2">"12.50"</span><span class="p">,</span> <span class="mf">12.5</span><span class="p">),</span> <span class="p">(</span><span class="s2">"free"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_cases</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">expected</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="n">to_price</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">==</span> <span class="n">expected</span>
+</code></pre></div>
+
+<div class="code-card term"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">terminal</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code>pytest<span class="w">                  </span><span class="c1"># everything</span>
+pytest<span class="w"> </span>-v<span class="w">               </span><span class="c1"># one line per test</span>
+pytest<span class="w"> </span>test_prices.py<span class="w">   </span><span class="c1"># one file</span>
+pytest<span class="w"> </span>-k<span class="w"> </span>price<span class="w">         </span><span class="c1"># tests whose name contains "price"</span>
+pytest<span class="w"> </span>-x<span class="w">               </span><span class="c1"># stop at the first failure</span>
+</code></pre></div>
+
+<p><strong>Debugging</strong></p>
+<div class="code-card"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">python</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code><span class="nb">breakpoint</span><span class="p">()</span>            <span class="c1"># then: p name, n, s, c, l, w, q</span>
+</code></pre></div>
+
+<p>Read tracebacks from the bottom up. Last line first, then your own frames.</p>
+<p><strong>Style</strong></p>
+<div class="code-card term"><div class="code-head"><div class="dots"><span></span><span></span><span></span></div><span class="lang">terminal</span><button class="copy-btn" type="button"><svg class="icon"><use href="#icon-copy"></use></svg>Copy</button></div><pre><code>black<span class="w"> </span>your_package/<span class="w">     </span><span class="c1"># reformat</span>
+ruff<span class="w"> </span>check<span class="w"> </span>your_package/<span class="w">   </span><span class="c1"># find problems</span>
+</code></pre></div>
+
+      <div class="article-end">
+        <p><strong>Reliable code is code that tells the truth about itself and leaves evidence behind: type hints and docstrings say what a function expects and returns (and <code>mypy</code> checks the hints, because Python won't), logging records what happened at the right level of detail, <code>raise</code> guards your inputs where <code>assert</code> might vanish, <code>pytest</code> proves the behaviour you care about and keeps proving it after every change, and a traceback read from the bottom up (plus <code>breakpoint()</code> when that isn't enough) shows you where to look.</strong> Next up, chapter 20 is the final project. One program, built from everything in chapters 1 to 19: it walks a shop's pages with a generator, cleans the fields with regex, rejects bad rows with custom exceptions, models books with a dataclass, and is logged, type-hinted and tested. It ends with a tidy dataset, ready for the NumPy and pandas course that comes next.</p>
+      </div>
+    </main>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="f-left">Python Programming Series &nbsp;/&nbsp; Article 19 of the course</div>
+  <div class="f-right"><a href="#top">Back to top ↑</a></div>
+</footer>
+<script>
+(function(){
+  var t=document.getElementById('navToggle'),s=document.getElementById('sidebar');
+  if(t&&s){t.addEventListener('click',function(){s.classList.toggle('open');var o=s.classList.contains('open');t.innerHTML=o?'<svg class="icon"><use href="#icon-close"></use></svg>':'<svg class="icon"><use href="#icon-menu"></use></svg>';});s.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){s.classList.remove('open');t.innerHTML='<svg class="icon"><use href="#icon-menu"></use></svg>';});});}
+  var tl=Array.prototype.slice.call(document.querySelectorAll('.toc a')),sc=tl.map(function(a){return document.getElementById(a.getAttribute('href').slice(1));}).filter(Boolean);
+  if('IntersectionObserver' in window&&sc.length){var bi={};tl.forEach(function(a){bi[a.getAttribute('href').slice(1)]=a;});var obs=new IntersectionObserver(function(es){es.forEach(function(e){var l=bi[e.target.id];if(!l)return;if(e.isIntersecting){tl.forEach(function(a){a.classList.remove('active');});l.classList.add('active');}});},{rootMargin:'-15% 0px -70% 0px',threshold:0});sc.forEach(function(s){obs.observe(s);});}
+  document.querySelectorAll('.code-card').forEach(function(c){var b=c.querySelector('.copy-btn'),e=c.querySelector('code');if(!b||!e)return;b.addEventListener('click',function(){var tx=e.innerText,done=function(){var o=b.innerHTML;b.innerHTML='<svg class="icon"><use href="#icon-check"></use></svg> Copied';setTimeout(function(){b.innerHTML=o;},1600);};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(tx).then(done,done);else{var ta=document.createElement('textarea');ta.value=tx;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(x){}document.body.removeChild(ta);done();}});});
+})();
+</script>
+</body>
+</html>
