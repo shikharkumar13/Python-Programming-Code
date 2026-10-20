@@ -117,12 +117,12 @@ The constructs you meet the moment you read real code, and the tooling around th
 
 | # | Chapter | Cells | Notebook | Article |
 |--:|---------|------:|----------|---------|
-| 11 | **Modules and Virtual Environments**<br><sub>`import` machinery, writing modules, packages, terminal, venv, pip, import errors, layout</sub> | 105 | [open](./11.%20Modules%20and%20Virtual%20Environments.ipynb) | _in progress_ |
-| 12 | **Iterators and Generators**<br><sub>Iterator protocol, `yield`, laziness, generator expressions</sub> | 108 | [open](./12.%20Iterators%20and%20Generators.ipynb) | _in progress_ |
-| 13 | **Closures and Decorators**<br><sub>First-class functions, closures, `@`, `functools`, decorator factories</sub> | 102 | [open](./13.%20Closures%20and%20Decorators.ipynb) | _in progress_ |
-| 14 | **Context Managers**<br><sub>`__enter__`/`__exit__`, `@contextmanager`, `suppress`, `ExitStack`</sub> | 98 | [open](./14.%20Context%20Managers.ipynb) | _in progress_ |
-| 15 | **The Standard Library Toolkit**<br><sub>`collections`, `itertools`, `functools`, `datetime`</sub> | 127 | [open](./15.%20The%20Standard%20Library%20Toolkit.ipynb) | _in progress_ |
-| 16 | **Regular Expressions**<br><sub>Raw strings, character classes, groups, greedy vs lazy, `re.escape`</sub> | 97 | [open](./16.%20Regular%20Expressions.ipynb) | _in progress_ |
+| 11 | **Modules and Virtual Environments**<br><sub>`import` machinery, writing modules, packages, terminal, venv, pip, import errors, layout</sub> | 105 | [open](./11.%20Modules%20and%20Virtual%20Environments.ipynb) | [read](https://shikharkumar13.github.io/Python-Programming-Code/11_Modules_Virtual_Environments.html) |
+| 12 | **Iterators and Generators**<br><sub>Iterator protocol, `yield`, laziness, generator expressions</sub> | 108 | [open](./12.%20Iterators%20and%20Generators.ipynb) | [read](https://shikharkumar13.github.io/Python-Programming-Code/12_Iterators_Generators.html) |
+| 13 | **Closures and Decorators**<br><sub>First-class functions, closures, `@`, `functools`, decorator factories</sub> | 102 | [open](./13.%20Closures%20and%20Decorators.ipynb) | [read](https://shikharkumar13.github.io/Python-Programming-Code/13_Closures_Decorators.html) |
+| 14 | **Context Managers**<br><sub>`__enter__`/`__exit__`, `@contextmanager`, `suppress`, `ExitStack`</sub> | 98 | [open](./14.%20Context%20Managers.ipynb) | [read](https://shikharkumar13.github.io/Python-Programming-Code/14_Context_Managers.html) |
+| 15 | **The Standard Library Toolkit**<br><sub>`collections`, `itertools`, `functools`, `datetime`</sub> | 127 | [open](./15.%20The%20Standard%20Library%20Toolkit.ipynb) | [read](https://shikharkumar13.github.io/Python-Programming-Code/15_Standard_Library_Toolkit.html) |
+| 16 | **Regular Expressions**<br><sub>Raw strings, character classes, groups, greedy vs lazy, `re.escape`</sub> | 97 | [open](./16.%20Regular%20Expressions.ipynb) | [read](https://shikharkumar13.github.io/Python-Programming-Code/16_Regular_Expressions.html) |
 
 ### Part III: Working with real data (chapters 17 to 20)
 
@@ -130,10 +130,10 @@ Getting data from the network, and shipping code that survives contact with it.
 
 | # | Chapter | Cells | Notebook | Article |
 |--:|---------|------:|----------|---------|
-| 17 | **Working with APIs**<br><sub>HTTP verbs, status codes, timeouts, retries, keys, pagination</sub> | 69 | [open](./17.%20Working%20with%20APIs.ipynb) | _in progress_ |
-| 18 | **Web Scraping**<br><sub>`robots.txt`, BeautifulSoup, selectors, tables, encoding, ethics</sub> | 65 | [open](./18.%20Web%20Scraping.ipynb) | _in progress_ |
-| 19 | **Writing Reliable Code**<br><sub>Type hints, `mypy`, docstrings, `logging`, `pytest`, tracebacks</sub> | 59 | [open](./19.%20Writing%20Reliable%20Code.ipynb) | _in progress_ |
-| 20 | **Capstone Project**<br><sub>End-to-end pipeline: package, tests, validation, CSV and JSON output</sub> | 44 | [open](./20.%20Capstone%20Project.ipynb) | _in progress_ |
+| 17 | **Working with APIs**<br><sub>HTTP verbs, status codes, timeouts, retries, keys, pagination</sub> | 69 | [open](./17.%20Working%20with%20APIs.ipynb) | [read](https://shikharkumar13.github.io/Python-Programming-Code/17_Working_with_APIs.html) |
+| 18 | **Web Scraping**<br><sub>`robots.txt`, BeautifulSoup, selectors, tables, encoding, ethics</sub> | 65 | [open](./18.%20Web%20Scraping.ipynb) | [read](https://shikharkumar13.github.io/Python-Programming-Code/18_Web_Scraping.html) |
+| 19 | **Writing Reliable Code**<br><sub>Type hints, `mypy`, docstrings, `logging`, `pytest`, tracebacks</sub> | 59 | [open](./19.%20Writing%20Reliable%20Code.ipynb) | [read](https://shikharkumar13.github.io/Python-Programming-Code/19_Writing_Reliable_Code.html) |
+| 20 | **Capstone Project**<br><sub>End-to-end pipeline: package, tests, validation, CSV and JSON output</sub> | 44 | [open](./20.%20Capstone%20Project.ipynb) |
 
 ---
 
